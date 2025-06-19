@@ -495,9 +495,6 @@ func PublicOfferingDataSourceSchema(ctx context.Context) schema.Schema {
 						Description:         "If set, it will be used as a latest date for resource termination",
 						MarkdownDescription: "If set, it will be used as a latest date for resource termination",
 					},
-					"managed_rancher_load_balancer_cloud_init_template": schema.StringAttribute{
-						Computed: true,
-					},
 					"managed_rancher_load_balancer_data_volume_size_gb": schema.Int64Attribute{
 						Computed: true,
 					},
@@ -7286,24 +7283,6 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 			fmt.Sprintf(`latest_date_for_resource_termination expected to be basetypes.StringValue, was: %T`, latestDateForResourceTerminationAttribute))
 	}
 
-	managedRancherLoadBalancerCloudInitTemplateAttribute, ok := attributes["managed_rancher_load_balancer_cloud_init_template"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`managed_rancher_load_balancer_cloud_init_template is missing from object`)
-
-		return nil, diags
-	}
-
-	managedRancherLoadBalancerCloudInitTemplateVal, ok := managedRancherLoadBalancerCloudInitTemplateAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`managed_rancher_load_balancer_cloud_init_template expected to be basetypes.StringValue, was: %T`, managedRancherLoadBalancerCloudInitTemplateAttribute))
-	}
-
 	managedRancherLoadBalancerDataVolumeSizeGbAttribute, ok := attributes["managed_rancher_load_balancer_data_volume_size_gb"]
 
 	if !ok {
@@ -7739,7 +7718,6 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 		InitialUsergroupNumber:                         initialUsergroupNumberVal,
 		IsResourceTerminationDateRequired:              isResourceTerminationDateRequiredVal,
 		LatestDateForResourceTermination:               latestDateForResourceTerminationVal,
-		ManagedRancherLoadBalancerCloudInitTemplate:    managedRancherLoadBalancerCloudInitTemplateVal,
 		ManagedRancherLoadBalancerDataVolumeSizeGb:     managedRancherLoadBalancerDataVolumeSizeGbVal,
 		ManagedRancherLoadBalancerDataVolumeTypeName:   managedRancherLoadBalancerDataVolumeTypeNameVal,
 		ManagedRancherLoadBalancerFlavorName:           managedRancherLoadBalancerFlavorNameVal,
@@ -8118,24 +8096,6 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 			fmt.Sprintf(`latest_date_for_resource_termination expected to be basetypes.StringValue, was: %T`, latestDateForResourceTerminationAttribute))
 	}
 
-	managedRancherLoadBalancerCloudInitTemplateAttribute, ok := attributes["managed_rancher_load_balancer_cloud_init_template"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`managed_rancher_load_balancer_cloud_init_template is missing from object`)
-
-		return NewPluginOptionsValueUnknown(), diags
-	}
-
-	managedRancherLoadBalancerCloudInitTemplateVal, ok := managedRancherLoadBalancerCloudInitTemplateAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`managed_rancher_load_balancer_cloud_init_template expected to be basetypes.StringValue, was: %T`, managedRancherLoadBalancerCloudInitTemplateAttribute))
-	}
-
 	managedRancherLoadBalancerDataVolumeSizeGbAttribute, ok := attributes["managed_rancher_load_balancer_data_volume_size_gb"]
 
 	if !ok {
@@ -8571,7 +8531,6 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 		InitialUsergroupNumber:                         initialUsergroupNumberVal,
 		IsResourceTerminationDateRequired:              isResourceTerminationDateRequiredVal,
 		LatestDateForResourceTermination:               latestDateForResourceTerminationVal,
-		ManagedRancherLoadBalancerCloudInitTemplate:    managedRancherLoadBalancerCloudInitTemplateVal,
 		ManagedRancherLoadBalancerDataVolumeSizeGb:     managedRancherLoadBalancerDataVolumeSizeGbVal,
 		ManagedRancherLoadBalancerDataVolumeTypeName:   managedRancherLoadBalancerDataVolumeTypeNameVal,
 		ManagedRancherLoadBalancerFlavorName:           managedRancherLoadBalancerFlavorNameVal,
@@ -8683,7 +8642,6 @@ type PluginOptionsValue struct {
 	InitialUsergroupNumber                         basetypes.Int64Value  `tfsdk:"initial_usergroup_number"`
 	IsResourceTerminationDateRequired              basetypes.BoolValue   `tfsdk:"is_resource_termination_date_required"`
 	LatestDateForResourceTermination               basetypes.StringValue `tfsdk:"latest_date_for_resource_termination"`
-	ManagedRancherLoadBalancerCloudInitTemplate    basetypes.StringValue `tfsdk:"managed_rancher_load_balancer_cloud_init_template"`
 	ManagedRancherLoadBalancerDataVolumeSizeGb     basetypes.Int64Value  `tfsdk:"managed_rancher_load_balancer_data_volume_size_gb"`
 	ManagedRancherLoadBalancerDataVolumeTypeName   basetypes.StringValue `tfsdk:"managed_rancher_load_balancer_data_volume_type_name"`
 	ManagedRancherLoadBalancerFlavorName           basetypes.StringValue `tfsdk:"managed_rancher_load_balancer_flavor_name"`
@@ -8711,7 +8669,7 @@ type PluginOptionsValue struct {
 }
 
 func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 40)
+	attrTypes := make(map[string]tftypes.Type, 39)
 
 	var val tftypes.Value
 	var err error
@@ -8732,7 +8690,6 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 	attrTypes["initial_usergroup_number"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["is_resource_termination_date_required"] = basetypes.BoolType{}.TerraformType(ctx)
 	attrTypes["latest_date_for_resource_termination"] = basetypes.StringType{}.TerraformType(ctx)
-	attrTypes["managed_rancher_load_balancer_cloud_init_template"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["managed_rancher_load_balancer_data_volume_size_gb"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["managed_rancher_load_balancer_data_volume_type_name"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["managed_rancher_load_balancer_flavor_name"] = basetypes.StringType{}.TerraformType(ctx)
@@ -8763,7 +8720,7 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 40)
+		vals := make(map[string]tftypes.Value, 39)
 
 		val, err = v.AutoApproveInServiceProviderProjects.ToTerraformValue(ctx)
 
@@ -8892,14 +8849,6 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 		}
 
 		vals["latest_date_for_resource_termination"] = val
-
-		val, err = v.ManagedRancherLoadBalancerCloudInitTemplate.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["managed_rancher_load_balancer_cloud_init_template"] = val
 
 		val, err = v.ManagedRancherLoadBalancerDataVolumeSizeGb.ToTerraformValue(ctx)
 
@@ -9144,7 +9093,6 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 			"initial_usergroup_number":                              basetypes.Int64Type{},
 			"is_resource_termination_date_required":                 basetypes.BoolType{},
 			"latest_date_for_resource_termination":                  basetypes.StringType{},
-			"managed_rancher_load_balancer_cloud_init_template":     basetypes.StringType{},
 			"managed_rancher_load_balancer_data_volume_size_gb":     basetypes.Int64Type{},
 			"managed_rancher_load_balancer_data_volume_type_name":   basetypes.StringType{},
 			"managed_rancher_load_balancer_flavor_name":             basetypes.StringType{},
@@ -9159,7 +9107,7 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 			"managed_rancher_worker_system_volume_type_name":        basetypes.StringType{},
 			"max_instances":                                         basetypes.Int64Type{},
 			"max_resource_termination_offset_in_days":               basetypes.Int64Type{},
-			"max_volumes": basetypes.Int64Type{},
+			"max_volumes":                                           basetypes.Int64Type{},
 			"openstack_offering_uuid_list": basetypes.ListType{
 				ElemType: types.StringType,
 			},
@@ -9190,7 +9138,6 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 		"initial_usergroup_number":                              basetypes.Int64Type{},
 		"is_resource_termination_date_required":                 basetypes.BoolType{},
 		"latest_date_for_resource_termination":                  basetypes.StringType{},
-		"managed_rancher_load_balancer_cloud_init_template":     basetypes.StringType{},
 		"managed_rancher_load_balancer_data_volume_size_gb":     basetypes.Int64Type{},
 		"managed_rancher_load_balancer_data_volume_type_name":   basetypes.StringType{},
 		"managed_rancher_load_balancer_flavor_name":             basetypes.StringType{},
@@ -9205,7 +9152,7 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 		"managed_rancher_worker_system_volume_type_name":        basetypes.StringType{},
 		"max_instances":                                         basetypes.Int64Type{},
 		"max_resource_termination_offset_in_days":               basetypes.Int64Type{},
-		"max_volumes": basetypes.Int64Type{},
+		"max_volumes":                                           basetypes.Int64Type{},
 		"openstack_offering_uuid_list": basetypes.ListType{
 			ElemType: types.StringType,
 		},
@@ -9245,7 +9192,6 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 			"initial_usergroup_number":                              v.InitialUsergroupNumber,
 			"is_resource_termination_date_required":                 v.IsResourceTerminationDateRequired,
 			"latest_date_for_resource_termination":                  v.LatestDateForResourceTermination,
-			"managed_rancher_load_balancer_cloud_init_template":     v.ManagedRancherLoadBalancerCloudInitTemplate,
 			"managed_rancher_load_balancer_data_volume_size_gb":     v.ManagedRancherLoadBalancerDataVolumeSizeGb,
 			"managed_rancher_load_balancer_data_volume_type_name":   v.ManagedRancherLoadBalancerDataVolumeTypeName,
 			"managed_rancher_load_balancer_flavor_name":             v.ManagedRancherLoadBalancerFlavorName,
@@ -9260,15 +9206,15 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 			"managed_rancher_worker_system_volume_type_name":        v.ManagedRancherWorkerSystemVolumeTypeName,
 			"max_instances":                                         v.MaxInstances,
 			"max_resource_termination_offset_in_days":               v.MaxResourceTerminationOffsetInDays,
-			"max_volumes":                               v.MaxVolumes,
-			"openstack_offering_uuid_list":              openstackOfferingUuidListVal,
-			"service_provider_can_create_offering_user": v.ServiceProviderCanCreateOfferingUser,
-			"snapshot_size_limit_gb":                    v.SnapshotSizeLimitGb,
-			"storage_mode":                              v.StorageMode,
-			"supports_downscaling":                      v.SupportsDownscaling,
-			"supports_pausing":                          v.SupportsPausing,
-			"username_anonymized_prefix":                v.UsernameAnonymizedPrefix,
-			"username_generation_policy":                v.UsernameGenerationPolicy,
+			"max_volumes":                                           v.MaxVolumes,
+			"openstack_offering_uuid_list":                          openstackOfferingUuidListVal,
+			"service_provider_can_create_offering_user":             v.ServiceProviderCanCreateOfferingUser,
+			"snapshot_size_limit_gb":                                v.SnapshotSizeLimitGb,
+			"storage_mode":                                          v.StorageMode,
+			"supports_downscaling":                                  v.SupportsDownscaling,
+			"supports_pausing":                                      v.SupportsPausing,
+			"username_anonymized_prefix":                            v.UsernameAnonymizedPrefix,
+			"username_generation_policy":                            v.UsernameGenerationPolicy,
 		})
 
 	return objVal, diags
@@ -9350,10 +9296,6 @@ func (v PluginOptionsValue) Equal(o attr.Value) bool {
 	}
 
 	if !v.LatestDateForResourceTermination.Equal(other.LatestDateForResourceTermination) {
-		return false
-	}
-
-	if !v.ManagedRancherLoadBalancerCloudInitTemplate.Equal(other.ManagedRancherLoadBalancerCloudInitTemplate) {
 		return false
 	}
 
@@ -9478,7 +9420,6 @@ func (v PluginOptionsValue) AttributeTypes(ctx context.Context) map[string]attr.
 		"initial_usergroup_number":                              basetypes.Int64Type{},
 		"is_resource_termination_date_required":                 basetypes.BoolType{},
 		"latest_date_for_resource_termination":                  basetypes.StringType{},
-		"managed_rancher_load_balancer_cloud_init_template":     basetypes.StringType{},
 		"managed_rancher_load_balancer_data_volume_size_gb":     basetypes.Int64Type{},
 		"managed_rancher_load_balancer_data_volume_type_name":   basetypes.StringType{},
 		"managed_rancher_load_balancer_flavor_name":             basetypes.StringType{},
@@ -9493,7 +9434,7 @@ func (v PluginOptionsValue) AttributeTypes(ctx context.Context) map[string]attr.
 		"managed_rancher_worker_system_volume_type_name":        basetypes.StringType{},
 		"max_instances":                                         basetypes.Int64Type{},
 		"max_resource_termination_offset_in_days":               basetypes.Int64Type{},
-		"max_volumes": basetypes.Int64Type{},
+		"max_volumes":                                           basetypes.Int64Type{},
 		"openstack_offering_uuid_list": basetypes.ListType{
 			ElemType: types.StringType,
 		},

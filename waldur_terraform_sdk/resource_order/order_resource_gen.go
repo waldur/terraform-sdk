@@ -188,7 +188,6 @@ func OrderResourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"output": schema.StringAttribute{
-				Optional: true,
 				Computed: true,
 			},
 			"plan": schema.StringAttribute{
