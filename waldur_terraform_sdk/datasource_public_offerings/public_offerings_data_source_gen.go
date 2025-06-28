@@ -624,6 +624,21 @@ func PublicOfferingsDataSourceSchema(ctx context.Context) schema.Schema {
 								"managed_rancher_server_system_volume_type_name": schema.StringAttribute{
 									Computed: true,
 								},
+								"managed_rancher_tenant_max_cpu": schema.Int64Attribute{
+									Computed:            true,
+									Description:         "Max number of vCPUs for tenants",
+									MarkdownDescription: "Max number of vCPUs for tenants",
+								},
+								"managed_rancher_tenant_max_disk": schema.Int64Attribute{
+									Computed:            true,
+									Description:         "Max size of disk space for tenants (GB)",
+									MarkdownDescription: "Max size of disk space for tenants (GB)",
+								},
+								"managed_rancher_tenant_max_ram": schema.Int64Attribute{
+									Computed:            true,
+									Description:         "Max number of RAM for tenants",
+									MarkdownDescription: "Max number of RAM for tenants",
+								},
 								"managed_rancher_worker_system_volume_size_gb": schema.Int64Attribute{
 									Computed: true,
 								},
@@ -11595,6 +11610,60 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 			fmt.Sprintf(`managed_rancher_server_system_volume_type_name expected to be basetypes.StringValue, was: %T`, managedRancherServerSystemVolumeTypeNameAttribute))
 	}
 
+	managedRancherTenantMaxCpuAttribute, ok := attributes["managed_rancher_tenant_max_cpu"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`managed_rancher_tenant_max_cpu is missing from object`)
+
+		return nil, diags
+	}
+
+	managedRancherTenantMaxCpuVal, ok := managedRancherTenantMaxCpuAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`managed_rancher_tenant_max_cpu expected to be basetypes.Int64Value, was: %T`, managedRancherTenantMaxCpuAttribute))
+	}
+
+	managedRancherTenantMaxDiskAttribute, ok := attributes["managed_rancher_tenant_max_disk"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`managed_rancher_tenant_max_disk is missing from object`)
+
+		return nil, diags
+	}
+
+	managedRancherTenantMaxDiskVal, ok := managedRancherTenantMaxDiskAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`managed_rancher_tenant_max_disk expected to be basetypes.Int64Value, was: %T`, managedRancherTenantMaxDiskAttribute))
+	}
+
+	managedRancherTenantMaxRamAttribute, ok := attributes["managed_rancher_tenant_max_ram"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`managed_rancher_tenant_max_ram is missing from object`)
+
+		return nil, diags
+	}
+
+	managedRancherTenantMaxRamVal, ok := managedRancherTenantMaxRamAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`managed_rancher_tenant_max_ram expected to be basetypes.Int64Value, was: %T`, managedRancherTenantMaxRamAttribute))
+	}
+
 	managedRancherWorkerSystemVolumeSizeGbAttribute, ok := attributes["managed_rancher_worker_system_volume_size_gb"]
 
 	if !ok {
@@ -11860,6 +11929,9 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 		ManagedRancherServerFlavorName:                 managedRancherServerFlavorNameVal,
 		ManagedRancherServerSystemVolumeSizeGb:         managedRancherServerSystemVolumeSizeGbVal,
 		ManagedRancherServerSystemVolumeTypeName:       managedRancherServerSystemVolumeTypeNameVal,
+		ManagedRancherTenantMaxCpu:                     managedRancherTenantMaxCpuVal,
+		ManagedRancherTenantMaxDisk:                    managedRancherTenantMaxDiskVal,
+		ManagedRancherTenantMaxRam:                     managedRancherTenantMaxRamVal,
 		ManagedRancherWorkerSystemVolumeSizeGb:         managedRancherWorkerSystemVolumeSizeGbVal,
 		ManagedRancherWorkerSystemVolumeTypeName:       managedRancherWorkerSystemVolumeTypeNameVal,
 		MaxInstances:                                   maxInstancesVal,
@@ -12408,6 +12480,60 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 			fmt.Sprintf(`managed_rancher_server_system_volume_type_name expected to be basetypes.StringValue, was: %T`, managedRancherServerSystemVolumeTypeNameAttribute))
 	}
 
+	managedRancherTenantMaxCpuAttribute, ok := attributes["managed_rancher_tenant_max_cpu"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`managed_rancher_tenant_max_cpu is missing from object`)
+
+		return NewPluginOptionsValueUnknown(), diags
+	}
+
+	managedRancherTenantMaxCpuVal, ok := managedRancherTenantMaxCpuAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`managed_rancher_tenant_max_cpu expected to be basetypes.Int64Value, was: %T`, managedRancherTenantMaxCpuAttribute))
+	}
+
+	managedRancherTenantMaxDiskAttribute, ok := attributes["managed_rancher_tenant_max_disk"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`managed_rancher_tenant_max_disk is missing from object`)
+
+		return NewPluginOptionsValueUnknown(), diags
+	}
+
+	managedRancherTenantMaxDiskVal, ok := managedRancherTenantMaxDiskAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`managed_rancher_tenant_max_disk expected to be basetypes.Int64Value, was: %T`, managedRancherTenantMaxDiskAttribute))
+	}
+
+	managedRancherTenantMaxRamAttribute, ok := attributes["managed_rancher_tenant_max_ram"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`managed_rancher_tenant_max_ram is missing from object`)
+
+		return NewPluginOptionsValueUnknown(), diags
+	}
+
+	managedRancherTenantMaxRamVal, ok := managedRancherTenantMaxRamAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`managed_rancher_tenant_max_ram expected to be basetypes.Int64Value, was: %T`, managedRancherTenantMaxRamAttribute))
+	}
+
 	managedRancherWorkerSystemVolumeSizeGbAttribute, ok := attributes["managed_rancher_worker_system_volume_size_gb"]
 
 	if !ok {
@@ -12673,6 +12799,9 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 		ManagedRancherServerFlavorName:                 managedRancherServerFlavorNameVal,
 		ManagedRancherServerSystemVolumeSizeGb:         managedRancherServerSystemVolumeSizeGbVal,
 		ManagedRancherServerSystemVolumeTypeName:       managedRancherServerSystemVolumeTypeNameVal,
+		ManagedRancherTenantMaxCpu:                     managedRancherTenantMaxCpuVal,
+		ManagedRancherTenantMaxDisk:                    managedRancherTenantMaxDiskVal,
+		ManagedRancherTenantMaxRam:                     managedRancherTenantMaxRamVal,
 		ManagedRancherWorkerSystemVolumeSizeGb:         managedRancherWorkerSystemVolumeSizeGbVal,
 		ManagedRancherWorkerSystemVolumeTypeName:       managedRancherWorkerSystemVolumeTypeNameVal,
 		MaxInstances:                                   maxInstancesVal,
@@ -12784,6 +12913,9 @@ type PluginOptionsValue struct {
 	ManagedRancherServerFlavorName                 basetypes.StringValue `tfsdk:"managed_rancher_server_flavor_name"`
 	ManagedRancherServerSystemVolumeSizeGb         basetypes.Int64Value  `tfsdk:"managed_rancher_server_system_volume_size_gb"`
 	ManagedRancherServerSystemVolumeTypeName       basetypes.StringValue `tfsdk:"managed_rancher_server_system_volume_type_name"`
+	ManagedRancherTenantMaxCpu                     basetypes.Int64Value  `tfsdk:"managed_rancher_tenant_max_cpu"`
+	ManagedRancherTenantMaxDisk                    basetypes.Int64Value  `tfsdk:"managed_rancher_tenant_max_disk"`
+	ManagedRancherTenantMaxRam                     basetypes.Int64Value  `tfsdk:"managed_rancher_tenant_max_ram"`
 	ManagedRancherWorkerSystemVolumeSizeGb         basetypes.Int64Value  `tfsdk:"managed_rancher_worker_system_volume_size_gb"`
 	ManagedRancherWorkerSystemVolumeTypeName       basetypes.StringValue `tfsdk:"managed_rancher_worker_system_volume_type_name"`
 	MaxInstances                                   basetypes.Int64Value  `tfsdk:"max_instances"`
@@ -12801,7 +12933,7 @@ type PluginOptionsValue struct {
 }
 
 func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 39)
+	attrTypes := make(map[string]tftypes.Type, 42)
 
 	var val tftypes.Value
 	var err error
@@ -12832,6 +12964,9 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 	attrTypes["managed_rancher_server_flavor_name"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["managed_rancher_server_system_volume_size_gb"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["managed_rancher_server_system_volume_type_name"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["managed_rancher_tenant_max_cpu"] = basetypes.Int64Type{}.TerraformType(ctx)
+	attrTypes["managed_rancher_tenant_max_disk"] = basetypes.Int64Type{}.TerraformType(ctx)
+	attrTypes["managed_rancher_tenant_max_ram"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["managed_rancher_worker_system_volume_size_gb"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["managed_rancher_worker_system_volume_type_name"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["max_instances"] = basetypes.Int64Type{}.TerraformType(ctx)
@@ -12852,7 +12987,7 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 39)
+		vals := make(map[string]tftypes.Value, 42)
 
 		val, err = v.AutoApproveInServiceProviderProjects.ToTerraformValue(ctx)
 
@@ -13062,6 +13197,30 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 
 		vals["managed_rancher_server_system_volume_type_name"] = val
 
+		val, err = v.ManagedRancherTenantMaxCpu.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["managed_rancher_tenant_max_cpu"] = val
+
+		val, err = v.ManagedRancherTenantMaxDisk.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["managed_rancher_tenant_max_disk"] = val
+
+		val, err = v.ManagedRancherTenantMaxRam.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["managed_rancher_tenant_max_ram"] = val
+
 		val, err = v.ManagedRancherWorkerSystemVolumeSizeGb.ToTerraformValue(ctx)
 
 		if err != nil {
@@ -13235,6 +13394,9 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 			"managed_rancher_server_flavor_name":                    basetypes.StringType{},
 			"managed_rancher_server_system_volume_size_gb":          basetypes.Int64Type{},
 			"managed_rancher_server_system_volume_type_name":        basetypes.StringType{},
+			"managed_rancher_tenant_max_cpu":                        basetypes.Int64Type{},
+			"managed_rancher_tenant_max_disk":                       basetypes.Int64Type{},
+			"managed_rancher_tenant_max_ram":                        basetypes.Int64Type{},
 			"managed_rancher_worker_system_volume_size_gb":          basetypes.Int64Type{},
 			"managed_rancher_worker_system_volume_type_name":        basetypes.StringType{},
 			"max_instances":                                         basetypes.Int64Type{},
@@ -13280,6 +13442,9 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 		"managed_rancher_server_flavor_name":                    basetypes.StringType{},
 		"managed_rancher_server_system_volume_size_gb":          basetypes.Int64Type{},
 		"managed_rancher_server_system_volume_type_name":        basetypes.StringType{},
+		"managed_rancher_tenant_max_cpu":                        basetypes.Int64Type{},
+		"managed_rancher_tenant_max_disk":                       basetypes.Int64Type{},
+		"managed_rancher_tenant_max_ram":                        basetypes.Int64Type{},
 		"managed_rancher_worker_system_volume_size_gb":          basetypes.Int64Type{},
 		"managed_rancher_worker_system_volume_type_name":        basetypes.StringType{},
 		"max_instances":                                         basetypes.Int64Type{},
@@ -13334,6 +13499,9 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 			"managed_rancher_server_flavor_name":                    v.ManagedRancherServerFlavorName,
 			"managed_rancher_server_system_volume_size_gb":          v.ManagedRancherServerSystemVolumeSizeGb,
 			"managed_rancher_server_system_volume_type_name":        v.ManagedRancherServerSystemVolumeTypeName,
+			"managed_rancher_tenant_max_cpu":                        v.ManagedRancherTenantMaxCpu,
+			"managed_rancher_tenant_max_disk":                       v.ManagedRancherTenantMaxDisk,
+			"managed_rancher_tenant_max_ram":                        v.ManagedRancherTenantMaxRam,
 			"managed_rancher_worker_system_volume_size_gb":          v.ManagedRancherWorkerSystemVolumeSizeGb,
 			"managed_rancher_worker_system_volume_type_name":        v.ManagedRancherWorkerSystemVolumeTypeName,
 			"max_instances":                                         v.MaxInstances,
@@ -13471,6 +13639,18 @@ func (v PluginOptionsValue) Equal(o attr.Value) bool {
 		return false
 	}
 
+	if !v.ManagedRancherTenantMaxCpu.Equal(other.ManagedRancherTenantMaxCpu) {
+		return false
+	}
+
+	if !v.ManagedRancherTenantMaxDisk.Equal(other.ManagedRancherTenantMaxDisk) {
+		return false
+	}
+
+	if !v.ManagedRancherTenantMaxRam.Equal(other.ManagedRancherTenantMaxRam) {
+		return false
+	}
+
 	if !v.ManagedRancherWorkerSystemVolumeSizeGb.Equal(other.ManagedRancherWorkerSystemVolumeSizeGb) {
 		return false
 	}
@@ -13562,6 +13742,9 @@ func (v PluginOptionsValue) AttributeTypes(ctx context.Context) map[string]attr.
 		"managed_rancher_server_flavor_name":                    basetypes.StringType{},
 		"managed_rancher_server_system_volume_size_gb":          basetypes.Int64Type{},
 		"managed_rancher_server_system_volume_type_name":        basetypes.StringType{},
+		"managed_rancher_tenant_max_cpu":                        basetypes.Int64Type{},
+		"managed_rancher_tenant_max_disk":                       basetypes.Int64Type{},
+		"managed_rancher_tenant_max_ram":                        basetypes.Int64Type{},
 		"managed_rancher_worker_system_volume_size_gb":          basetypes.Int64Type{},
 		"managed_rancher_worker_system_volume_type_name":        basetypes.StringType{},
 		"max_instances":                                         basetypes.Int64Type{},
