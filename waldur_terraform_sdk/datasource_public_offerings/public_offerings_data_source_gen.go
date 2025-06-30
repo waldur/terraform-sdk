@@ -995,6 +995,12 @@ func PublicOfferingsDataSourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 				Computed:    true,
 			},
+			"uuid_list": schema.StringAttribute{
+				Optional:            true,
+				Computed:            true,
+				Description:         "Comma-separated offering UUIDs",
+				MarkdownDescription: "Comma-separated offering UUIDs",
+			},
 		},
 	}
 }
@@ -1028,6 +1034,7 @@ type PublicOfferingsModel struct {
 	Shared                types.Bool   `tfsdk:"shared"`
 	State                 types.List   `tfsdk:"state"`
 	Type                  types.List   `tfsdk:"type"`
+	UuidList              types.String `tfsdk:"uuid_list"`
 }
 
 var _ basetypes.ObjectTypable = PublicOfferingsType{}
