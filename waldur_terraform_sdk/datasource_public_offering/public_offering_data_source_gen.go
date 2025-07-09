@@ -561,11 +561,21 @@ func PublicOfferingDataSourceSchema(ctx context.Context) schema.Schema {
 						Description:         "Default limit for number of volumes in OpenStack tenant",
 						MarkdownDescription: "Default limit for number of volumes in OpenStack tenant",
 					},
+					"minimal_team_count_for_provisioning": schema.Int64Attribute{
+						Computed:            true,
+						Description:         "Minimal team count required for provisioning of resources",
+						MarkdownDescription: "Minimal team count required for provisioning of resources",
+					},
 					"openstack_offering_uuid_list": schema.ListAttribute{
 						ElementType:         types.StringType,
 						Computed:            true,
 						Description:         "List of UUID of OpenStack offerings where tenant can be created",
 						MarkdownDescription: "List of UUID of OpenStack offerings where tenant can be created",
+					},
+					"required_team_role_for_provisioning": schema.StringAttribute{
+						Computed:            true,
+						Description:         "Required user role in a project for provisioning of resources",
+						MarkdownDescription: "Required user role in a project for provisioning of resources",
 					},
 					"service_provider_can_create_offering_user": schema.BoolAttribute{
 						Computed:            true,
@@ -7622,6 +7632,24 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 			fmt.Sprintf(`max_volumes expected to be basetypes.Int64Value, was: %T`, maxVolumesAttribute))
 	}
 
+	minimalTeamCountForProvisioningAttribute, ok := attributes["minimal_team_count_for_provisioning"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`minimal_team_count_for_provisioning is missing from object`)
+
+		return nil, diags
+	}
+
+	minimalTeamCountForProvisioningVal, ok := minimalTeamCountForProvisioningAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`minimal_team_count_for_provisioning expected to be basetypes.Int64Value, was: %T`, minimalTeamCountForProvisioningAttribute))
+	}
+
 	openstackOfferingUuidListAttribute, ok := attributes["openstack_offering_uuid_list"]
 
 	if !ok {
@@ -7638,6 +7666,24 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 		diags.AddError(
 			"Attribute Wrong Type",
 			fmt.Sprintf(`openstack_offering_uuid_list expected to be basetypes.ListValue, was: %T`, openstackOfferingUuidListAttribute))
+	}
+
+	requiredTeamRoleForProvisioningAttribute, ok := attributes["required_team_role_for_provisioning"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`required_team_role_for_provisioning is missing from object`)
+
+		return nil, diags
+	}
+
+	requiredTeamRoleForProvisioningVal, ok := requiredTeamRoleForProvisioningAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`required_team_role_for_provisioning expected to be basetypes.StringValue, was: %T`, requiredTeamRoleForProvisioningAttribute))
 	}
 
 	serviceProviderCanCreateOfferingUserAttribute, ok := attributes["service_provider_can_create_offering_user"]
@@ -7805,7 +7851,9 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 		MaxInstances:                                   maxInstancesVal,
 		MaxResourceTerminationOffsetInDays:             maxResourceTerminationOffsetInDaysVal,
 		MaxVolumes:                                     maxVolumesVal,
+		MinimalTeamCountForProvisioning:                minimalTeamCountForProvisioningVal,
 		OpenstackOfferingUuidList:                      openstackOfferingUuidListVal,
+		RequiredTeamRoleForProvisioning:                requiredTeamRoleForProvisioningVal,
 		ServiceProviderCanCreateOfferingUser:           serviceProviderCanCreateOfferingUserVal,
 		SnapshotSizeLimitGb:                            snapshotSizeLimitGbVal,
 		StorageMode:                                    storageModeVal,
@@ -8492,6 +8540,24 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 			fmt.Sprintf(`max_volumes expected to be basetypes.Int64Value, was: %T`, maxVolumesAttribute))
 	}
 
+	minimalTeamCountForProvisioningAttribute, ok := attributes["minimal_team_count_for_provisioning"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`minimal_team_count_for_provisioning is missing from object`)
+
+		return NewPluginOptionsValueUnknown(), diags
+	}
+
+	minimalTeamCountForProvisioningVal, ok := minimalTeamCountForProvisioningAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`minimal_team_count_for_provisioning expected to be basetypes.Int64Value, was: %T`, minimalTeamCountForProvisioningAttribute))
+	}
+
 	openstackOfferingUuidListAttribute, ok := attributes["openstack_offering_uuid_list"]
 
 	if !ok {
@@ -8508,6 +8574,24 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 		diags.AddError(
 			"Attribute Wrong Type",
 			fmt.Sprintf(`openstack_offering_uuid_list expected to be basetypes.ListValue, was: %T`, openstackOfferingUuidListAttribute))
+	}
+
+	requiredTeamRoleForProvisioningAttribute, ok := attributes["required_team_role_for_provisioning"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`required_team_role_for_provisioning is missing from object`)
+
+		return NewPluginOptionsValueUnknown(), diags
+	}
+
+	requiredTeamRoleForProvisioningVal, ok := requiredTeamRoleForProvisioningAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`required_team_role_for_provisioning expected to be basetypes.StringValue, was: %T`, requiredTeamRoleForProvisioningAttribute))
 	}
 
 	serviceProviderCanCreateOfferingUserAttribute, ok := attributes["service_provider_can_create_offering_user"]
@@ -8675,7 +8759,9 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 		MaxInstances:                                   maxInstancesVal,
 		MaxResourceTerminationOffsetInDays:             maxResourceTerminationOffsetInDaysVal,
 		MaxVolumes:                                     maxVolumesVal,
+		MinimalTeamCountForProvisioning:                minimalTeamCountForProvisioningVal,
 		OpenstackOfferingUuidList:                      openstackOfferingUuidListVal,
+		RequiredTeamRoleForProvisioning:                requiredTeamRoleForProvisioningVal,
 		ServiceProviderCanCreateOfferingUser:           serviceProviderCanCreateOfferingUserVal,
 		SnapshotSizeLimitGb:                            snapshotSizeLimitGbVal,
 		StorageMode:                                    storageModeVal,
@@ -8789,7 +8875,9 @@ type PluginOptionsValue struct {
 	MaxInstances                                   basetypes.Int64Value  `tfsdk:"max_instances"`
 	MaxResourceTerminationOffsetInDays             basetypes.Int64Value  `tfsdk:"max_resource_termination_offset_in_days"`
 	MaxVolumes                                     basetypes.Int64Value  `tfsdk:"max_volumes"`
+	MinimalTeamCountForProvisioning                basetypes.Int64Value  `tfsdk:"minimal_team_count_for_provisioning"`
 	OpenstackOfferingUuidList                      basetypes.ListValue   `tfsdk:"openstack_offering_uuid_list"`
+	RequiredTeamRoleForProvisioning                basetypes.StringValue `tfsdk:"required_team_role_for_provisioning"`
 	ServiceProviderCanCreateOfferingUser           basetypes.BoolValue   `tfsdk:"service_provider_can_create_offering_user"`
 	SnapshotSizeLimitGb                            basetypes.Int64Value  `tfsdk:"snapshot_size_limit_gb"`
 	StorageMode                                    basetypes.StringValue `tfsdk:"storage_mode"`
@@ -8801,7 +8889,7 @@ type PluginOptionsValue struct {
 }
 
 func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 42)
+	attrTypes := make(map[string]tftypes.Type, 44)
 
 	var val tftypes.Value
 	var err error
@@ -8840,9 +8928,11 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 	attrTypes["max_instances"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["max_resource_termination_offset_in_days"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["max_volumes"] = basetypes.Int64Type{}.TerraformType(ctx)
+	attrTypes["minimal_team_count_for_provisioning"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["openstack_offering_uuid_list"] = basetypes.ListType{
 		ElemType: types.StringType,
 	}.TerraformType(ctx)
+	attrTypes["required_team_role_for_provisioning"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["service_provider_can_create_offering_user"] = basetypes.BoolType{}.TerraformType(ctx)
 	attrTypes["snapshot_size_limit_gb"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["storage_mode"] = basetypes.StringType{}.TerraformType(ctx)
@@ -8855,7 +8945,7 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 42)
+		vals := make(map[string]tftypes.Value, 44)
 
 		val, err = v.AutoApproveInServiceProviderProjects.ToTerraformValue(ctx)
 
@@ -9129,6 +9219,14 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 
 		vals["max_volumes"] = val
 
+		val, err = v.MinimalTeamCountForProvisioning.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["minimal_team_count_for_provisioning"] = val
+
 		val, err = v.OpenstackOfferingUuidList.ToTerraformValue(ctx)
 
 		if err != nil {
@@ -9136,6 +9234,14 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 		}
 
 		vals["openstack_offering_uuid_list"] = val
+
+		val, err = v.RequiredTeamRoleForProvisioning.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["required_team_role_for_provisioning"] = val
 
 		val, err = v.ServiceProviderCanCreateOfferingUser.ToTerraformValue(ctx)
 
@@ -9270,9 +9376,11 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 			"max_instances":                                         basetypes.Int64Type{},
 			"max_resource_termination_offset_in_days":               basetypes.Int64Type{},
 			"max_volumes":                                           basetypes.Int64Type{},
+			"minimal_team_count_for_provisioning":                   basetypes.Int64Type{},
 			"openstack_offering_uuid_list": basetypes.ListType{
 				ElemType: types.StringType,
 			},
+			"required_team_role_for_provisioning":       basetypes.StringType{},
 			"service_provider_can_create_offering_user": basetypes.BoolType{},
 			"snapshot_size_limit_gb":                    basetypes.Int64Type{},
 			"storage_mode":                              basetypes.StringType{},
@@ -9318,9 +9426,11 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 		"max_instances":                                         basetypes.Int64Type{},
 		"max_resource_termination_offset_in_days":               basetypes.Int64Type{},
 		"max_volumes":                                           basetypes.Int64Type{},
+		"minimal_team_count_for_provisioning":                   basetypes.Int64Type{},
 		"openstack_offering_uuid_list": basetypes.ListType{
 			ElemType: types.StringType,
 		},
+		"required_team_role_for_provisioning":       basetypes.StringType{},
 		"service_provider_can_create_offering_user": basetypes.BoolType{},
 		"snapshot_size_limit_gb":                    basetypes.Int64Type{},
 		"storage_mode":                              basetypes.StringType{},
@@ -9375,7 +9485,9 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 			"max_instances":                                         v.MaxInstances,
 			"max_resource_termination_offset_in_days":               v.MaxResourceTerminationOffsetInDays,
 			"max_volumes":                                           v.MaxVolumes,
+			"minimal_team_count_for_provisioning":                   v.MinimalTeamCountForProvisioning,
 			"openstack_offering_uuid_list":                          openstackOfferingUuidListVal,
+			"required_team_role_for_provisioning":                   v.RequiredTeamRoleForProvisioning,
 			"service_provider_can_create_offering_user":             v.ServiceProviderCanCreateOfferingUser,
 			"snapshot_size_limit_gb":                                v.SnapshotSizeLimitGb,
 			"storage_mode":                                          v.StorageMode,
@@ -9539,7 +9651,15 @@ func (v PluginOptionsValue) Equal(o attr.Value) bool {
 		return false
 	}
 
+	if !v.MinimalTeamCountForProvisioning.Equal(other.MinimalTeamCountForProvisioning) {
+		return false
+	}
+
 	if !v.OpenstackOfferingUuidList.Equal(other.OpenstackOfferingUuidList) {
+		return false
+	}
+
+	if !v.RequiredTeamRoleForProvisioning.Equal(other.RequiredTeamRoleForProvisioning) {
 		return false
 	}
 
@@ -9618,9 +9738,11 @@ func (v PluginOptionsValue) AttributeTypes(ctx context.Context) map[string]attr.
 		"max_instances":                                         basetypes.Int64Type{},
 		"max_resource_termination_offset_in_days":               basetypes.Int64Type{},
 		"max_volumes":                                           basetypes.Int64Type{},
+		"minimal_team_count_for_provisioning":                   basetypes.Int64Type{},
 		"openstack_offering_uuid_list": basetypes.ListType{
 			ElemType: types.StringType,
 		},
+		"required_team_role_for_provisioning":       basetypes.StringType{},
 		"service_provider_can_create_offering_user": basetypes.BoolType{},
 		"snapshot_size_limit_gb":                    basetypes.Int64Type{},
 		"storage_mode":                              basetypes.StringType{},
