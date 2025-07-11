@@ -537,8 +537,8 @@ func PublicOfferingDataSourceSchema(ctx context.Context) schema.Schema {
 					},
 					"managed_rancher_tenant_max_ram": schema.Int64Attribute{
 						Computed:            true,
-						Description:         "Max number of RAM for tenants",
-						MarkdownDescription: "Max number of RAM for tenants",
+						Description:         "Max number of RAM for tenants (GB)",
+						MarkdownDescription: "Max number of RAM for tenants (GB)",
 					},
 					"managed_rancher_worker_system_volume_size_gb": schema.Int64Attribute{
 						Computed: true,
