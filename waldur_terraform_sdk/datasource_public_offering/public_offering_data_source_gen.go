@@ -188,7 +188,9 @@ func PublicOfferingDataSourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"google_calendar_link": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "Get the Google Calendar link for an offering.",
+				MarkdownDescription: "Get the Google Calendar link for an offering.",
 			},
 			"image": schema.StringAttribute{
 				Computed: true,
