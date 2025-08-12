@@ -331,8 +331,10 @@ func OrdersDataSourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"query": schema.StringAttribute{
-				Optional: true,
-				Computed: true,
+				Optional:            true,
+				Computed:            true,
+				Description:         "Search by order UUID, project name or resource name",
+				MarkdownDescription: "Search by order UUID, project name or resource name",
 			},
 			"resource": schema.StringAttribute{
 				Optional: true,
