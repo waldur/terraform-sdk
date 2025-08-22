@@ -353,11 +353,16 @@ func OpenstackBackupDataSourceSchema(ctx context.Context) schema.Schema {
 				},
 				Computed: true,
 			},
-			"instance_security_groups": schema.ListAttribute{
-				ElementType: types.ListType{
-					ElemType: types.ObjectType{
-						AttrTypes: map[string]attr.Type{
-							"url": types.StringType,
+			"instance_security_groups": schema.ListNestedAttribute{
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"url": schema.StringAttribute{
+							Computed: true,
+						},
+					},
+					CustomType: InstanceSecurityGroupsType{
+						ObjectType: types.ObjectType{
+							AttrTypes: InstanceSecurityGroupsValue{}.AttributeTypes(ctx),
 						},
 					},
 				},
@@ -721,11 +726,16 @@ func OpenstackBackupDataSourceSchema(ctx context.Context) schema.Schema {
 							},
 							Computed: true,
 						},
-						"security_groups": schema.ListAttribute{
-							ElementType: types.ListType{
-								ElemType: types.ObjectType{
-									AttrTypes: map[string]attr.Type{
-										"url": types.StringType,
+						"security_groups": schema.ListNestedAttribute{
+							NestedObject: schema.NestedAttributeObject{
+								Attributes: map[string]schema.Attribute{
+									"url": schema.StringAttribute{
+										Computed: true,
+									},
+								},
+								CustomType: SecurityGroupsType{
+									ObjectType: types.ObjectType{
+										AttrTypes: SecurityGroupsValue{}.AttributeTypes(ctx),
 									},
 								},
 							},
@@ -6948,6 +6958,330 @@ func (v RulesValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 	}
 }
 
+var _ basetypes.ObjectTypable = InstanceSecurityGroupsType{}
+
+type InstanceSecurityGroupsType struct {
+	basetypes.ObjectType
+}
+
+func (t InstanceSecurityGroupsType) Equal(o attr.Type) bool {
+	other, ok := o.(InstanceSecurityGroupsType)
+
+	if !ok {
+		return false
+	}
+
+	return t.ObjectType.Equal(other.ObjectType)
+}
+
+func (t InstanceSecurityGroupsType) String() string {
+	return "InstanceSecurityGroupsType"
+}
+
+func (t InstanceSecurityGroupsType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributes := in.Attributes()
+
+	urlAttribute, ok := attributes["url"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`url is missing from object`)
+
+		return nil, diags
+	}
+
+	urlVal, ok := urlAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`url expected to be basetypes.StringValue, was: %T`, urlAttribute))
+	}
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	return InstanceSecurityGroupsValue{
+		Url:   urlVal,
+		state: attr.ValueStateKnown,
+	}, diags
+}
+
+func NewInstanceSecurityGroupsValueNull() InstanceSecurityGroupsValue {
+	return InstanceSecurityGroupsValue{
+		state: attr.ValueStateNull,
+	}
+}
+
+func NewInstanceSecurityGroupsValueUnknown() InstanceSecurityGroupsValue {
+	return InstanceSecurityGroupsValue{
+		state: attr.ValueStateUnknown,
+	}
+}
+
+func NewInstanceSecurityGroupsValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (InstanceSecurityGroupsValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	// Reference: https://github.com/hashicorp/terraform-plugin-framework/issues/521
+	ctx := context.Background()
+
+	for name, attributeType := range attributeTypes {
+		attribute, ok := attributes[name]
+
+		if !ok {
+			diags.AddError(
+				"Missing InstanceSecurityGroupsValue Attribute Value",
+				"While creating a InstanceSecurityGroupsValue value, a missing attribute value was detected. "+
+					"A InstanceSecurityGroupsValue must contain values for all attributes, even if null or unknown. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("InstanceSecurityGroupsValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
+			)
+
+			continue
+		}
+
+		if !attributeType.Equal(attribute.Type(ctx)) {
+			diags.AddError(
+				"Invalid InstanceSecurityGroupsValue Attribute Type",
+				"While creating a InstanceSecurityGroupsValue value, an invalid attribute value was detected. "+
+					"A InstanceSecurityGroupsValue must use a matching attribute type for the value. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("InstanceSecurityGroupsValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
+					fmt.Sprintf("InstanceSecurityGroupsValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
+			)
+		}
+	}
+
+	for name := range attributes {
+		_, ok := attributeTypes[name]
+
+		if !ok {
+			diags.AddError(
+				"Extra InstanceSecurityGroupsValue Attribute Value",
+				"While creating a InstanceSecurityGroupsValue value, an extra attribute value was detected. "+
+					"A InstanceSecurityGroupsValue must not contain values beyond the expected attribute types. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("Extra InstanceSecurityGroupsValue Attribute Name: %s", name),
+			)
+		}
+	}
+
+	if diags.HasError() {
+		return NewInstanceSecurityGroupsValueUnknown(), diags
+	}
+
+	urlAttribute, ok := attributes["url"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`url is missing from object`)
+
+		return NewInstanceSecurityGroupsValueUnknown(), diags
+	}
+
+	urlVal, ok := urlAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`url expected to be basetypes.StringValue, was: %T`, urlAttribute))
+	}
+
+	if diags.HasError() {
+		return NewInstanceSecurityGroupsValueUnknown(), diags
+	}
+
+	return InstanceSecurityGroupsValue{
+		Url:   urlVal,
+		state: attr.ValueStateKnown,
+	}, diags
+}
+
+func NewInstanceSecurityGroupsValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) InstanceSecurityGroupsValue {
+	object, diags := NewInstanceSecurityGroupsValue(attributeTypes, attributes)
+
+	if diags.HasError() {
+		// This could potentially be added to the diag package.
+		diagsStrings := make([]string, 0, len(diags))
+
+		for _, diagnostic := range diags {
+			diagsStrings = append(diagsStrings, fmt.Sprintf(
+				"%s | %s | %s",
+				diagnostic.Severity(),
+				diagnostic.Summary(),
+				diagnostic.Detail()))
+		}
+
+		panic("NewInstanceSecurityGroupsValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
+	}
+
+	return object
+}
+
+func (t InstanceSecurityGroupsType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+	if in.Type() == nil {
+		return NewInstanceSecurityGroupsValueNull(), nil
+	}
+
+	if !in.Type().Equal(t.TerraformType(ctx)) {
+		return nil, fmt.Errorf("expected %s, got %s", t.TerraformType(ctx), in.Type())
+	}
+
+	if !in.IsKnown() {
+		return NewInstanceSecurityGroupsValueUnknown(), nil
+	}
+
+	if in.IsNull() {
+		return NewInstanceSecurityGroupsValueNull(), nil
+	}
+
+	attributes := map[string]attr.Value{}
+
+	val := map[string]tftypes.Value{}
+
+	err := in.As(&val)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for k, v := range val {
+		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
+
+		if err != nil {
+			return nil, err
+		}
+
+		attributes[k] = a
+	}
+
+	return NewInstanceSecurityGroupsValueMust(InstanceSecurityGroupsValue{}.AttributeTypes(ctx), attributes), nil
+}
+
+func (t InstanceSecurityGroupsType) ValueType(ctx context.Context) attr.Value {
+	return InstanceSecurityGroupsValue{}
+}
+
+var _ basetypes.ObjectValuable = InstanceSecurityGroupsValue{}
+
+type InstanceSecurityGroupsValue struct {
+	Url   basetypes.StringValue `tfsdk:"url"`
+	state attr.ValueState
+}
+
+func (v InstanceSecurityGroupsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+	attrTypes := make(map[string]tftypes.Type, 1)
+
+	var val tftypes.Value
+	var err error
+
+	attrTypes["url"] = basetypes.StringType{}.TerraformType(ctx)
+
+	objectType := tftypes.Object{AttributeTypes: attrTypes}
+
+	switch v.state {
+	case attr.ValueStateKnown:
+		vals := make(map[string]tftypes.Value, 1)
+
+		val, err = v.Url.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["url"] = val
+
+		if err := tftypes.ValidateValue(objectType, vals); err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		return tftypes.NewValue(objectType, vals), nil
+	case attr.ValueStateNull:
+		return tftypes.NewValue(objectType, nil), nil
+	case attr.ValueStateUnknown:
+		return tftypes.NewValue(objectType, tftypes.UnknownValue), nil
+	default:
+		panic(fmt.Sprintf("unhandled Object state in ToTerraformValue: %s", v.state))
+	}
+}
+
+func (v InstanceSecurityGroupsValue) IsNull() bool {
+	return v.state == attr.ValueStateNull
+}
+
+func (v InstanceSecurityGroupsValue) IsUnknown() bool {
+	return v.state == attr.ValueStateUnknown
+}
+
+func (v InstanceSecurityGroupsValue) String() string {
+	return "InstanceSecurityGroupsValue"
+}
+
+func (v InstanceSecurityGroupsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributeTypes := map[string]attr.Type{
+		"url": basetypes.StringType{},
+	}
+
+	if v.IsNull() {
+		return types.ObjectNull(attributeTypes), diags
+	}
+
+	if v.IsUnknown() {
+		return types.ObjectUnknown(attributeTypes), diags
+	}
+
+	objVal, diags := types.ObjectValue(
+		attributeTypes,
+		map[string]attr.Value{
+			"url": v.Url,
+		})
+
+	return objVal, diags
+}
+
+func (v InstanceSecurityGroupsValue) Equal(o attr.Value) bool {
+	other, ok := o.(InstanceSecurityGroupsValue)
+
+	if !ok {
+		return false
+	}
+
+	if v.state != other.state {
+		return false
+	}
+
+	if v.state != attr.ValueStateKnown {
+		return true
+	}
+
+	if !v.Url.Equal(other.Url) {
+		return false
+	}
+
+	return true
+}
+
+func (v InstanceSecurityGroupsValue) Type(ctx context.Context) attr.Type {
+	return InstanceSecurityGroupsType{
+		basetypes.ObjectType{
+			AttrTypes: v.AttributeTypes(ctx),
+		},
+	}
+}
+
+func (v InstanceSecurityGroupsValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
+	return map[string]attr.Type{
+		"url": basetypes.StringType{},
+	}
+}
+
 var _ basetypes.ObjectTypable = RestorationsType{}
 
 type RestorationsType struct {
@@ -7454,13 +7788,7 @@ func (v RestorationsValue) ToTerraformValue(ctx context.Context) (tftypes.Value,
 		ElemType: PortsValue{}.Type(ctx),
 	}.TerraformType(ctx)
 	attrTypes["security_groups"] = basetypes.ListType{
-		ElemType: types.ListType{
-			ElemType: types.ObjectType{
-				AttrTypes: map[string]attr.Type{
-					"url": types.StringType,
-				},
-			},
-		},
+		ElemType: SecurityGroupsValue{}.Type(ctx),
 	}.TerraformType(ctx)
 	attrTypes["uuid"] = basetypes.StringType{}.TerraformType(ctx)
 
@@ -7621,59 +7949,33 @@ func (v RestorationsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectV
 		)
 	}
 
-	var securityGroupsVal basetypes.ListValue
-	switch {
-	case v.SecurityGroups.IsUnknown():
-		securityGroupsVal = types.ListUnknown(types.ListType{
-			ElemType: types.ObjectType{
-				AttrTypes: map[string]attr.Type{
-					"url": types.StringType,
+	securityGroups := types.ListValueMust(
+		SecurityGroupsType{
+			basetypes.ObjectType{
+				AttrTypes: SecurityGroupsValue{}.AttributeTypes(ctx),
+			},
+		},
+		v.SecurityGroups.Elements(),
+	)
+
+	if v.SecurityGroups.IsNull() {
+		securityGroups = types.ListNull(
+			SecurityGroupsType{
+				basetypes.ObjectType{
+					AttrTypes: SecurityGroupsValue{}.AttributeTypes(ctx),
 				},
 			},
-		})
-	case v.SecurityGroups.IsNull():
-		securityGroupsVal = types.ListNull(types.ListType{
-			ElemType: types.ObjectType{
-				AttrTypes: map[string]attr.Type{
-					"url": types.StringType,
-				},
-			},
-		})
-	default:
-		var d diag.Diagnostics
-		securityGroupsVal, d = types.ListValue(types.ListType{
-			ElemType: types.ObjectType{
-				AttrTypes: map[string]attr.Type{
-					"url": types.StringType,
-				},
-			},
-		}, v.SecurityGroups.Elements())
-		diags.Append(d...)
+		)
 	}
 
-	if diags.HasError() {
-		return types.ObjectUnknown(map[string]attr.Type{
-			"created": basetypes.StringType{},
-			"flavor":  basetypes.StringType{},
-			"floating_ips": basetypes.ListType{
-				ElemType: FloatingIpsValue{}.Type(ctx),
-			},
-			"instance": basetypes.StringType{},
-			"name":     basetypes.StringType{},
-			"ports": basetypes.ListType{
-				ElemType: PortsValue{}.Type(ctx),
-			},
-			"security_groups": basetypes.ListType{
-				ElemType: types.ListType{
-					ElemType: types.ObjectType{
-						AttrTypes: map[string]attr.Type{
-							"url": types.StringType,
-						},
-					},
+	if v.SecurityGroups.IsUnknown() {
+		securityGroups = types.ListUnknown(
+			SecurityGroupsType{
+				basetypes.ObjectType{
+					AttrTypes: SecurityGroupsValue{}.AttributeTypes(ctx),
 				},
 			},
-			"uuid": basetypes.StringType{},
-		}), diags
+		)
 	}
 
 	attributeTypes := map[string]attr.Type{
@@ -7688,13 +7990,7 @@ func (v RestorationsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectV
 			ElemType: PortsValue{}.Type(ctx),
 		},
 		"security_groups": basetypes.ListType{
-			ElemType: types.ListType{
-				ElemType: types.ObjectType{
-					AttrTypes: map[string]attr.Type{
-						"url": types.StringType,
-					},
-				},
-			},
+			ElemType: SecurityGroupsValue{}.Type(ctx),
 		},
 		"uuid": basetypes.StringType{},
 	}
@@ -7716,7 +8012,7 @@ func (v RestorationsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectV
 			"instance":        v.Instance,
 			"name":            v.Name,
 			"ports":           ports,
-			"security_groups": securityGroupsVal,
+			"security_groups": securityGroups,
 			"uuid":            v.Uuid,
 		})
 
@@ -7794,13 +8090,7 @@ func (v RestorationsValue) AttributeTypes(ctx context.Context) map[string]attr.T
 			ElemType: PortsValue{}.Type(ctx),
 		},
 		"security_groups": basetypes.ListType{
-			ElemType: types.ListType{
-				ElemType: types.ObjectType{
-					AttrTypes: map[string]attr.Type{
-						"url": types.StringType,
-					},
-				},
-			},
+			ElemType: SecurityGroupsValue{}.Type(ctx),
 		},
 		"uuid": basetypes.StringType{},
 	}
@@ -13931,5 +14221,329 @@ func (v RulesValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 		"remote_group_name": basetypes.StringType{},
 		"remote_group_uuid": basetypes.StringType{},
 		"to_port":           basetypes.Int64Type{},
+	}
+}
+
+var _ basetypes.ObjectTypable = SecurityGroupsType{}
+
+type SecurityGroupsType struct {
+	basetypes.ObjectType
+}
+
+func (t SecurityGroupsType) Equal(o attr.Type) bool {
+	other, ok := o.(SecurityGroupsType)
+
+	if !ok {
+		return false
+	}
+
+	return t.ObjectType.Equal(other.ObjectType)
+}
+
+func (t SecurityGroupsType) String() string {
+	return "SecurityGroupsType"
+}
+
+func (t SecurityGroupsType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributes := in.Attributes()
+
+	urlAttribute, ok := attributes["url"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`url is missing from object`)
+
+		return nil, diags
+	}
+
+	urlVal, ok := urlAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`url expected to be basetypes.StringValue, was: %T`, urlAttribute))
+	}
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	return SecurityGroupsValue{
+		Url:   urlVal,
+		state: attr.ValueStateKnown,
+	}, diags
+}
+
+func NewSecurityGroupsValueNull() SecurityGroupsValue {
+	return SecurityGroupsValue{
+		state: attr.ValueStateNull,
+	}
+}
+
+func NewSecurityGroupsValueUnknown() SecurityGroupsValue {
+	return SecurityGroupsValue{
+		state: attr.ValueStateUnknown,
+	}
+}
+
+func NewSecurityGroupsValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (SecurityGroupsValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	// Reference: https://github.com/hashicorp/terraform-plugin-framework/issues/521
+	ctx := context.Background()
+
+	for name, attributeType := range attributeTypes {
+		attribute, ok := attributes[name]
+
+		if !ok {
+			diags.AddError(
+				"Missing SecurityGroupsValue Attribute Value",
+				"While creating a SecurityGroupsValue value, a missing attribute value was detected. "+
+					"A SecurityGroupsValue must contain values for all attributes, even if null or unknown. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("SecurityGroupsValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
+			)
+
+			continue
+		}
+
+		if !attributeType.Equal(attribute.Type(ctx)) {
+			diags.AddError(
+				"Invalid SecurityGroupsValue Attribute Type",
+				"While creating a SecurityGroupsValue value, an invalid attribute value was detected. "+
+					"A SecurityGroupsValue must use a matching attribute type for the value. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("SecurityGroupsValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
+					fmt.Sprintf("SecurityGroupsValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
+			)
+		}
+	}
+
+	for name := range attributes {
+		_, ok := attributeTypes[name]
+
+		if !ok {
+			diags.AddError(
+				"Extra SecurityGroupsValue Attribute Value",
+				"While creating a SecurityGroupsValue value, an extra attribute value was detected. "+
+					"A SecurityGroupsValue must not contain values beyond the expected attribute types. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("Extra SecurityGroupsValue Attribute Name: %s", name),
+			)
+		}
+	}
+
+	if diags.HasError() {
+		return NewSecurityGroupsValueUnknown(), diags
+	}
+
+	urlAttribute, ok := attributes["url"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`url is missing from object`)
+
+		return NewSecurityGroupsValueUnknown(), diags
+	}
+
+	urlVal, ok := urlAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`url expected to be basetypes.StringValue, was: %T`, urlAttribute))
+	}
+
+	if diags.HasError() {
+		return NewSecurityGroupsValueUnknown(), diags
+	}
+
+	return SecurityGroupsValue{
+		Url:   urlVal,
+		state: attr.ValueStateKnown,
+	}, diags
+}
+
+func NewSecurityGroupsValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) SecurityGroupsValue {
+	object, diags := NewSecurityGroupsValue(attributeTypes, attributes)
+
+	if diags.HasError() {
+		// This could potentially be added to the diag package.
+		diagsStrings := make([]string, 0, len(diags))
+
+		for _, diagnostic := range diags {
+			diagsStrings = append(diagsStrings, fmt.Sprintf(
+				"%s | %s | %s",
+				diagnostic.Severity(),
+				diagnostic.Summary(),
+				diagnostic.Detail()))
+		}
+
+		panic("NewSecurityGroupsValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
+	}
+
+	return object
+}
+
+func (t SecurityGroupsType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+	if in.Type() == nil {
+		return NewSecurityGroupsValueNull(), nil
+	}
+
+	if !in.Type().Equal(t.TerraformType(ctx)) {
+		return nil, fmt.Errorf("expected %s, got %s", t.TerraformType(ctx), in.Type())
+	}
+
+	if !in.IsKnown() {
+		return NewSecurityGroupsValueUnknown(), nil
+	}
+
+	if in.IsNull() {
+		return NewSecurityGroupsValueNull(), nil
+	}
+
+	attributes := map[string]attr.Value{}
+
+	val := map[string]tftypes.Value{}
+
+	err := in.As(&val)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for k, v := range val {
+		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
+
+		if err != nil {
+			return nil, err
+		}
+
+		attributes[k] = a
+	}
+
+	return NewSecurityGroupsValueMust(SecurityGroupsValue{}.AttributeTypes(ctx), attributes), nil
+}
+
+func (t SecurityGroupsType) ValueType(ctx context.Context) attr.Value {
+	return SecurityGroupsValue{}
+}
+
+var _ basetypes.ObjectValuable = SecurityGroupsValue{}
+
+type SecurityGroupsValue struct {
+	Url   basetypes.StringValue `tfsdk:"url"`
+	state attr.ValueState
+}
+
+func (v SecurityGroupsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+	attrTypes := make(map[string]tftypes.Type, 1)
+
+	var val tftypes.Value
+	var err error
+
+	attrTypes["url"] = basetypes.StringType{}.TerraformType(ctx)
+
+	objectType := tftypes.Object{AttributeTypes: attrTypes}
+
+	switch v.state {
+	case attr.ValueStateKnown:
+		vals := make(map[string]tftypes.Value, 1)
+
+		val, err = v.Url.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["url"] = val
+
+		if err := tftypes.ValidateValue(objectType, vals); err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		return tftypes.NewValue(objectType, vals), nil
+	case attr.ValueStateNull:
+		return tftypes.NewValue(objectType, nil), nil
+	case attr.ValueStateUnknown:
+		return tftypes.NewValue(objectType, tftypes.UnknownValue), nil
+	default:
+		panic(fmt.Sprintf("unhandled Object state in ToTerraformValue: %s", v.state))
+	}
+}
+
+func (v SecurityGroupsValue) IsNull() bool {
+	return v.state == attr.ValueStateNull
+}
+
+func (v SecurityGroupsValue) IsUnknown() bool {
+	return v.state == attr.ValueStateUnknown
+}
+
+func (v SecurityGroupsValue) String() string {
+	return "SecurityGroupsValue"
+}
+
+func (v SecurityGroupsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributeTypes := map[string]attr.Type{
+		"url": basetypes.StringType{},
+	}
+
+	if v.IsNull() {
+		return types.ObjectNull(attributeTypes), diags
+	}
+
+	if v.IsUnknown() {
+		return types.ObjectUnknown(attributeTypes), diags
+	}
+
+	objVal, diags := types.ObjectValue(
+		attributeTypes,
+		map[string]attr.Value{
+			"url": v.Url,
+		})
+
+	return objVal, diags
+}
+
+func (v SecurityGroupsValue) Equal(o attr.Value) bool {
+	other, ok := o.(SecurityGroupsValue)
+
+	if !ok {
+		return false
+	}
+
+	if v.state != other.state {
+		return false
+	}
+
+	if v.state != attr.ValueStateKnown {
+		return true
+	}
+
+	if !v.Url.Equal(other.Url) {
+		return false
+	}
+
+	return true
+}
+
+func (v SecurityGroupsValue) Type(ctx context.Context) attr.Type {
+	return SecurityGroupsType{
+		basetypes.ObjectType{
+			AttrTypes: v.AttributeTypes(ctx),
+		},
+	}
+}
+
+func (v SecurityGroupsValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
+	return map[string]attr.Type{
+		"url": basetypes.StringType{},
 	}
 }
