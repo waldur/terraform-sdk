@@ -19,16 +19,22 @@ func OpenstackVolumeDataSourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"availability_zone": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "Availability zone where this volume is located",
+				MarkdownDescription: "Availability zone where this volume is located",
 			},
 			"availability_zone_name": schema.StringAttribute{
 				Computed: true,
 			},
 			"backend_id": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "Volume ID in the OpenStack backend",
+				MarkdownDescription: "Volume ID in the OpenStack backend",
 			},
 			"bootable": schema.BoolAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "Indicates if this volume can be used to boot an instance",
+				MarkdownDescription: "Indicates if this volume can be used to boot an instance",
 			},
 			"created": schema.StringAttribute{
 				Computed: true,
@@ -68,16 +74,24 @@ func OpenstackVolumeDataSourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 			},
 			"image": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "Image that this volume was created from, if any",
+				MarkdownDescription: "Image that this volume was created from, if any",
 			},
 			"image_metadata": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "Metadata of the image this volume was created from",
+				MarkdownDescription: "Metadata of the image this volume was created from",
 			},
 			"image_name": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "Name of the image this volume was created from",
+				MarkdownDescription: "Name of the image this volume was created from",
 			},
 			"instance": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "Instance that this volume is attached to, if any",
+				MarkdownDescription: "Instance that this volume is attached to, if any",
 			},
 			"instance_marketplace_uuid": schema.StringAttribute{
 				Computed: true,
@@ -154,7 +168,9 @@ func OpenstackVolumeDataSourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "Size in MiB",
 			},
 			"source_snapshot": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "Snapshot that this volume was created from, if any",
+				MarkdownDescription: "Snapshot that this volume was created from, if any",
 			},
 			"state": schema.StringAttribute{
 				Computed: true,
@@ -166,7 +182,9 @@ func OpenstackVolumeDataSourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"type": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "Type of the volume (e.g. SSD, HDD)",
+				MarkdownDescription: "Type of the volume (e.g. SSD, HDD)",
 			},
 			"type_name": schema.StringAttribute{
 				Computed: true,

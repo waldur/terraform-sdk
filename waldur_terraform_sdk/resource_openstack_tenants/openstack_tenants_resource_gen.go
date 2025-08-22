@@ -31,7 +31,9 @@ func OpenstackTenantsResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"backend_id": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "ID of tenant in the OpenStack backend",
+				MarkdownDescription: "ID of tenant in the OpenStack backend",
 			},
 			"created": schema.StringAttribute{
 				Computed: true,
@@ -71,7 +73,9 @@ func OpenstackTenantsResourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"external_network_id": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "ID of external network connected to OpenStack tenant",
+				MarkdownDescription: "ID of external network connected to OpenStack tenant",
 			},
 			"field": schema.ListAttribute{
 				ElementType: types.StringType,
@@ -79,7 +83,9 @@ func OpenstackTenantsResourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 			},
 			"internal_network_id": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "ID of internal network in OpenStack tenant",
+				MarkdownDescription: "ID of internal network in OpenStack tenant",
 			},
 			"is_limit_based": schema.BoolAttribute{
 				Computed: true,

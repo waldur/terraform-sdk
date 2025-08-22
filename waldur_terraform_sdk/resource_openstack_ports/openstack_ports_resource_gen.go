@@ -25,7 +25,9 @@ func OpenstackPortsResourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"admin_state_up": schema.BoolAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "Administrative state of the port. If down, port does not forward packets",
+				MarkdownDescription: "Administrative state of the port. If down, port does not forward packets",
 			},
 			"allowed_address_pairs": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
@@ -56,7 +58,9 @@ func OpenstackPortsResourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"backend_id": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "Port ID in OpenStack",
+				MarkdownDescription: "Port ID in OpenStack",
 			},
 			"created": schema.StringAttribute{
 				Computed: true,
@@ -81,10 +85,14 @@ func OpenstackPortsResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"device_id": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "ID of device (instance, router etc) to which this port is connected",
+				MarkdownDescription: "ID of device (instance, router etc) to which this port is connected",
 			},
 			"device_owner": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "Entity that uses this port (e.g. network:router_interface)",
+				MarkdownDescription: "Entity that uses this port (e.g. network:router_interface)",
 			},
 			"error_message": schema.StringAttribute{
 				Computed: true,
@@ -101,13 +109,17 @@ func OpenstackPortsResourceSchema(ctx context.Context) schema.Schema {
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"ip_address": schema.StringAttribute{
-							Required: true,
+							Required:            true,
+							Description:         "IP address to assign to the port",
+							MarkdownDescription: "IP address to assign to the port",
 							Validators: []validator.String{
 								stringvalidator.LengthAtLeast(1),
 							},
 						},
 						"subnet_id": schema.StringAttribute{
-							Required: true,
+							Required:            true,
+							Description:         "ID of the subnet in which to assign the IP address",
+							MarkdownDescription: "ID of the subnet in which to assign the IP address",
 							Validators: []validator.String{
 								stringvalidator.LengthAtLeast(1),
 							},
@@ -133,8 +145,10 @@ func OpenstackPortsResourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"mac_address": schema.StringAttribute{
-				Optional: true,
-				Computed: true,
+				Optional:            true,
+				Computed:            true,
+				Description:         "MAC address of the port",
+				MarkdownDescription: "MAC address of the port",
 				Validators: []validator.String{
 					stringvalidator.LengthAtMost(32),
 				},
@@ -170,8 +184,10 @@ func OpenstackPortsResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"network": schema.StringAttribute{
-				Optional: true,
-				Computed: true,
+				Optional:            true,
+				Computed:            true,
+				Description:         "Network to which this port belongs",
+				MarkdownDescription: "Network to which this port belongs",
 			},
 			"network_name": schema.StringAttribute{
 				Computed: true,
@@ -180,8 +196,10 @@ func OpenstackPortsResourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"port_security_enabled": schema.BoolAttribute{
-				Optional: true,
-				Computed: true,
+				Optional:            true,
+				Computed:            true,
+				Description:         "If True, security groups and rules will be applied to this port",
+				MarkdownDescription: "If True, security groups and rules will be applied to this port",
 			},
 			"project": schema.StringAttribute{
 				Computed: true,
@@ -239,10 +257,14 @@ func OpenstackPortsResourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"status": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "Port status in OpenStack (e.g. ACTIVE, DOWN)",
+				MarkdownDescription: "Port status in OpenStack (e.g. ACTIVE, DOWN)",
 			},
 			"tenant": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "OpenStack tenant this port belongs to",
+				MarkdownDescription: "OpenStack tenant this port belongs to",
 			},
 			"tenant_name": schema.StringAttribute{
 				Computed: true,

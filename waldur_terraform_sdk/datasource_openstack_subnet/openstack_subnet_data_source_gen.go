@@ -64,14 +64,18 @@ func OpenstackSubnetDataSourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"disable_gateway": schema.BoolAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "If True, no gateway IP address will be allocated",
+				MarkdownDescription: "If True, no gateway IP address will be allocated",
 			},
 			"dns_nameservers": schema.ListAttribute{
 				ElementType: types.StringType,
 				Computed:    true,
 			},
 			"enable_dhcp": schema.BoolAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "If True, DHCP service will be enabled on this subnet",
+				MarkdownDescription: "If True, DHCP service will be enabled on this subnet",
 			},
 			"error_message": schema.StringAttribute{
 				Computed: true,
@@ -85,7 +89,9 @@ func OpenstackSubnetDataSourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 			},
 			"gateway_ip": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "IP address of the gateway for this subnet",
+				MarkdownDescription: "IP address of the gateway for this subnet",
 			},
 			"host_routes": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
@@ -106,7 +112,9 @@ func OpenstackSubnetDataSourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"ip_version": schema.Int64Attribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "IP protocol version (4 or 6)",
+				MarkdownDescription: "IP protocol version (4 or 6)",
 			},
 			"is_connected": schema.BoolAttribute{
 				Computed:            true,
@@ -147,7 +155,9 @@ func OpenstackSubnetDataSourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"network": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "Network to which this subnet belongs",
+				MarkdownDescription: "Network to which this subnet belongs",
 			},
 			"network_name": schema.StringAttribute{
 				Computed: true,

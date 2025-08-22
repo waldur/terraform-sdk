@@ -60,7 +60,9 @@ func OpenstackServerGroupDataSourceSchema(ctx context.Context) schema.Schema {
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"backend_id": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "Instance ID in the OpenStack backend",
+							MarkdownDescription: "Instance ID in the OpenStack backend",
 						},
 						"name": schema.StringAttribute{
 							Computed: true,

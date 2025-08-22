@@ -13,7 +13,9 @@ func OpenstackInstanceAvailabilityZoneDataSourceSchema(ctx context.Context) sche
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"available": schema.BoolAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "Indicates whether this availability zone is available for instance provisioning",
+				MarkdownDescription: "Indicates whether this availability zone is available for instance provisioning",
 			},
 			"name": schema.StringAttribute{
 				Computed: true,

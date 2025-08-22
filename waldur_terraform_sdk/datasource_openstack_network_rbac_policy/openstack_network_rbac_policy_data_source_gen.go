@@ -25,7 +25,9 @@ func OpenstackNetworkRbacPolicyDataSourceSchema(ctx context.Context) schema.Sche
 				Computed: true,
 			},
 			"policy_type": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "Type of access granted - either shared access or external network access",
+				MarkdownDescription: "Type of access granted - either shared access or external network access",
 			},
 			"target_tenant": schema.StringAttribute{
 				Computed: true,

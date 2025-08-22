@@ -25,16 +25,24 @@ func OpenstackInstanceDataSourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"availability_zone": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "Availability zone where this instance is located",
+				MarkdownDescription: "Availability zone where this instance is located",
 			},
 			"availability_zone_name": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "Name of the availability zone where instance is located",
+				MarkdownDescription: "Name of the availability zone where instance is located",
 			},
 			"backend_id": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "Instance ID in the OpenStack backend",
+				MarkdownDescription: "Instance ID in the OpenStack backend",
 			},
 			"connect_directly_to_external_network": schema.BoolAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "If True, instance will be connected directly to external network",
+				MarkdownDescription: "If True, instance will be connected directly to external network",
 			},
 			"cores": schema.Int64Attribute{
 				Computed:            true,
@@ -89,22 +97,30 @@ func OpenstackInstanceDataSourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "Flavor disk size in MiB",
 			},
 			"flavor_name": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "Name of the flavor used by this instance",
+				MarkdownDescription: "Name of the flavor used by this instance",
 			},
 			"floating_ips": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"address": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "The public IPv4 address of the floating IP",
+							MarkdownDescription: "The public IPv4 address of the floating IP",
 						},
 						"port_fixed_ips": schema.ListNestedAttribute{
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
 									"ip_address": schema.StringAttribute{
-										Computed: true,
+										Computed:            true,
+										Description:         "IP address to assign to the port",
+										MarkdownDescription: "IP address to assign to the port",
 									},
 									"subnet_id": schema.StringAttribute{
-										Computed: true,
+										Computed:            true,
+										Description:         "ID of the subnet in which to assign the IP address",
+										MarkdownDescription: "ID of the subnet in which to assign the IP address",
 									},
 								},
 								CustomType: PortFixedIpsType{
@@ -116,13 +132,17 @@ func OpenstackInstanceDataSourceSchema(ctx context.Context) schema.Schema {
 							Computed: true,
 						},
 						"port_mac_address": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "MAC address of the port",
+							MarkdownDescription: "MAC address of the port",
 						},
 						"subnet": schema.StringAttribute{
 							Computed: true,
 						},
 						"subnet_cidr": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "IPv4 network address in CIDR format (e.g. 192.168.0.0/24)",
+							MarkdownDescription: "IPv4 network address in CIDR format (e.g. 192.168.0.0/24)",
 						},
 						"subnet_description": schema.StringAttribute{
 							Computed: true,
@@ -146,10 +166,14 @@ func OpenstackInstanceDataSourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
-				Computed: true,
+				Computed:            true,
+				Description:         "Floating IPs to assign to the instance",
+				MarkdownDescription: "Floating IPs to assign to the instance",
 			},
 			"hypervisor_hostname": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "Name of the hypervisor hosting this instance",
+				MarkdownDescription: "Name of the hypervisor hosting this instance",
 			},
 			"image_name": schema.StringAttribute{
 				Computed: true,
@@ -232,19 +256,27 @@ func OpenstackInstanceDataSourceSchema(ctx context.Context) schema.Schema {
 							Computed: true,
 						},
 						"device_id": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "ID of device (instance, router etc) to which this port is connected",
+							MarkdownDescription: "ID of device (instance, router etc) to which this port is connected",
 						},
 						"device_owner": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "Entity that uses this port (e.g. network:router_interface)",
+							MarkdownDescription: "Entity that uses this port (e.g. network:router_interface)",
 						},
 						"fixed_ips": schema.ListNestedAttribute{
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
 									"ip_address": schema.StringAttribute{
-										Computed: true,
+										Computed:            true,
+										Description:         "IP address to assign to the port",
+										MarkdownDescription: "IP address to assign to the port",
 									},
 									"subnet_id": schema.StringAttribute{
-										Computed: true,
+										Computed:            true,
+										Description:         "ID of the subnet in which to assign the IP address",
+										MarkdownDescription: "ID of the subnet in which to assign the IP address",
 									},
 								},
 								CustomType: FixedIpsType{
@@ -256,7 +288,9 @@ func OpenstackInstanceDataSourceSchema(ctx context.Context) schema.Schema {
 							Computed: true,
 						},
 						"mac_address": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "MAC address of the port",
+							MarkdownDescription: "MAC address of the port",
 						},
 						"security_groups": schema.ListNestedAttribute{
 							NestedObject: schema.NestedAttributeObject{
@@ -340,25 +374,35 @@ func OpenstackInstanceDataSourceSchema(ctx context.Context) schema.Schema {
 										NestedObject: schema.NestedAttributeObject{
 											Attributes: map[string]schema.Attribute{
 												"cidr": schema.StringAttribute{
-													Computed: true,
+													Computed:            true,
+													Description:         "CIDR notation for the source/destination network address range",
+													MarkdownDescription: "CIDR notation for the source/destination network address range",
 												},
 												"description": schema.StringAttribute{
 													Computed: true,
 												},
 												"direction": schema.StringAttribute{
-													Computed: true,
+													Computed:            true,
+													Description:         "Traffic direction - either 'ingress' (incoming) or 'egress' (outgoing)",
+													MarkdownDescription: "Traffic direction - either 'ingress' (incoming) or 'egress' (outgoing)",
 												},
 												"ethertype": schema.StringAttribute{
-													Computed: true,
+													Computed:            true,
+													Description:         "IP protocol version - either 'IPv4' or 'IPv6'",
+													MarkdownDescription: "IP protocol version - either 'IPv4' or 'IPv6'",
 												},
 												"from_port": schema.Int64Attribute{
-													Computed: true,
+													Computed:            true,
+													Description:         "Starting port number in the range (1-65535)",
+													MarkdownDescription: "Starting port number in the range (1-65535)",
 												},
 												"id": schema.Int64Attribute{
 													Computed: true,
 												},
 												"remote_group": schema.StringAttribute{
-													Computed: true,
+													Computed:            true,
+													Description:         "Remote security group that this rule references, if any",
+													MarkdownDescription: "Remote security group that this rule references, if any",
 												},
 												"remote_group_name": schema.StringAttribute{
 													Computed: true,
@@ -367,7 +411,9 @@ func OpenstackInstanceDataSourceSchema(ctx context.Context) schema.Schema {
 													Computed: true,
 												},
 												"to_port": schema.Int64Attribute{
-													Computed: true,
+													Computed:            true,
+													Description:         "Ending port number in the range (1-65535)",
+													MarkdownDescription: "Ending port number in the range (1-65535)",
 												},
 											},
 											CustomType: RulesType{
@@ -421,10 +467,14 @@ func OpenstackInstanceDataSourceSchema(ctx context.Context) schema.Schema {
 							Computed: true,
 						},
 						"subnet": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "Subnet to which this port belongs",
+							MarkdownDescription: "Subnet to which this port belongs",
 						},
 						"subnet_cidr": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "IPv4 network address in CIDR format (e.g. 192.168.0.0/24)",
+							MarkdownDescription: "IPv4 network address in CIDR format (e.g. 192.168.0.0/24)",
 						},
 						"subnet_description": schema.StringAttribute{
 							Computed: true,
@@ -445,7 +495,9 @@ func OpenstackInstanceDataSourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
-				Computed: true,
+				Computed:            true,
+				Description:         "Network ports to attach to the instance",
+				MarkdownDescription: "Network ports to attach to the instance",
 			},
 			"project": schema.StringAttribute{
 				Computed: true,
@@ -499,7 +551,9 @@ func OpenstackInstanceDataSourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
-				Computed: true,
+				Computed:            true,
+				Description:         "List of security groups to apply to the instance",
+				MarkdownDescription: "List of security groups to apply to the instance",
 			},
 			"server_group": schema.SingleNestedAttribute{
 				Attributes: map[string]schema.Attribute{
@@ -507,7 +561,9 @@ func OpenstackInstanceDataSourceSchema(ctx context.Context) schema.Schema {
 						Computed: true,
 					},
 					"policy": schema.StringAttribute{
-						Computed: true,
+						Computed:            true,
+						Description:         "Server group policy determining the rules for scheduling servers in this group",
+						MarkdownDescription: "Server group policy determining the rules for scheduling servers in this group",
 					},
 					"state": schema.StringAttribute{
 						Computed: true,
@@ -521,13 +577,17 @@ func OpenstackInstanceDataSourceSchema(ctx context.Context) schema.Schema {
 						AttrTypes: ServerGroupValue{}.AttributeTypes(ctx),
 					},
 				},
-				Computed: true,
+				Computed:            true,
+				Description:         "Server group for instance scheduling policy",
+				MarkdownDescription: "Server group for instance scheduling policy",
 			},
 			"service_name": schema.StringAttribute{
 				Computed: true,
 			},
 			"service_settings": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "OpenStack provider settings",
+				MarkdownDescription: "OpenStack provider settings",
 			},
 			"service_settings_error_message": schema.StringAttribute{
 				Computed: true,
@@ -545,10 +605,14 @@ func OpenstackInstanceDataSourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"tenant": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "The OpenStack tenant to create the instance in",
+				MarkdownDescription: "The OpenStack tenant to create the instance in",
 			},
 			"tenant_uuid": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "UUID of the OpenStack tenant",
+				MarkdownDescription: "UUID of the OpenStack tenant",
 			},
 			"url": schema.StringAttribute{
 				Computed: true,
@@ -565,7 +629,9 @@ func OpenstackInstanceDataSourceSchema(ctx context.Context) schema.Schema {
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"bootable": schema.BoolAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "Indicates if this volume can be used to boot an instance",
+							MarkdownDescription: "Indicates if this volume can be used to boot an instance",
 						},
 						"device": schema.StringAttribute{
 							Computed:            true,
@@ -573,7 +639,9 @@ func OpenstackInstanceDataSourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "Name of volume as instance device e.g. /dev/vdb.",
 						},
 						"image_name": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "Name of the image this volume was created from",
+							MarkdownDescription: "Name of the image this volume was created from",
 						},
 						"marketplace_resource_uuid": schema.StringAttribute{
 							Computed: true,
@@ -593,7 +661,9 @@ func OpenstackInstanceDataSourceSchema(ctx context.Context) schema.Schema {
 							Computed: true,
 						},
 						"type": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "Type of the volume (e.g. SSD, HDD)",
+							MarkdownDescription: "Type of the volume (e.g. SSD, HDD)",
 						},
 						"type_name": schema.StringAttribute{
 							Computed: true,
@@ -611,7 +681,9 @@ func OpenstackInstanceDataSourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
-				Computed: true,
+				Computed:            true,
+				Description:         "List of volumes attached to the instance",
+				MarkdownDescription: "List of volumes attached to the instance",
 			},
 		},
 	}

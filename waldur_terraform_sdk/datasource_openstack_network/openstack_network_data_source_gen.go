@@ -54,7 +54,9 @@ func OpenstackNetworkDataSourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 			},
 			"is_external": schema.BoolAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "Defines whether this network is external (public) or internal (private)",
+				MarkdownDescription: "Defines whether this network is external (public) or internal (private)",
 			},
 			"is_limit_based": schema.BoolAttribute{
 				Computed: true,
@@ -119,7 +121,9 @@ func OpenstackNetworkDataSourceSchema(ctx context.Context) schema.Schema {
 							Computed: true,
 						},
 						"policy_type": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "Type of access granted - either shared access or external network access",
+							MarkdownDescription: "Type of access granted - either shared access or external network access",
 						},
 						"target_tenant": schema.StringAttribute{
 							Computed: true,
@@ -185,19 +189,27 @@ func OpenstackNetworkDataSourceSchema(ctx context.Context) schema.Schema {
 							Computed: true,
 						},
 						"cidr": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "IPv4 network address in CIDR format (e.g. 192.168.0.0/24)",
+							MarkdownDescription: "IPv4 network address in CIDR format (e.g. 192.168.0.0/24)",
 						},
 						"description": schema.StringAttribute{
 							Computed: true,
 						},
 						"enable_dhcp": schema.BoolAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "If True, DHCP service will be enabled on this subnet",
+							MarkdownDescription: "If True, DHCP service will be enabled on this subnet",
 						},
 						"gateway_ip": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "IP address of the gateway for this subnet",
+							MarkdownDescription: "IP address of the gateway for this subnet",
 						},
 						"ip_version": schema.Int64Attribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "IP protocol version (4 or 6)",
+							MarkdownDescription: "IP protocol version (4 or 6)",
 						},
 						"name": schema.StringAttribute{
 							Computed: true,
@@ -215,7 +227,9 @@ func OpenstackNetworkDataSourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"tenant": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "OpenStack tenant this network belongs to",
+				MarkdownDescription: "OpenStack tenant this network belongs to",
 			},
 			"tenant_name": schema.StringAttribute{
 				Computed: true,
@@ -224,7 +238,9 @@ func OpenstackNetworkDataSourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"type": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "Network type, such as local, flat, vlan, vxlan, or gre",
+				MarkdownDescription: "Network type, such as local, flat, vlan, vxlan, or gre",
 			},
 			"url": schema.StringAttribute{
 				Computed: true,

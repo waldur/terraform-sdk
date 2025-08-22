@@ -25,7 +25,9 @@ func OpenstackSnapshotDataSourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"backend_id": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "Snapshot ID in the OpenStack backend",
+				MarkdownDescription: "Snapshot ID in the OpenStack backend",
 			},
 			"created": schema.StringAttribute{
 				Computed: true,
@@ -121,7 +123,9 @@ func OpenstackSnapshotDataSourceSchema(ctx context.Context) schema.Schema {
 							Computed: true,
 						},
 						"volume": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "Volume that is being restored from the snapshot",
+							MarkdownDescription: "Volume that is being restored from the snapshot",
 						},
 						"volume_device": schema.StringAttribute{
 							Computed:            true,
@@ -175,7 +179,9 @@ func OpenstackSnapshotDataSourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "Size in MiB",
 			},
 			"source_volume": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "Volume from which this snapshot was created",
+				MarkdownDescription: "Volume from which this snapshot was created",
 			},
 			"source_volume_marketplace_uuid": schema.StringAttribute{
 				Computed: true,

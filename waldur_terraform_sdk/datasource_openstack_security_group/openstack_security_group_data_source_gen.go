@@ -102,25 +102,35 @@ func OpenstackSecurityGroupDataSourceSchema(ctx context.Context) schema.Schema {
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"cidr": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "CIDR notation for the source/destination network address range",
+							MarkdownDescription: "CIDR notation for the source/destination network address range",
 						},
 						"description": schema.StringAttribute{
 							Computed: true,
 						},
 						"direction": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "Traffic direction - either 'ingress' (incoming) or 'egress' (outgoing)",
+							MarkdownDescription: "Traffic direction - either 'ingress' (incoming) or 'egress' (outgoing)",
 						},
 						"ethertype": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "IP protocol version - either 'IPv4' or 'IPv6'",
+							MarkdownDescription: "IP protocol version - either 'IPv4' or 'IPv6'",
 						},
 						"from_port": schema.Int64Attribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "Starting port number in the range (1-65535)",
+							MarkdownDescription: "Starting port number in the range (1-65535)",
 						},
 						"id": schema.Int64Attribute{
 							Computed: true,
 						},
 						"remote_group": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "Remote security group that this rule references, if any",
+							MarkdownDescription: "Remote security group that this rule references, if any",
 						},
 						"remote_group_name": schema.StringAttribute{
 							Computed: true,
@@ -129,7 +139,9 @@ func OpenstackSecurityGroupDataSourceSchema(ctx context.Context) schema.Schema {
 							Computed: true,
 						},
 						"to_port": schema.Int64Attribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "Ending port number in the range (1-65535)",
+							MarkdownDescription: "Ending port number in the range (1-65535)",
 						},
 					},
 					CustomType: RulesType{

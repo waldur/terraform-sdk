@@ -24,7 +24,9 @@ func OpenstackRoutersResourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"backend_id": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
+				Description:         "Router ID in OpenStack",
+				MarkdownDescription: "Router ID in OpenStack",
 			},
 			"created": schema.StringAttribute{
 				Computed: true,
@@ -59,10 +61,14 @@ func OpenstackRoutersResourceSchema(ctx context.Context) schema.Schema {
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"ip_address": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "IP address to assign to the port",
+							MarkdownDescription: "IP address to assign to the port",
 						},
 						"subnet_id": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "ID of the subnet in which to assign the IP address",
+							MarkdownDescription: "ID of the subnet in which to assign the IP address",
 						},
 					},
 					CustomType: FixedIpsType{
@@ -132,19 +138,27 @@ func OpenstackRoutersResourceSchema(ctx context.Context) schema.Schema {
 							Computed: true,
 						},
 						"device_id": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "ID of device (instance, router etc) to which this port is connected",
+							MarkdownDescription: "ID of device (instance, router etc) to which this port is connected",
 						},
 						"device_owner": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "Entity that uses this port (e.g. network:router_interface)",
+							MarkdownDescription: "Entity that uses this port (e.g. network:router_interface)",
 						},
 						"fixed_ips": schema.ListNestedAttribute{
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
 									"ip_address": schema.StringAttribute{
-										Computed: true,
+										Computed:            true,
+										Description:         "IP address to assign to the port",
+										MarkdownDescription: "IP address to assign to the port",
 									},
 									"subnet_id": schema.StringAttribute{
-										Computed: true,
+										Computed:            true,
+										Description:         "ID of the subnet in which to assign the IP address",
+										MarkdownDescription: "ID of the subnet in which to assign the IP address",
 									},
 								},
 								CustomType: FixedIpsType{
@@ -156,7 +170,9 @@ func OpenstackRoutersResourceSchema(ctx context.Context) schema.Schema {
 							Computed: true,
 						},
 						"mac_address": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "MAC address of the port",
+							MarkdownDescription: "MAC address of the port",
 						},
 						"security_groups": schema.ListNestedAttribute{
 							NestedObject: schema.NestedAttributeObject{
@@ -240,25 +256,35 @@ func OpenstackRoutersResourceSchema(ctx context.Context) schema.Schema {
 										NestedObject: schema.NestedAttributeObject{
 											Attributes: map[string]schema.Attribute{
 												"cidr": schema.StringAttribute{
-													Computed: true,
+													Computed:            true,
+													Description:         "CIDR notation for the source/destination network address range",
+													MarkdownDescription: "CIDR notation for the source/destination network address range",
 												},
 												"description": schema.StringAttribute{
 													Computed: true,
 												},
 												"direction": schema.StringAttribute{
-													Computed: true,
+													Computed:            true,
+													Description:         "Traffic direction - either 'ingress' (incoming) or 'egress' (outgoing)",
+													MarkdownDescription: "Traffic direction - either 'ingress' (incoming) or 'egress' (outgoing)",
 												},
 												"ethertype": schema.StringAttribute{
-													Computed: true,
+													Computed:            true,
+													Description:         "IP protocol version - either 'IPv4' or 'IPv6'",
+													MarkdownDescription: "IP protocol version - either 'IPv4' or 'IPv6'",
 												},
 												"from_port": schema.Int64Attribute{
-													Computed: true,
+													Computed:            true,
+													Description:         "Starting port number in the range (1-65535)",
+													MarkdownDescription: "Starting port number in the range (1-65535)",
 												},
 												"id": schema.Int64Attribute{
 													Computed: true,
 												},
 												"remote_group": schema.StringAttribute{
-													Computed: true,
+													Computed:            true,
+													Description:         "Remote security group that this rule references, if any",
+													MarkdownDescription: "Remote security group that this rule references, if any",
 												},
 												"remote_group_name": schema.StringAttribute{
 													Computed: true,
@@ -267,7 +293,9 @@ func OpenstackRoutersResourceSchema(ctx context.Context) schema.Schema {
 													Computed: true,
 												},
 												"to_port": schema.Int64Attribute{
-													Computed: true,
+													Computed:            true,
+													Description:         "Ending port number in the range (1-65535)",
+													MarkdownDescription: "Ending port number in the range (1-65535)",
 												},
 											},
 											CustomType: RulesType{
@@ -321,10 +349,14 @@ func OpenstackRoutersResourceSchema(ctx context.Context) schema.Schema {
 							Computed: true,
 						},
 						"subnet": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "Subnet to which this port belongs",
+							MarkdownDescription: "Subnet to which this port belongs",
 						},
 						"subnet_cidr": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
+							Description:         "IPv4 network address in CIDR format (e.g. 192.168.0.0/24)",
+							MarkdownDescription: "IPv4 network address in CIDR format (e.g. 192.168.0.0/24)",
 						},
 						"subnet_description": schema.StringAttribute{
 							Computed: true,
@@ -396,7 +428,9 @@ func OpenstackRoutersResourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"tenant": schema.StringAttribute{
-				Required: true,
+				Required:            true,
+				Description:         "OpenStack tenant this router belongs to",
+				MarkdownDescription: "OpenStack tenant this router belongs to",
 			},
 			"tenant_name": schema.StringAttribute{
 				Computed: true,
