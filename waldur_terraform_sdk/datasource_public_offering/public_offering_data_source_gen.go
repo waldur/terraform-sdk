@@ -192,6 +192,9 @@ func PublicOfferingDataSourceSchema(ctx context.Context) schema.Schema {
 				Description:         "Get the Google Calendar link for an offering.",
 				MarkdownDescription: "Get the Google Calendar link for an offering.",
 			},
+			"has_compliance_requirements": schema.BoolAttribute{
+				Computed: true,
+			},
 			"image": schema.StringAttribute{
 				Computed: true,
 			},
@@ -866,68 +869,69 @@ func PublicOfferingDataSourceSchema(ctx context.Context) schema.Schema {
 }
 
 type PublicOfferingModel struct {
-	AccessUrl              types.String         `tfsdk:"access_url"`
-	BackendId              types.String         `tfsdk:"backend_id"`
-	Billable               types.Bool           `tfsdk:"billable"`
-	Category               types.String         `tfsdk:"category"`
-	CategoryTitle          types.String         `tfsdk:"category_title"`
-	CategoryUuid           types.String         `tfsdk:"category_uuid"`
-	CitationCount          types.Int64          `tfsdk:"citation_count"`
-	Components             types.List           `tfsdk:"components"`
-	Created                types.String         `tfsdk:"created"`
-	Customer               types.String         `tfsdk:"customer"`
-	CustomerName           types.String         `tfsdk:"customer_name"`
-	CustomerUuid           types.String         `tfsdk:"customer_uuid"`
-	DataciteDoi            types.String         `tfsdk:"datacite_doi"`
-	Description            types.String         `tfsdk:"description"`
-	Endpoints              types.List           `tfsdk:"endpoints"`
-	Field                  types.List           `tfsdk:"field"`
-	Files                  types.List           `tfsdk:"files"`
-	FullDescription        types.String         `tfsdk:"full_description"`
-	GettingStarted         types.String         `tfsdk:"getting_started"`
-	GoogleCalendarIsPublic types.Bool           `tfsdk:"google_calendar_is_public"`
-	GoogleCalendarLink     types.String         `tfsdk:"google_calendar_link"`
-	Image                  types.String         `tfsdk:"image"`
-	IntegrationGuide       types.String         `tfsdk:"integration_guide"`
-	Latitude               types.Float64        `tfsdk:"latitude"`
-	Longitude              types.Float64        `tfsdk:"longitude"`
-	Name                   types.String         `tfsdk:"name"`
-	Options                OptionsValue         `tfsdk:"options"`
-	OrderCount             types.Int64          `tfsdk:"order_count"`
-	OrganizationGroups     types.List           `tfsdk:"organization_groups"`
-	ParentDescription      types.String         `tfsdk:"parent_description"`
-	ParentName             types.String         `tfsdk:"parent_name"`
-	ParentUuid             types.String         `tfsdk:"parent_uuid"`
-	PausedReason           types.String         `tfsdk:"paused_reason"`
-	Plans                  types.List           `tfsdk:"plans"`
-	PluginOptions          PluginOptionsValue   `tfsdk:"plugin_options"`
-	PrivacyPolicyLink      types.String         `tfsdk:"privacy_policy_link"`
-	Project                types.String         `tfsdk:"project"`
-	ProjectName            types.String         `tfsdk:"project_name"`
-	ProjectUuid            types.String         `tfsdk:"project_uuid"`
-	PromotionCampaigns     types.List           `tfsdk:"promotion_campaigns"`
-	Quotas                 types.List           `tfsdk:"quotas"`
-	ResourceOptions        ResourceOptionsValue `tfsdk:"resource_options"`
-	Roles                  types.List           `tfsdk:"roles"`
-	Scope                  types.String         `tfsdk:"scope"`
-	ScopeErrorMessage      types.String         `tfsdk:"scope_error_message"`
-	ScopeName              types.String         `tfsdk:"scope_name"`
-	ScopeState             types.String         `tfsdk:"scope_state"`
-	ScopeUuid              types.String         `tfsdk:"scope_uuid"`
-	Screenshots            types.List           `tfsdk:"screenshots"`
-	Shared                 types.Bool           `tfsdk:"shared"`
-	Slug                   types.String         `tfsdk:"slug"`
-	State                  types.String         `tfsdk:"state"`
-	TermsOfService         types.String         `tfsdk:"terms_of_service"`
-	TermsOfServiceLink     types.String         `tfsdk:"terms_of_service_link"`
-	Thumbnail              types.String         `tfsdk:"thumbnail"`
-	TotalCost              types.Int64          `tfsdk:"total_cost"`
-	TotalCostEstimated     types.Int64          `tfsdk:"total_cost_estimated"`
-	TotalCustomers         types.Int64          `tfsdk:"total_customers"`
-	Type                   types.String         `tfsdk:"type"`
-	Url                    types.String         `tfsdk:"url"`
-	Uuid                   types.String         `tfsdk:"uuid"`
-	VendorDetails          types.String         `tfsdk:"vendor_details"`
+	AccessUrl                 types.String         `tfsdk:"access_url"`
+	BackendId                 types.String         `tfsdk:"backend_id"`
+	Billable                  types.Bool           `tfsdk:"billable"`
+	Category                  types.String         `tfsdk:"category"`
+	CategoryTitle             types.String         `tfsdk:"category_title"`
+	CategoryUuid              types.String         `tfsdk:"category_uuid"`
+	CitationCount             types.Int64          `tfsdk:"citation_count"`
+	Components                types.List           `tfsdk:"components"`
+	Created                   types.String         `tfsdk:"created"`
+	Customer                  types.String         `tfsdk:"customer"`
+	CustomerName              types.String         `tfsdk:"customer_name"`
+	CustomerUuid              types.String         `tfsdk:"customer_uuid"`
+	DataciteDoi               types.String         `tfsdk:"datacite_doi"`
+	Description               types.String         `tfsdk:"description"`
+	Endpoints                 types.List           `tfsdk:"endpoints"`
+	Field                     types.List           `tfsdk:"field"`
+	Files                     types.List           `tfsdk:"files"`
+	FullDescription           types.String         `tfsdk:"full_description"`
+	GettingStarted            types.String         `tfsdk:"getting_started"`
+	GoogleCalendarIsPublic    types.Bool           `tfsdk:"google_calendar_is_public"`
+	GoogleCalendarLink        types.String         `tfsdk:"google_calendar_link"`
+	HasComplianceRequirements types.Bool           `tfsdk:"has_compliance_requirements"`
+	Image                     types.String         `tfsdk:"image"`
+	IntegrationGuide          types.String         `tfsdk:"integration_guide"`
+	Latitude                  types.Float64        `tfsdk:"latitude"`
+	Longitude                 types.Float64        `tfsdk:"longitude"`
+	Name                      types.String         `tfsdk:"name"`
+	Options                   OptionsValue         `tfsdk:"options"`
+	OrderCount                types.Int64          `tfsdk:"order_count"`
+	OrganizationGroups        types.List           `tfsdk:"organization_groups"`
+	ParentDescription         types.String         `tfsdk:"parent_description"`
+	ParentName                types.String         `tfsdk:"parent_name"`
+	ParentUuid                types.String         `tfsdk:"parent_uuid"`
+	PausedReason              types.String         `tfsdk:"paused_reason"`
+	Plans                     types.List           `tfsdk:"plans"`
+	PluginOptions             PluginOptionsValue   `tfsdk:"plugin_options"`
+	PrivacyPolicyLink         types.String         `tfsdk:"privacy_policy_link"`
+	Project                   types.String         `tfsdk:"project"`
+	ProjectName               types.String         `tfsdk:"project_name"`
+	ProjectUuid               types.String         `tfsdk:"project_uuid"`
+	PromotionCampaigns        types.List           `tfsdk:"promotion_campaigns"`
+	Quotas                    types.List           `tfsdk:"quotas"`
+	ResourceOptions           ResourceOptionsValue `tfsdk:"resource_options"`
+	Roles                     types.List           `tfsdk:"roles"`
+	Scope                     types.String         `tfsdk:"scope"`
+	ScopeErrorMessage         types.String         `tfsdk:"scope_error_message"`
+	ScopeName                 types.String         `tfsdk:"scope_name"`
+	ScopeState                types.String         `tfsdk:"scope_state"`
+	ScopeUuid                 types.String         `tfsdk:"scope_uuid"`
+	Screenshots               types.List           `tfsdk:"screenshots"`
+	Shared                    types.Bool           `tfsdk:"shared"`
+	Slug                      types.String         `tfsdk:"slug"`
+	State                     types.String         `tfsdk:"state"`
+	TermsOfService            types.String         `tfsdk:"terms_of_service"`
+	TermsOfServiceLink        types.String         `tfsdk:"terms_of_service_link"`
+	Thumbnail                 types.String         `tfsdk:"thumbnail"`
+	TotalCost                 types.Int64          `tfsdk:"total_cost"`
+	TotalCostEstimated        types.Int64          `tfsdk:"total_cost_estimated"`
+	TotalCustomers            types.Int64          `tfsdk:"total_customers"`
+	Type                      types.String         `tfsdk:"type"`
+	Url                       types.String         `tfsdk:"url"`
+	Uuid                      types.String         `tfsdk:"uuid"`
+	VendorDetails             types.String         `tfsdk:"vendor_details"`
 }
 
 var _ basetypes.ObjectTypable = ComponentsType{}

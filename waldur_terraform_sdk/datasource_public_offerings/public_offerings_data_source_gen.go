@@ -291,6 +291,9 @@ func PublicOfferingsDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "Get the Google Calendar link for an offering.",
 							MarkdownDescription: "Get the Google Calendar link for an offering.",
 						},
+						"has_compliance_requirements": schema.BoolAttribute{
+							Computed: true,
+						},
 						"image": schema.StringAttribute{
 							Computed: true,
 						},
@@ -1434,6 +1437,24 @@ func (t PublicOfferingsType) ValueFromObject(ctx context.Context, in basetypes.O
 			fmt.Sprintf(`google_calendar_link expected to be basetypes.StringValue, was: %T`, googleCalendarLinkAttribute))
 	}
 
+	hasComplianceRequirementsAttribute, ok := attributes["has_compliance_requirements"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`has_compliance_requirements is missing from object`)
+
+		return nil, diags
+	}
+
+	hasComplianceRequirementsVal, ok := hasComplianceRequirementsAttribute.(basetypes.BoolValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`has_compliance_requirements expected to be basetypes.BoolValue, was: %T`, hasComplianceRequirementsAttribute))
+	}
+
 	imageAttribute, ok := attributes["image"]
 
 	if !ok {
@@ -2177,68 +2198,69 @@ func (t PublicOfferingsType) ValueFromObject(ctx context.Context, in basetypes.O
 	}
 
 	return PublicOfferingsValue{
-		AccessUrl:              accessUrlVal,
-		BackendId:              backendIdVal,
-		Billable:               billableVal,
-		Category:               categoryVal,
-		CategoryTitle:          categoryTitleVal,
-		CategoryUuid:           categoryUuidVal,
-		CitationCount:          citationCountVal,
-		Components:             componentsVal,
-		Created:                createdVal,
-		Customer:               customerVal,
-		CustomerName:           customerNameVal,
-		CustomerUuid:           customerUuidVal,
-		DataciteDoi:            dataciteDoiVal,
-		Description:            descriptionVal,
-		Endpoints:              endpointsVal,
-		Files:                  filesVal,
-		FullDescription:        fullDescriptionVal,
-		GettingStarted:         gettingStartedVal,
-		GoogleCalendarIsPublic: googleCalendarIsPublicVal,
-		GoogleCalendarLink:     googleCalendarLinkVal,
-		Image:                  imageVal,
-		IntegrationGuide:       integrationGuideVal,
-		Latitude:               latitudeVal,
-		Longitude:              longitudeVal,
-		Name:                   nameVal,
-		Options:                optionsVal,
-		OrderCount:             orderCountVal,
-		OrganizationGroups:     organizationGroupsVal,
-		ParentDescription:      parentDescriptionVal,
-		ParentName:             parentNameVal,
-		ParentUuid:             parentUuidVal,
-		PausedReason:           pausedReasonVal,
-		Plans:                  plansVal,
-		PluginOptions:          pluginOptionsVal,
-		PrivacyPolicyLink:      privacyPolicyLinkVal,
-		Project:                projectVal,
-		ProjectName:            projectNameVal,
-		ProjectUuid:            projectUuidVal,
-		PromotionCampaigns:     promotionCampaignsVal,
-		Quotas:                 quotasVal,
-		ResourceOptions:        resourceOptionsVal,
-		Roles:                  rolesVal,
-		Scope:                  scopeVal,
-		ScopeErrorMessage:      scopeErrorMessageVal,
-		ScopeName:              scopeNameVal,
-		ScopeState:             scopeStateVal,
-		ScopeUuid:              scopeUuidVal,
-		Screenshots:            screenshotsVal,
-		Shared:                 sharedVal,
-		Slug:                   slugVal,
-		State:                  stateVal,
-		TermsOfService:         termsOfServiceVal,
-		TermsOfServiceLink:     termsOfServiceLinkVal,
-		Thumbnail:              thumbnailVal,
-		TotalCost:              totalCostVal,
-		TotalCostEstimated:     totalCostEstimatedVal,
-		TotalCustomers:         totalCustomersVal,
-		PublicOfferingsType:    typeVal,
-		Url:                    urlVal,
-		Uuid:                   uuidVal,
-		VendorDetails:          vendorDetailsVal,
-		state:                  attr.ValueStateKnown,
+		AccessUrl:                 accessUrlVal,
+		BackendId:                 backendIdVal,
+		Billable:                  billableVal,
+		Category:                  categoryVal,
+		CategoryTitle:             categoryTitleVal,
+		CategoryUuid:              categoryUuidVal,
+		CitationCount:             citationCountVal,
+		Components:                componentsVal,
+		Created:                   createdVal,
+		Customer:                  customerVal,
+		CustomerName:              customerNameVal,
+		CustomerUuid:              customerUuidVal,
+		DataciteDoi:               dataciteDoiVal,
+		Description:               descriptionVal,
+		Endpoints:                 endpointsVal,
+		Files:                     filesVal,
+		FullDescription:           fullDescriptionVal,
+		GettingStarted:            gettingStartedVal,
+		GoogleCalendarIsPublic:    googleCalendarIsPublicVal,
+		GoogleCalendarLink:        googleCalendarLinkVal,
+		HasComplianceRequirements: hasComplianceRequirementsVal,
+		Image:                     imageVal,
+		IntegrationGuide:          integrationGuideVal,
+		Latitude:                  latitudeVal,
+		Longitude:                 longitudeVal,
+		Name:                      nameVal,
+		Options:                   optionsVal,
+		OrderCount:                orderCountVal,
+		OrganizationGroups:        organizationGroupsVal,
+		ParentDescription:         parentDescriptionVal,
+		ParentName:                parentNameVal,
+		ParentUuid:                parentUuidVal,
+		PausedReason:              pausedReasonVal,
+		Plans:                     plansVal,
+		PluginOptions:             pluginOptionsVal,
+		PrivacyPolicyLink:         privacyPolicyLinkVal,
+		Project:                   projectVal,
+		ProjectName:               projectNameVal,
+		ProjectUuid:               projectUuidVal,
+		PromotionCampaigns:        promotionCampaignsVal,
+		Quotas:                    quotasVal,
+		ResourceOptions:           resourceOptionsVal,
+		Roles:                     rolesVal,
+		Scope:                     scopeVal,
+		ScopeErrorMessage:         scopeErrorMessageVal,
+		ScopeName:                 scopeNameVal,
+		ScopeState:                scopeStateVal,
+		ScopeUuid:                 scopeUuidVal,
+		Screenshots:               screenshotsVal,
+		Shared:                    sharedVal,
+		Slug:                      slugVal,
+		State:                     stateVal,
+		TermsOfService:            termsOfServiceVal,
+		TermsOfServiceLink:        termsOfServiceLinkVal,
+		Thumbnail:                 thumbnailVal,
+		TotalCost:                 totalCostVal,
+		TotalCostEstimated:        totalCostEstimatedVal,
+		TotalCustomers:            totalCustomersVal,
+		PublicOfferingsType:       typeVal,
+		Url:                       urlVal,
+		Uuid:                      uuidVal,
+		VendorDetails:             vendorDetailsVal,
+		state:                     attr.ValueStateKnown,
 	}, diags
 }
 
@@ -2665,6 +2687,24 @@ func NewPublicOfferingsValue(attributeTypes map[string]attr.Type, attributes map
 			fmt.Sprintf(`google_calendar_link expected to be basetypes.StringValue, was: %T`, googleCalendarLinkAttribute))
 	}
 
+	hasComplianceRequirementsAttribute, ok := attributes["has_compliance_requirements"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`has_compliance_requirements is missing from object`)
+
+		return NewPublicOfferingsValueUnknown(), diags
+	}
+
+	hasComplianceRequirementsVal, ok := hasComplianceRequirementsAttribute.(basetypes.BoolValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`has_compliance_requirements expected to be basetypes.BoolValue, was: %T`, hasComplianceRequirementsAttribute))
+	}
+
 	imageAttribute, ok := attributes["image"]
 
 	if !ok {
@@ -3408,68 +3448,69 @@ func NewPublicOfferingsValue(attributeTypes map[string]attr.Type, attributes map
 	}
 
 	return PublicOfferingsValue{
-		AccessUrl:              accessUrlVal,
-		BackendId:              backendIdVal,
-		Billable:               billableVal,
-		Category:               categoryVal,
-		CategoryTitle:          categoryTitleVal,
-		CategoryUuid:           categoryUuidVal,
-		CitationCount:          citationCountVal,
-		Components:             componentsVal,
-		Created:                createdVal,
-		Customer:               customerVal,
-		CustomerName:           customerNameVal,
-		CustomerUuid:           customerUuidVal,
-		DataciteDoi:            dataciteDoiVal,
-		Description:            descriptionVal,
-		Endpoints:              endpointsVal,
-		Files:                  filesVal,
-		FullDescription:        fullDescriptionVal,
-		GettingStarted:         gettingStartedVal,
-		GoogleCalendarIsPublic: googleCalendarIsPublicVal,
-		GoogleCalendarLink:     googleCalendarLinkVal,
-		Image:                  imageVal,
-		IntegrationGuide:       integrationGuideVal,
-		Latitude:               latitudeVal,
-		Longitude:              longitudeVal,
-		Name:                   nameVal,
-		Options:                optionsVal,
-		OrderCount:             orderCountVal,
-		OrganizationGroups:     organizationGroupsVal,
-		ParentDescription:      parentDescriptionVal,
-		ParentName:             parentNameVal,
-		ParentUuid:             parentUuidVal,
-		PausedReason:           pausedReasonVal,
-		Plans:                  plansVal,
-		PluginOptions:          pluginOptionsVal,
-		PrivacyPolicyLink:      privacyPolicyLinkVal,
-		Project:                projectVal,
-		ProjectName:            projectNameVal,
-		ProjectUuid:            projectUuidVal,
-		PromotionCampaigns:     promotionCampaignsVal,
-		Quotas:                 quotasVal,
-		ResourceOptions:        resourceOptionsVal,
-		Roles:                  rolesVal,
-		Scope:                  scopeVal,
-		ScopeErrorMessage:      scopeErrorMessageVal,
-		ScopeName:              scopeNameVal,
-		ScopeState:             scopeStateVal,
-		ScopeUuid:              scopeUuidVal,
-		Screenshots:            screenshotsVal,
-		Shared:                 sharedVal,
-		Slug:                   slugVal,
-		State:                  stateVal,
-		TermsOfService:         termsOfServiceVal,
-		TermsOfServiceLink:     termsOfServiceLinkVal,
-		Thumbnail:              thumbnailVal,
-		TotalCost:              totalCostVal,
-		TotalCostEstimated:     totalCostEstimatedVal,
-		TotalCustomers:         totalCustomersVal,
-		PublicOfferingsType:    typeVal,
-		Url:                    urlVal,
-		Uuid:                   uuidVal,
-		VendorDetails:          vendorDetailsVal,
-		state:                  attr.ValueStateKnown,
+		AccessUrl:                 accessUrlVal,
+		BackendId:                 backendIdVal,
+		Billable:                  billableVal,
+		Category:                  categoryVal,
+		CategoryTitle:             categoryTitleVal,
+		CategoryUuid:              categoryUuidVal,
+		CitationCount:             citationCountVal,
+		Components:                componentsVal,
+		Created:                   createdVal,
+		Customer:                  customerVal,
+		CustomerName:              customerNameVal,
+		CustomerUuid:              customerUuidVal,
+		DataciteDoi:               dataciteDoiVal,
+		Description:               descriptionVal,
+		Endpoints:                 endpointsVal,
+		Files:                     filesVal,
+		FullDescription:           fullDescriptionVal,
+		GettingStarted:            gettingStartedVal,
+		GoogleCalendarIsPublic:    googleCalendarIsPublicVal,
+		GoogleCalendarLink:        googleCalendarLinkVal,
+		HasComplianceRequirements: hasComplianceRequirementsVal,
+		Image:                     imageVal,
+		IntegrationGuide:          integrationGuideVal,
+		Latitude:                  latitudeVal,
+		Longitude:                 longitudeVal,
+		Name:                      nameVal,
+		Options:                   optionsVal,
+		OrderCount:                orderCountVal,
+		OrganizationGroups:        organizationGroupsVal,
+		ParentDescription:         parentDescriptionVal,
+		ParentName:                parentNameVal,
+		ParentUuid:                parentUuidVal,
+		PausedReason:              pausedReasonVal,
+		Plans:                     plansVal,
+		PluginOptions:             pluginOptionsVal,
+		PrivacyPolicyLink:         privacyPolicyLinkVal,
+		Project:                   projectVal,
+		ProjectName:               projectNameVal,
+		ProjectUuid:               projectUuidVal,
+		PromotionCampaigns:        promotionCampaignsVal,
+		Quotas:                    quotasVal,
+		ResourceOptions:           resourceOptionsVal,
+		Roles:                     rolesVal,
+		Scope:                     scopeVal,
+		ScopeErrorMessage:         scopeErrorMessageVal,
+		ScopeName:                 scopeNameVal,
+		ScopeState:                scopeStateVal,
+		ScopeUuid:                 scopeUuidVal,
+		Screenshots:               screenshotsVal,
+		Shared:                    sharedVal,
+		Slug:                      slugVal,
+		State:                     stateVal,
+		TermsOfService:            termsOfServiceVal,
+		TermsOfServiceLink:        termsOfServiceLinkVal,
+		Thumbnail:                 thumbnailVal,
+		TotalCost:                 totalCostVal,
+		TotalCostEstimated:        totalCostEstimatedVal,
+		TotalCustomers:            totalCustomersVal,
+		PublicOfferingsType:       typeVal,
+		Url:                       urlVal,
+		Uuid:                      uuidVal,
+		VendorDetails:             vendorDetailsVal,
+		state:                     attr.ValueStateKnown,
 	}, diags
 }
 
@@ -3541,72 +3582,73 @@ func (t PublicOfferingsType) ValueType(ctx context.Context) attr.Value {
 var _ basetypes.ObjectValuable = PublicOfferingsValue{}
 
 type PublicOfferingsValue struct {
-	AccessUrl              basetypes.StringValue  `tfsdk:"access_url"`
-	BackendId              basetypes.StringValue  `tfsdk:"backend_id"`
-	Billable               basetypes.BoolValue    `tfsdk:"billable"`
-	Category               basetypes.StringValue  `tfsdk:"category"`
-	CategoryTitle          basetypes.StringValue  `tfsdk:"category_title"`
-	CategoryUuid           basetypes.StringValue  `tfsdk:"category_uuid"`
-	CitationCount          basetypes.Int64Value   `tfsdk:"citation_count"`
-	Components             basetypes.ListValue    `tfsdk:"components"`
-	Created                basetypes.StringValue  `tfsdk:"created"`
-	Customer               basetypes.StringValue  `tfsdk:"customer"`
-	CustomerName           basetypes.StringValue  `tfsdk:"customer_name"`
-	CustomerUuid           basetypes.StringValue  `tfsdk:"customer_uuid"`
-	DataciteDoi            basetypes.StringValue  `tfsdk:"datacite_doi"`
-	Description            basetypes.StringValue  `tfsdk:"description"`
-	Endpoints              basetypes.ListValue    `tfsdk:"endpoints"`
-	Files                  basetypes.ListValue    `tfsdk:"files"`
-	FullDescription        basetypes.StringValue  `tfsdk:"full_description"`
-	GettingStarted         basetypes.StringValue  `tfsdk:"getting_started"`
-	GoogleCalendarIsPublic basetypes.BoolValue    `tfsdk:"google_calendar_is_public"`
-	GoogleCalendarLink     basetypes.StringValue  `tfsdk:"google_calendar_link"`
-	Image                  basetypes.StringValue  `tfsdk:"image"`
-	IntegrationGuide       basetypes.StringValue  `tfsdk:"integration_guide"`
-	Latitude               basetypes.Float64Value `tfsdk:"latitude"`
-	Longitude              basetypes.Float64Value `tfsdk:"longitude"`
-	Name                   basetypes.StringValue  `tfsdk:"name"`
-	Options                basetypes.ObjectValue  `tfsdk:"options"`
-	OrderCount             basetypes.Int64Value   `tfsdk:"order_count"`
-	OrganizationGroups     basetypes.ListValue    `tfsdk:"organization_groups"`
-	ParentDescription      basetypes.StringValue  `tfsdk:"parent_description"`
-	ParentName             basetypes.StringValue  `tfsdk:"parent_name"`
-	ParentUuid             basetypes.StringValue  `tfsdk:"parent_uuid"`
-	PausedReason           basetypes.StringValue  `tfsdk:"paused_reason"`
-	Plans                  basetypes.ListValue    `tfsdk:"plans"`
-	PluginOptions          basetypes.ObjectValue  `tfsdk:"plugin_options"`
-	PrivacyPolicyLink      basetypes.StringValue  `tfsdk:"privacy_policy_link"`
-	Project                basetypes.StringValue  `tfsdk:"project"`
-	ProjectName            basetypes.StringValue  `tfsdk:"project_name"`
-	ProjectUuid            basetypes.StringValue  `tfsdk:"project_uuid"`
-	PromotionCampaigns     basetypes.ListValue    `tfsdk:"promotion_campaigns"`
-	Quotas                 basetypes.ListValue    `tfsdk:"quotas"`
-	ResourceOptions        basetypes.ObjectValue  `tfsdk:"resource_options"`
-	Roles                  basetypes.ListValue    `tfsdk:"roles"`
-	Scope                  basetypes.StringValue  `tfsdk:"scope"`
-	ScopeErrorMessage      basetypes.StringValue  `tfsdk:"scope_error_message"`
-	ScopeName              basetypes.StringValue  `tfsdk:"scope_name"`
-	ScopeState             basetypes.StringValue  `tfsdk:"scope_state"`
-	ScopeUuid              basetypes.StringValue  `tfsdk:"scope_uuid"`
-	Screenshots            basetypes.ListValue    `tfsdk:"screenshots"`
-	Shared                 basetypes.BoolValue    `tfsdk:"shared"`
-	Slug                   basetypes.StringValue  `tfsdk:"slug"`
-	State                  basetypes.StringValue  `tfsdk:"state"`
-	TermsOfService         basetypes.StringValue  `tfsdk:"terms_of_service"`
-	TermsOfServiceLink     basetypes.StringValue  `tfsdk:"terms_of_service_link"`
-	Thumbnail              basetypes.StringValue  `tfsdk:"thumbnail"`
-	TotalCost              basetypes.Int64Value   `tfsdk:"total_cost"`
-	TotalCostEstimated     basetypes.Int64Value   `tfsdk:"total_cost_estimated"`
-	TotalCustomers         basetypes.Int64Value   `tfsdk:"total_customers"`
-	PublicOfferingsType    basetypes.StringValue  `tfsdk:"type"`
-	Url                    basetypes.StringValue  `tfsdk:"url"`
-	Uuid                   basetypes.StringValue  `tfsdk:"uuid"`
-	VendorDetails          basetypes.StringValue  `tfsdk:"vendor_details"`
-	state                  attr.ValueState
+	AccessUrl                 basetypes.StringValue  `tfsdk:"access_url"`
+	BackendId                 basetypes.StringValue  `tfsdk:"backend_id"`
+	Billable                  basetypes.BoolValue    `tfsdk:"billable"`
+	Category                  basetypes.StringValue  `tfsdk:"category"`
+	CategoryTitle             basetypes.StringValue  `tfsdk:"category_title"`
+	CategoryUuid              basetypes.StringValue  `tfsdk:"category_uuid"`
+	CitationCount             basetypes.Int64Value   `tfsdk:"citation_count"`
+	Components                basetypes.ListValue    `tfsdk:"components"`
+	Created                   basetypes.StringValue  `tfsdk:"created"`
+	Customer                  basetypes.StringValue  `tfsdk:"customer"`
+	CustomerName              basetypes.StringValue  `tfsdk:"customer_name"`
+	CustomerUuid              basetypes.StringValue  `tfsdk:"customer_uuid"`
+	DataciteDoi               basetypes.StringValue  `tfsdk:"datacite_doi"`
+	Description               basetypes.StringValue  `tfsdk:"description"`
+	Endpoints                 basetypes.ListValue    `tfsdk:"endpoints"`
+	Files                     basetypes.ListValue    `tfsdk:"files"`
+	FullDescription           basetypes.StringValue  `tfsdk:"full_description"`
+	GettingStarted            basetypes.StringValue  `tfsdk:"getting_started"`
+	GoogleCalendarIsPublic    basetypes.BoolValue    `tfsdk:"google_calendar_is_public"`
+	GoogleCalendarLink        basetypes.StringValue  `tfsdk:"google_calendar_link"`
+	HasComplianceRequirements basetypes.BoolValue    `tfsdk:"has_compliance_requirements"`
+	Image                     basetypes.StringValue  `tfsdk:"image"`
+	IntegrationGuide          basetypes.StringValue  `tfsdk:"integration_guide"`
+	Latitude                  basetypes.Float64Value `tfsdk:"latitude"`
+	Longitude                 basetypes.Float64Value `tfsdk:"longitude"`
+	Name                      basetypes.StringValue  `tfsdk:"name"`
+	Options                   basetypes.ObjectValue  `tfsdk:"options"`
+	OrderCount                basetypes.Int64Value   `tfsdk:"order_count"`
+	OrganizationGroups        basetypes.ListValue    `tfsdk:"organization_groups"`
+	ParentDescription         basetypes.StringValue  `tfsdk:"parent_description"`
+	ParentName                basetypes.StringValue  `tfsdk:"parent_name"`
+	ParentUuid                basetypes.StringValue  `tfsdk:"parent_uuid"`
+	PausedReason              basetypes.StringValue  `tfsdk:"paused_reason"`
+	Plans                     basetypes.ListValue    `tfsdk:"plans"`
+	PluginOptions             basetypes.ObjectValue  `tfsdk:"plugin_options"`
+	PrivacyPolicyLink         basetypes.StringValue  `tfsdk:"privacy_policy_link"`
+	Project                   basetypes.StringValue  `tfsdk:"project"`
+	ProjectName               basetypes.StringValue  `tfsdk:"project_name"`
+	ProjectUuid               basetypes.StringValue  `tfsdk:"project_uuid"`
+	PromotionCampaigns        basetypes.ListValue    `tfsdk:"promotion_campaigns"`
+	Quotas                    basetypes.ListValue    `tfsdk:"quotas"`
+	ResourceOptions           basetypes.ObjectValue  `tfsdk:"resource_options"`
+	Roles                     basetypes.ListValue    `tfsdk:"roles"`
+	Scope                     basetypes.StringValue  `tfsdk:"scope"`
+	ScopeErrorMessage         basetypes.StringValue  `tfsdk:"scope_error_message"`
+	ScopeName                 basetypes.StringValue  `tfsdk:"scope_name"`
+	ScopeState                basetypes.StringValue  `tfsdk:"scope_state"`
+	ScopeUuid                 basetypes.StringValue  `tfsdk:"scope_uuid"`
+	Screenshots               basetypes.ListValue    `tfsdk:"screenshots"`
+	Shared                    basetypes.BoolValue    `tfsdk:"shared"`
+	Slug                      basetypes.StringValue  `tfsdk:"slug"`
+	State                     basetypes.StringValue  `tfsdk:"state"`
+	TermsOfService            basetypes.StringValue  `tfsdk:"terms_of_service"`
+	TermsOfServiceLink        basetypes.StringValue  `tfsdk:"terms_of_service_link"`
+	Thumbnail                 basetypes.StringValue  `tfsdk:"thumbnail"`
+	TotalCost                 basetypes.Int64Value   `tfsdk:"total_cost"`
+	TotalCostEstimated        basetypes.Int64Value   `tfsdk:"total_cost_estimated"`
+	TotalCustomers            basetypes.Int64Value   `tfsdk:"total_customers"`
+	PublicOfferingsType       basetypes.StringValue  `tfsdk:"type"`
+	Url                       basetypes.StringValue  `tfsdk:"url"`
+	Uuid                      basetypes.StringValue  `tfsdk:"uuid"`
+	VendorDetails             basetypes.StringValue  `tfsdk:"vendor_details"`
+	state                     attr.ValueState
 }
 
 func (v PublicOfferingsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 61)
+	attrTypes := make(map[string]tftypes.Type, 62)
 
 	var val tftypes.Value
 	var err error
@@ -3637,6 +3679,7 @@ func (v PublicOfferingsValue) ToTerraformValue(ctx context.Context) (tftypes.Val
 	attrTypes["getting_started"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["google_calendar_is_public"] = basetypes.BoolType{}.TerraformType(ctx)
 	attrTypes["google_calendar_link"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["has_compliance_requirements"] = basetypes.BoolType{}.TerraformType(ctx)
 	attrTypes["image"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["integration_guide"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["latitude"] = basetypes.Float64Type{}.TerraformType(ctx)
@@ -3701,7 +3744,7 @@ func (v PublicOfferingsValue) ToTerraformValue(ctx context.Context) (tftypes.Val
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 61)
+		vals := make(map[string]tftypes.Value, 62)
 
 		val, err = v.AccessUrl.ToTerraformValue(ctx)
 
@@ -3862,6 +3905,14 @@ func (v PublicOfferingsValue) ToTerraformValue(ctx context.Context) (tftypes.Val
 		}
 
 		vals["google_calendar_link"] = val
+
+		val, err = v.HasComplianceRequirements.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["has_compliance_requirements"] = val
 
 		val, err = v.Image.ToTerraformValue(ctx)
 
@@ -4567,15 +4618,16 @@ func (v PublicOfferingsValue) ToObjectValue(ctx context.Context) (basetypes.Obje
 		"files": basetypes.ListType{
 			ElemType: FilesValue{}.Type(ctx),
 		},
-		"full_description":          basetypes.StringType{},
-		"getting_started":           basetypes.StringType{},
-		"google_calendar_is_public": basetypes.BoolType{},
-		"google_calendar_link":      basetypes.StringType{},
-		"image":                     basetypes.StringType{},
-		"integration_guide":         basetypes.StringType{},
-		"latitude":                  basetypes.Float64Type{},
-		"longitude":                 basetypes.Float64Type{},
-		"name":                      basetypes.StringType{},
+		"full_description":            basetypes.StringType{},
+		"getting_started":             basetypes.StringType{},
+		"google_calendar_is_public":   basetypes.BoolType{},
+		"google_calendar_link":        basetypes.StringType{},
+		"has_compliance_requirements": basetypes.BoolType{},
+		"image":                       basetypes.StringType{},
+		"integration_guide":           basetypes.StringType{},
+		"latitude":                    basetypes.Float64Type{},
+		"longitude":                   basetypes.Float64Type{},
+		"name":                        basetypes.StringType{},
 		"options": basetypes.ObjectType{
 			AttrTypes: OptionsValue{}.AttributeTypes(ctx),
 		},
@@ -4643,67 +4695,68 @@ func (v PublicOfferingsValue) ToObjectValue(ctx context.Context) (basetypes.Obje
 	objVal, diags := types.ObjectValue(
 		attributeTypes,
 		map[string]attr.Value{
-			"access_url":                v.AccessUrl,
-			"backend_id":                v.BackendId,
-			"billable":                  v.Billable,
-			"category":                  v.Category,
-			"category_title":            v.CategoryTitle,
-			"category_uuid":             v.CategoryUuid,
-			"citation_count":            v.CitationCount,
-			"components":                components,
-			"created":                   v.Created,
-			"customer":                  v.Customer,
-			"customer_name":             v.CustomerName,
-			"customer_uuid":             v.CustomerUuid,
-			"datacite_doi":              v.DataciteDoi,
-			"description":               v.Description,
-			"endpoints":                 endpoints,
-			"files":                     files,
-			"full_description":          v.FullDescription,
-			"getting_started":           v.GettingStarted,
-			"google_calendar_is_public": v.GoogleCalendarIsPublic,
-			"google_calendar_link":      v.GoogleCalendarLink,
-			"image":                     v.Image,
-			"integration_guide":         v.IntegrationGuide,
-			"latitude":                  v.Latitude,
-			"longitude":                 v.Longitude,
-			"name":                      v.Name,
-			"options":                   options,
-			"order_count":               v.OrderCount,
-			"organization_groups":       organizationGroups,
-			"parent_description":        v.ParentDescription,
-			"parent_name":               v.ParentName,
-			"parent_uuid":               v.ParentUuid,
-			"paused_reason":             v.PausedReason,
-			"plans":                     plans,
-			"plugin_options":            pluginOptions,
-			"privacy_policy_link":       v.PrivacyPolicyLink,
-			"project":                   v.Project,
-			"project_name":              v.ProjectName,
-			"project_uuid":              v.ProjectUuid,
-			"promotion_campaigns":       promotionCampaigns,
-			"quotas":                    quotas,
-			"resource_options":          resourceOptions,
-			"roles":                     roles,
-			"scope":                     v.Scope,
-			"scope_error_message":       v.ScopeErrorMessage,
-			"scope_name":                v.ScopeName,
-			"scope_state":               v.ScopeState,
-			"scope_uuid":                v.ScopeUuid,
-			"screenshots":               screenshots,
-			"shared":                    v.Shared,
-			"slug":                      v.Slug,
-			"state":                     v.State,
-			"terms_of_service":          v.TermsOfService,
-			"terms_of_service_link":     v.TermsOfServiceLink,
-			"thumbnail":                 v.Thumbnail,
-			"total_cost":                v.TotalCost,
-			"total_cost_estimated":      v.TotalCostEstimated,
-			"total_customers":           v.TotalCustomers,
-			"type":                      v.PublicOfferingsType,
-			"url":                       v.Url,
-			"uuid":                      v.Uuid,
-			"vendor_details":            v.VendorDetails,
+			"access_url":                  v.AccessUrl,
+			"backend_id":                  v.BackendId,
+			"billable":                    v.Billable,
+			"category":                    v.Category,
+			"category_title":              v.CategoryTitle,
+			"category_uuid":               v.CategoryUuid,
+			"citation_count":              v.CitationCount,
+			"components":                  components,
+			"created":                     v.Created,
+			"customer":                    v.Customer,
+			"customer_name":               v.CustomerName,
+			"customer_uuid":               v.CustomerUuid,
+			"datacite_doi":                v.DataciteDoi,
+			"description":                 v.Description,
+			"endpoints":                   endpoints,
+			"files":                       files,
+			"full_description":            v.FullDescription,
+			"getting_started":             v.GettingStarted,
+			"google_calendar_is_public":   v.GoogleCalendarIsPublic,
+			"google_calendar_link":        v.GoogleCalendarLink,
+			"has_compliance_requirements": v.HasComplianceRequirements,
+			"image":                       v.Image,
+			"integration_guide":           v.IntegrationGuide,
+			"latitude":                    v.Latitude,
+			"longitude":                   v.Longitude,
+			"name":                        v.Name,
+			"options":                     options,
+			"order_count":                 v.OrderCount,
+			"organization_groups":         organizationGroups,
+			"parent_description":          v.ParentDescription,
+			"parent_name":                 v.ParentName,
+			"parent_uuid":                 v.ParentUuid,
+			"paused_reason":               v.PausedReason,
+			"plans":                       plans,
+			"plugin_options":              pluginOptions,
+			"privacy_policy_link":         v.PrivacyPolicyLink,
+			"project":                     v.Project,
+			"project_name":                v.ProjectName,
+			"project_uuid":                v.ProjectUuid,
+			"promotion_campaigns":         promotionCampaigns,
+			"quotas":                      quotas,
+			"resource_options":            resourceOptions,
+			"roles":                       roles,
+			"scope":                       v.Scope,
+			"scope_error_message":         v.ScopeErrorMessage,
+			"scope_name":                  v.ScopeName,
+			"scope_state":                 v.ScopeState,
+			"scope_uuid":                  v.ScopeUuid,
+			"screenshots":                 screenshots,
+			"shared":                      v.Shared,
+			"slug":                        v.Slug,
+			"state":                       v.State,
+			"terms_of_service":            v.TermsOfService,
+			"terms_of_service_link":       v.TermsOfServiceLink,
+			"thumbnail":                   v.Thumbnail,
+			"total_cost":                  v.TotalCost,
+			"total_cost_estimated":        v.TotalCostEstimated,
+			"total_customers":             v.TotalCustomers,
+			"type":                        v.PublicOfferingsType,
+			"url":                         v.Url,
+			"uuid":                        v.Uuid,
+			"vendor_details":              v.VendorDetails,
 		})
 
 	return objVal, diags
@@ -4801,6 +4854,10 @@ func (v PublicOfferingsValue) Equal(o attr.Value) bool {
 	}
 
 	if !v.GoogleCalendarLink.Equal(other.GoogleCalendarLink) {
+		return false
+	}
+
+	if !v.HasComplianceRequirements.Equal(other.HasComplianceRequirements) {
 		return false
 	}
 
@@ -5003,15 +5060,16 @@ func (v PublicOfferingsValue) AttributeTypes(ctx context.Context) map[string]att
 		"files": basetypes.ListType{
 			ElemType: FilesValue{}.Type(ctx),
 		},
-		"full_description":          basetypes.StringType{},
-		"getting_started":           basetypes.StringType{},
-		"google_calendar_is_public": basetypes.BoolType{},
-		"google_calendar_link":      basetypes.StringType{},
-		"image":                     basetypes.StringType{},
-		"integration_guide":         basetypes.StringType{},
-		"latitude":                  basetypes.Float64Type{},
-		"longitude":                 basetypes.Float64Type{},
-		"name":                      basetypes.StringType{},
+		"full_description":            basetypes.StringType{},
+		"getting_started":             basetypes.StringType{},
+		"google_calendar_is_public":   basetypes.BoolType{},
+		"google_calendar_link":        basetypes.StringType{},
+		"has_compliance_requirements": basetypes.BoolType{},
+		"image":                       basetypes.StringType{},
+		"integration_guide":           basetypes.StringType{},
+		"latitude":                    basetypes.Float64Type{},
+		"longitude":                   basetypes.Float64Type{},
+		"name":                        basetypes.StringType{},
 		"options": basetypes.ObjectType{
 			AttrTypes: OptionsValue{}.AttributeTypes(ctx),
 		},
