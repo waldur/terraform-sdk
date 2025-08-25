@@ -203,9 +203,6 @@ func OrdersDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "Accessible to all customers.",
 							MarkdownDescription: "Accessible to all customers.",
 						},
-						"offering_terms_of_service": schema.StringAttribute{
-							Computed: true,
-						},
 						"offering_thumbnail": schema.StringAttribute{
 							Computed: true,
 						},
@@ -1043,24 +1040,6 @@ func (t OrdersType) ValueFromObject(ctx context.Context, in basetypes.ObjectValu
 			fmt.Sprintf(`offering_shared expected to be basetypes.BoolValue, was: %T`, offeringSharedAttribute))
 	}
 
-	offeringTermsOfServiceAttribute, ok := attributes["offering_terms_of_service"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`offering_terms_of_service is missing from object`)
-
-		return nil, diags
-	}
-
-	offeringTermsOfServiceVal, ok := offeringTermsOfServiceAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`offering_terms_of_service expected to be basetypes.StringValue, was: %T`, offeringTermsOfServiceAttribute))
-	}
-
 	offeringThumbnailAttribute, ok := attributes["offering_thumbnail"]
 
 	if !ok {
@@ -1623,7 +1602,6 @@ func (t OrdersType) ValueFromObject(ctx context.Context, in basetypes.ObjectValu
 		OfferingImage:              offeringImageVal,
 		OfferingName:               offeringNameVal,
 		OfferingShared:             offeringSharedVal,
-		OfferingTermsOfService:     offeringTermsOfServiceVal,
 		OfferingThumbnail:          offeringThumbnailVal,
 		OfferingType:               offeringTypeVal,
 		OfferingUuid:               offeringUuidVal,
@@ -2350,24 +2328,6 @@ func NewOrdersValue(attributeTypes map[string]attr.Type, attributes map[string]a
 			fmt.Sprintf(`offering_shared expected to be basetypes.BoolValue, was: %T`, offeringSharedAttribute))
 	}
 
-	offeringTermsOfServiceAttribute, ok := attributes["offering_terms_of_service"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`offering_terms_of_service is missing from object`)
-
-		return NewOrdersValueUnknown(), diags
-	}
-
-	offeringTermsOfServiceVal, ok := offeringTermsOfServiceAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`offering_terms_of_service expected to be basetypes.StringValue, was: %T`, offeringTermsOfServiceAttribute))
-	}
-
 	offeringThumbnailAttribute, ok := attributes["offering_thumbnail"]
 
 	if !ok {
@@ -2930,7 +2890,6 @@ func NewOrdersValue(attributeTypes map[string]attr.Type, attributes map[string]a
 		OfferingImage:              offeringImageVal,
 		OfferingName:               offeringNameVal,
 		OfferingShared:             offeringSharedVal,
-		OfferingTermsOfService:     offeringTermsOfServiceVal,
 		OfferingThumbnail:          offeringThumbnailVal,
 		OfferingType:               offeringTypeVal,
 		OfferingUuid:               offeringUuidVal,
@@ -3067,7 +3026,6 @@ type OrdersValue struct {
 	OfferingImage              basetypes.StringValue  `tfsdk:"offering_image"`
 	OfferingName               basetypes.StringValue  `tfsdk:"offering_name"`
 	OfferingShared             basetypes.BoolValue    `tfsdk:"offering_shared"`
-	OfferingTermsOfService     basetypes.StringValue  `tfsdk:"offering_terms_of_service"`
 	OfferingThumbnail          basetypes.StringValue  `tfsdk:"offering_thumbnail"`
 	OfferingType               basetypes.StringValue  `tfsdk:"offering_type"`
 	OfferingUuid               basetypes.StringValue  `tfsdk:"offering_uuid"`
@@ -3101,7 +3059,7 @@ type OrdersValue struct {
 }
 
 func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 65)
+	attrTypes := make(map[string]tftypes.Type, 64)
 
 	var val tftypes.Value
 	var err error
@@ -3145,7 +3103,6 @@ func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 	attrTypes["offering_image"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["offering_name"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["offering_shared"] = basetypes.BoolType{}.TerraformType(ctx)
-	attrTypes["offering_terms_of_service"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["offering_thumbnail"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["offering_type"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["offering_uuid"] = basetypes.StringType{}.TerraformType(ctx)
@@ -3180,7 +3137,7 @@ func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 65)
+		vals := make(map[string]tftypes.Value, 64)
 
 		val, err = v.ActivationPrice.ToTerraformValue(ctx)
 
@@ -3461,14 +3418,6 @@ func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 		}
 
 		vals["offering_shared"] = val
-
-		val, err = v.OfferingTermsOfService.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["offering_terms_of_service"] = val
 
 		val, err = v.OfferingThumbnail.ToTerraformValue(ctx)
 
@@ -3805,7 +3754,6 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 			"offering_image":                 basetypes.StringType{},
 			"offering_name":                  basetypes.StringType{},
 			"offering_shared":                basetypes.BoolType{},
-			"offering_terms_of_service":      basetypes.StringType{},
 			"offering_thumbnail":             basetypes.StringType{},
 			"offering_type":                  basetypes.StringType{},
 			"offering_uuid":                  basetypes.StringType{},
@@ -3878,7 +3826,6 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 		"offering_image":                 basetypes.StringType{},
 		"offering_name":                  basetypes.StringType{},
 		"offering_shared":                basetypes.BoolType{},
-		"offering_terms_of_service":      basetypes.StringType{},
 		"offering_thumbnail":             basetypes.StringType{},
 		"offering_type":                  basetypes.StringType{},
 		"offering_uuid":                  basetypes.StringType{},
@@ -3956,7 +3903,6 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 			"offering_image":                 v.OfferingImage,
 			"offering_name":                  v.OfferingName,
 			"offering_shared":                v.OfferingShared,
-			"offering_terms_of_service":      v.OfferingTermsOfService,
 			"offering_thumbnail":             v.OfferingThumbnail,
 			"offering_type":                  v.OfferingType,
 			"offering_uuid":                  v.OfferingUuid,
@@ -4146,10 +4092,6 @@ func (v OrdersValue) Equal(o attr.Value) bool {
 		return false
 	}
 
-	if !v.OfferingTermsOfService.Equal(other.OfferingTermsOfService) {
-		return false
-	}
-
 	if !v.OfferingThumbnail.Equal(other.OfferingThumbnail) {
 		return false
 	}
@@ -4318,7 +4260,6 @@ func (v OrdersValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 		"offering_image":                 basetypes.StringType{},
 		"offering_name":                  basetypes.StringType{},
 		"offering_shared":                basetypes.BoolType{},
-		"offering_terms_of_service":      basetypes.StringType{},
 		"offering_thumbnail":             basetypes.StringType{},
 		"offering_type":                  basetypes.StringType{},
 		"offering_uuid":                  basetypes.StringType{},

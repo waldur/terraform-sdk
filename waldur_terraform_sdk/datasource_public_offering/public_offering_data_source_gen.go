@@ -834,12 +834,6 @@ func PublicOfferingDataSourceSchema(ctx context.Context) schema.Schema {
 			"state": schema.StringAttribute{
 				Computed: true,
 			},
-			"terms_of_service": schema.StringAttribute{
-				Computed: true,
-			},
-			"terms_of_service_link": schema.StringAttribute{
-				Computed: true,
-			},
 			"thumbnail": schema.StringAttribute{
 				Computed: true,
 			},
@@ -922,8 +916,6 @@ type PublicOfferingModel struct {
 	Shared                    types.Bool           `tfsdk:"shared"`
 	Slug                      types.String         `tfsdk:"slug"`
 	State                     types.String         `tfsdk:"state"`
-	TermsOfService            types.String         `tfsdk:"terms_of_service"`
-	TermsOfServiceLink        types.String         `tfsdk:"terms_of_service_link"`
 	Thumbnail                 types.String         `tfsdk:"thumbnail"`
 	TotalCost                 types.Int64          `tfsdk:"total_cost"`
 	TotalCostEstimated        types.Int64          `tfsdk:"total_cost_estimated"`

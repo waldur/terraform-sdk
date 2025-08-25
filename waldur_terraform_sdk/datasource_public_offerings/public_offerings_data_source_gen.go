@@ -933,12 +933,6 @@ func PublicOfferingsDataSourceSchema(ctx context.Context) schema.Schema {
 						"state": schema.StringAttribute{
 							Computed: true,
 						},
-						"terms_of_service": schema.StringAttribute{
-							Computed: true,
-						},
-						"terms_of_service_link": schema.StringAttribute{
-							Computed: true,
-						},
 						"thumbnail": schema.StringAttribute{
 							Computed: true,
 						},
@@ -2013,42 +2007,6 @@ func (t PublicOfferingsType) ValueFromObject(ctx context.Context, in basetypes.O
 			fmt.Sprintf(`state expected to be basetypes.StringValue, was: %T`, stateAttribute))
 	}
 
-	termsOfServiceAttribute, ok := attributes["terms_of_service"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`terms_of_service is missing from object`)
-
-		return nil, diags
-	}
-
-	termsOfServiceVal, ok := termsOfServiceAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`terms_of_service expected to be basetypes.StringValue, was: %T`, termsOfServiceAttribute))
-	}
-
-	termsOfServiceLinkAttribute, ok := attributes["terms_of_service_link"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`terms_of_service_link is missing from object`)
-
-		return nil, diags
-	}
-
-	termsOfServiceLinkVal, ok := termsOfServiceLinkAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`terms_of_service_link expected to be basetypes.StringValue, was: %T`, termsOfServiceLinkAttribute))
-	}
-
 	thumbnailAttribute, ok := attributes["thumbnail"]
 
 	if !ok {
@@ -2250,8 +2208,6 @@ func (t PublicOfferingsType) ValueFromObject(ctx context.Context, in basetypes.O
 		Shared:                    sharedVal,
 		Slug:                      slugVal,
 		State:                     stateVal,
-		TermsOfService:            termsOfServiceVal,
-		TermsOfServiceLink:        termsOfServiceLinkVal,
 		Thumbnail:                 thumbnailVal,
 		TotalCost:                 totalCostVal,
 		TotalCostEstimated:        totalCostEstimatedVal,
@@ -3263,42 +3219,6 @@ func NewPublicOfferingsValue(attributeTypes map[string]attr.Type, attributes map
 			fmt.Sprintf(`state expected to be basetypes.StringValue, was: %T`, stateAttribute))
 	}
 
-	termsOfServiceAttribute, ok := attributes["terms_of_service"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`terms_of_service is missing from object`)
-
-		return NewPublicOfferingsValueUnknown(), diags
-	}
-
-	termsOfServiceVal, ok := termsOfServiceAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`terms_of_service expected to be basetypes.StringValue, was: %T`, termsOfServiceAttribute))
-	}
-
-	termsOfServiceLinkAttribute, ok := attributes["terms_of_service_link"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`terms_of_service_link is missing from object`)
-
-		return NewPublicOfferingsValueUnknown(), diags
-	}
-
-	termsOfServiceLinkVal, ok := termsOfServiceLinkAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`terms_of_service_link expected to be basetypes.StringValue, was: %T`, termsOfServiceLinkAttribute))
-	}
-
 	thumbnailAttribute, ok := attributes["thumbnail"]
 
 	if !ok {
@@ -3500,8 +3420,6 @@ func NewPublicOfferingsValue(attributeTypes map[string]attr.Type, attributes map
 		Shared:                    sharedVal,
 		Slug:                      slugVal,
 		State:                     stateVal,
-		TermsOfService:            termsOfServiceVal,
-		TermsOfServiceLink:        termsOfServiceLinkVal,
 		Thumbnail:                 thumbnailVal,
 		TotalCost:                 totalCostVal,
 		TotalCostEstimated:        totalCostEstimatedVal,
@@ -3634,8 +3552,6 @@ type PublicOfferingsValue struct {
 	Shared                    basetypes.BoolValue    `tfsdk:"shared"`
 	Slug                      basetypes.StringValue  `tfsdk:"slug"`
 	State                     basetypes.StringValue  `tfsdk:"state"`
-	TermsOfService            basetypes.StringValue  `tfsdk:"terms_of_service"`
-	TermsOfServiceLink        basetypes.StringValue  `tfsdk:"terms_of_service_link"`
 	Thumbnail                 basetypes.StringValue  `tfsdk:"thumbnail"`
 	TotalCost                 basetypes.Int64Value   `tfsdk:"total_cost"`
 	TotalCostEstimated        basetypes.Int64Value   `tfsdk:"total_cost_estimated"`
@@ -3648,7 +3564,7 @@ type PublicOfferingsValue struct {
 }
 
 func (v PublicOfferingsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 62)
+	attrTypes := make(map[string]tftypes.Type, 60)
 
 	var val tftypes.Value
 	var err error
@@ -3729,8 +3645,6 @@ func (v PublicOfferingsValue) ToTerraformValue(ctx context.Context) (tftypes.Val
 	attrTypes["shared"] = basetypes.BoolType{}.TerraformType(ctx)
 	attrTypes["slug"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["state"] = basetypes.StringType{}.TerraformType(ctx)
-	attrTypes["terms_of_service"] = basetypes.StringType{}.TerraformType(ctx)
-	attrTypes["terms_of_service_link"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["thumbnail"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["total_cost"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["total_cost_estimated"] = basetypes.Int64Type{}.TerraformType(ctx)
@@ -3744,7 +3658,7 @@ func (v PublicOfferingsValue) ToTerraformValue(ctx context.Context) (tftypes.Val
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 62)
+		vals := make(map[string]tftypes.Value, 60)
 
 		val, err = v.AccessUrl.ToTerraformValue(ctx)
 
@@ -4161,22 +4075,6 @@ func (v PublicOfferingsValue) ToTerraformValue(ctx context.Context) (tftypes.Val
 		}
 
 		vals["state"] = val
-
-		val, err = v.TermsOfService.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["terms_of_service"] = val
-
-		val, err = v.TermsOfServiceLink.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["terms_of_service_link"] = val
 
 		val, err = v.Thumbnail.ToTerraformValue(ctx)
 
@@ -4669,19 +4567,17 @@ func (v PublicOfferingsValue) ToObjectValue(ctx context.Context) (basetypes.Obje
 		"screenshots": basetypes.ListType{
 			ElemType: ScreenshotsValue{}.Type(ctx),
 		},
-		"shared":                basetypes.BoolType{},
-		"slug":                  basetypes.StringType{},
-		"state":                 basetypes.StringType{},
-		"terms_of_service":      basetypes.StringType{},
-		"terms_of_service_link": basetypes.StringType{},
-		"thumbnail":             basetypes.StringType{},
-		"total_cost":            basetypes.Int64Type{},
-		"total_cost_estimated":  basetypes.Int64Type{},
-		"total_customers":       basetypes.Int64Type{},
-		"type":                  basetypes.StringType{},
-		"url":                   basetypes.StringType{},
-		"uuid":                  basetypes.StringType{},
-		"vendor_details":        basetypes.StringType{},
+		"shared":               basetypes.BoolType{},
+		"slug":                 basetypes.StringType{},
+		"state":                basetypes.StringType{},
+		"thumbnail":            basetypes.StringType{},
+		"total_cost":           basetypes.Int64Type{},
+		"total_cost_estimated": basetypes.Int64Type{},
+		"total_customers":      basetypes.Int64Type{},
+		"type":                 basetypes.StringType{},
+		"url":                  basetypes.StringType{},
+		"uuid":                 basetypes.StringType{},
+		"vendor_details":       basetypes.StringType{},
 	}
 
 	if v.IsNull() {
@@ -4747,8 +4643,6 @@ func (v PublicOfferingsValue) ToObjectValue(ctx context.Context) (basetypes.Obje
 			"shared":                      v.Shared,
 			"slug":                        v.Slug,
 			"state":                       v.State,
-			"terms_of_service":            v.TermsOfService,
-			"terms_of_service_link":       v.TermsOfServiceLink,
 			"thumbnail":                   v.Thumbnail,
 			"total_cost":                  v.TotalCost,
 			"total_cost_estimated":        v.TotalCostEstimated,
@@ -4985,14 +4879,6 @@ func (v PublicOfferingsValue) Equal(o attr.Value) bool {
 		return false
 	}
 
-	if !v.TermsOfService.Equal(other.TermsOfService) {
-		return false
-	}
-
-	if !v.TermsOfServiceLink.Equal(other.TermsOfServiceLink) {
-		return false
-	}
-
 	if !v.Thumbnail.Equal(other.Thumbnail) {
 		return false
 	}
@@ -5111,19 +4997,17 @@ func (v PublicOfferingsValue) AttributeTypes(ctx context.Context) map[string]att
 		"screenshots": basetypes.ListType{
 			ElemType: ScreenshotsValue{}.Type(ctx),
 		},
-		"shared":                basetypes.BoolType{},
-		"slug":                  basetypes.StringType{},
-		"state":                 basetypes.StringType{},
-		"terms_of_service":      basetypes.StringType{},
-		"terms_of_service_link": basetypes.StringType{},
-		"thumbnail":             basetypes.StringType{},
-		"total_cost":            basetypes.Int64Type{},
-		"total_cost_estimated":  basetypes.Int64Type{},
-		"total_customers":       basetypes.Int64Type{},
-		"type":                  basetypes.StringType{},
-		"url":                   basetypes.StringType{},
-		"uuid":                  basetypes.StringType{},
-		"vendor_details":        basetypes.StringType{},
+		"shared":               basetypes.BoolType{},
+		"slug":                 basetypes.StringType{},
+		"state":                basetypes.StringType{},
+		"thumbnail":            basetypes.StringType{},
+		"total_cost":           basetypes.Int64Type{},
+		"total_cost_estimated": basetypes.Int64Type{},
+		"total_customers":      basetypes.Int64Type{},
+		"type":                 basetypes.StringType{},
+		"url":                  basetypes.StringType{},
+		"uuid":                 basetypes.StringType{},
+		"vendor_details":       basetypes.StringType{},
 	}
 }
 

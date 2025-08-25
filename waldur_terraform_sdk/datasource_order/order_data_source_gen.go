@@ -152,9 +152,6 @@ func OrderDataSourceSchema(ctx context.Context) schema.Schema {
 				Description:         "Accessible to all customers.",
 				MarkdownDescription: "Accessible to all customers.",
 			},
-			"offering_terms_of_service": schema.StringAttribute{
-				Computed: true,
-			},
 			"offering_thumbnail": schema.StringAttribute{
 				Computed: true,
 			},
@@ -287,7 +284,6 @@ type OrderModel struct {
 	OfferingImage              types.String  `tfsdk:"offering_image"`
 	OfferingName               types.String  `tfsdk:"offering_name"`
 	OfferingShared             types.Bool    `tfsdk:"offering_shared"`
-	OfferingTermsOfService     types.String  `tfsdk:"offering_terms_of_service"`
 	OfferingThumbnail          types.String  `tfsdk:"offering_thumbnail"`
 	OfferingType               types.String  `tfsdk:"offering_type"`
 	OfferingUuid               types.String  `tfsdk:"offering_uuid"`
