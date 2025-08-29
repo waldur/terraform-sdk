@@ -149,6 +149,11 @@ func OpenstackNetworkDataSourceSchema(ctx context.Context) schema.Schema {
 			"resource_type": schema.StringAttribute{
 				Computed: true,
 			},
+			"segmentation_id": schema.Int64Attribute{
+				Computed:            true,
+				Description:         "VLAN ID for VLAN networks or tunnel ID for VXLAN/GRE networks",
+				MarkdownDescription: "VLAN ID for VLAN networks or tunnel ID for VXLAN/GRE networks",
+			},
 			"service_name": schema.StringAttribute{
 				Computed: true,
 			},
@@ -282,6 +287,7 @@ type OpenstackNetworkModel struct {
 	ProjectUuid                 types.String `tfsdk:"project_uuid"`
 	RbacPolicies                types.List   `tfsdk:"rbac_policies"`
 	ResourceType                types.String `tfsdk:"resource_type"`
+	SegmentationId              types.Int64  `tfsdk:"segmentation_id"`
 	ServiceName                 types.String `tfsdk:"service_name"`
 	ServiceSettings             types.String `tfsdk:"service_settings"`
 	ServiceSettingsErrorMessage types.String `tfsdk:"service_settings_error_message"`

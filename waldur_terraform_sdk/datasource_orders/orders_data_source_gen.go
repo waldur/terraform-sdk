@@ -62,6 +62,13 @@ func OrdersDataSourceSchema(ctx context.Context) schema.Schema {
 				Optional: true,
 				Computed: true,
 			},
+			"offering_slug": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "Multiple values may be separated by commas.",
+				MarkdownDescription: "Multiple values may be separated by commas.",
+			},
 			"offering_type": schema.ListAttribute{
 				ElementType: types.StringType,
 				Optional:    true,
@@ -369,6 +376,7 @@ type OrdersModel struct {
 	Modified             types.String `tfsdk:"modified"`
 	O                    types.List   `tfsdk:"o"`
 	Offering             types.String `tfsdk:"offering"`
+	OfferingSlug         types.List   `tfsdk:"offering_slug"`
 	OfferingType         types.List   `tfsdk:"offering_type"`
 	OfferingUuid         types.String `tfsdk:"offering_uuid"`
 	Orders               types.Set    `tfsdk:"orders"`

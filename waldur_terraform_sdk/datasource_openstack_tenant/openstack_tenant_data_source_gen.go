@@ -18,6 +18,9 @@ import (
 func OpenstackTenantDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
+			"access_url": schema.StringAttribute{
+				Computed: true,
+			},
 			"availability_zone": schema.StringAttribute{
 				Computed:            true,
 				Description:         "Optional availability group. Will be used for all instances provisioned in this tenant",
@@ -159,6 +162,16 @@ func OpenstackTenantDataSourceSchema(ctx context.Context) schema.Schema {
 			"url": schema.StringAttribute{
 				Computed: true,
 			},
+			"user_password": schema.StringAttribute{
+				Computed:            true,
+				Description:         "Password of the tenant user",
+				MarkdownDescription: "Password of the tenant user",
+			},
+			"user_username": schema.StringAttribute{
+				Computed:            true,
+				Description:         "Username of the tenant user",
+				MarkdownDescription: "Username of the tenant user",
+			},
 			"uuid": schema.StringAttribute{
 				Required: true,
 			},
@@ -167,6 +180,7 @@ func OpenstackTenantDataSourceSchema(ctx context.Context) schema.Schema {
 }
 
 type OpenstackTenantModel struct {
+	AccessUrl                   types.String `tfsdk:"access_url"`
 	AvailabilityZone            types.String `tfsdk:"availability_zone"`
 	BackendId                   types.String `tfsdk:"backend_id"`
 	Created                     types.String `tfsdk:"created"`
@@ -204,6 +218,8 @@ type OpenstackTenantModel struct {
 	ServiceSettingsUuid         types.String `tfsdk:"service_settings_uuid"`
 	State                       types.String `tfsdk:"state"`
 	Url                         types.String `tfsdk:"url"`
+	UserPassword                types.String `tfsdk:"user_password"`
+	UserUsername                types.String `tfsdk:"user_username"`
 	Uuid                        types.String `tfsdk:"uuid"`
 }
 
