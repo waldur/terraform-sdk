@@ -541,6 +541,64 @@ func OpenstackInstanceDataSourceSchema(ctx context.Context) schema.Schema {
 			"security_groups": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
+						"description": schema.StringAttribute{
+							Computed: true,
+						},
+						"name": schema.StringAttribute{
+							Computed: true,
+						},
+						"rules": schema.ListNestedAttribute{
+							NestedObject: schema.NestedAttributeObject{
+								Attributes: map[string]schema.Attribute{
+									"cidr": schema.StringAttribute{
+										Computed:            true,
+										Description:         "CIDR notation for the source/destination network address range",
+										MarkdownDescription: "CIDR notation for the source/destination network address range",
+									},
+									"description": schema.StringAttribute{
+										Computed: true,
+									},
+									"direction": schema.StringAttribute{
+										Computed:            true,
+										Description:         "Traffic direction - either 'ingress' (incoming) or 'egress' (outgoing)",
+										MarkdownDescription: "Traffic direction - either 'ingress' (incoming) or 'egress' (outgoing)",
+									},
+									"ethertype": schema.StringAttribute{
+										Computed:            true,
+										Description:         "IP protocol version - either 'IPv4' or 'IPv6'",
+										MarkdownDescription: "IP protocol version - either 'IPv4' or 'IPv6'",
+									},
+									"from_port": schema.Int64Attribute{
+										Computed:            true,
+										Description:         "Starting port number in the range (1-65535)",
+										MarkdownDescription: "Starting port number in the range (1-65535)",
+									},
+									"id": schema.Int64Attribute{
+										Computed: true,
+									},
+									"remote_group_name": schema.StringAttribute{
+										Computed: true,
+									},
+									"remote_group_uuid": schema.StringAttribute{
+										Computed: true,
+									},
+									"to_port": schema.Int64Attribute{
+										Computed:            true,
+										Description:         "Ending port number in the range (1-65535)",
+										MarkdownDescription: "Ending port number in the range (1-65535)",
+									},
+								},
+								CustomType: RulesType{
+									ObjectType: types.ObjectType{
+										AttrTypes: RulesValue{}.AttributeTypes(ctx),
+									},
+								},
+							},
+							Computed: true,
+						},
+						"state": schema.StringAttribute{
+							Computed: true,
+						},
 						"url": schema.StringAttribute{
 							Computed: true,
 						},
@@ -7344,6 +7402,78 @@ func (t SecurityGroupsType) ValueFromObject(ctx context.Context, in basetypes.Ob
 
 	attributes := in.Attributes()
 
+	descriptionAttribute, ok := attributes["description"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`description is missing from object`)
+
+		return nil, diags
+	}
+
+	descriptionVal, ok := descriptionAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`description expected to be basetypes.StringValue, was: %T`, descriptionAttribute))
+	}
+
+	nameAttribute, ok := attributes["name"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`name is missing from object`)
+
+		return nil, diags
+	}
+
+	nameVal, ok := nameAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`name expected to be basetypes.StringValue, was: %T`, nameAttribute))
+	}
+
+	rulesAttribute, ok := attributes["rules"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`rules is missing from object`)
+
+		return nil, diags
+	}
+
+	rulesVal, ok := rulesAttribute.(basetypes.ListValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`rules expected to be basetypes.ListValue, was: %T`, rulesAttribute))
+	}
+
+	stateAttribute, ok := attributes["state"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`state is missing from object`)
+
+		return nil, diags
+	}
+
+	stateVal, ok := stateAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`state expected to be basetypes.StringValue, was: %T`, stateAttribute))
+	}
+
 	urlAttribute, ok := attributes["url"]
 
 	if !ok {
@@ -7367,8 +7497,12 @@ func (t SecurityGroupsType) ValueFromObject(ctx context.Context, in basetypes.Ob
 	}
 
 	return SecurityGroupsValue{
-		Url:   urlVal,
-		state: attr.ValueStateKnown,
+		Description: descriptionVal,
+		Name:        nameVal,
+		Rules:       rulesVal,
+		State:       stateVal,
+		Url:         urlVal,
+		state:       attr.ValueStateKnown,
 	}, diags
 }
 
@@ -7435,6 +7569,78 @@ func NewSecurityGroupsValue(attributeTypes map[string]attr.Type, attributes map[
 		return NewSecurityGroupsValueUnknown(), diags
 	}
 
+	descriptionAttribute, ok := attributes["description"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`description is missing from object`)
+
+		return NewSecurityGroupsValueUnknown(), diags
+	}
+
+	descriptionVal, ok := descriptionAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`description expected to be basetypes.StringValue, was: %T`, descriptionAttribute))
+	}
+
+	nameAttribute, ok := attributes["name"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`name is missing from object`)
+
+		return NewSecurityGroupsValueUnknown(), diags
+	}
+
+	nameVal, ok := nameAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`name expected to be basetypes.StringValue, was: %T`, nameAttribute))
+	}
+
+	rulesAttribute, ok := attributes["rules"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`rules is missing from object`)
+
+		return NewSecurityGroupsValueUnknown(), diags
+	}
+
+	rulesVal, ok := rulesAttribute.(basetypes.ListValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`rules expected to be basetypes.ListValue, was: %T`, rulesAttribute))
+	}
+
+	stateAttribute, ok := attributes["state"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`state is missing from object`)
+
+		return NewSecurityGroupsValueUnknown(), diags
+	}
+
+	stateVal, ok := stateAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`state expected to be basetypes.StringValue, was: %T`, stateAttribute))
+	}
+
 	urlAttribute, ok := attributes["url"]
 
 	if !ok {
@@ -7458,8 +7664,12 @@ func NewSecurityGroupsValue(attributeTypes map[string]attr.Type, attributes map[
 	}
 
 	return SecurityGroupsValue{
-		Url:   urlVal,
-		state: attr.ValueStateKnown,
+		Description: descriptionVal,
+		Name:        nameVal,
+		Rules:       rulesVal,
+		State:       stateVal,
+		Url:         urlVal,
+		state:       attr.ValueStateKnown,
 	}, diags
 }
 
@@ -7531,23 +7741,65 @@ func (t SecurityGroupsType) ValueType(ctx context.Context) attr.Value {
 var _ basetypes.ObjectValuable = SecurityGroupsValue{}
 
 type SecurityGroupsValue struct {
-	Url   basetypes.StringValue `tfsdk:"url"`
-	state attr.ValueState
+	Description basetypes.StringValue `tfsdk:"description"`
+	Name        basetypes.StringValue `tfsdk:"name"`
+	Rules       basetypes.ListValue   `tfsdk:"rules"`
+	State       basetypes.StringValue `tfsdk:"state"`
+	Url         basetypes.StringValue `tfsdk:"url"`
+	state       attr.ValueState
 }
 
 func (v SecurityGroupsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 1)
+	attrTypes := make(map[string]tftypes.Type, 5)
 
 	var val tftypes.Value
 	var err error
 
+	attrTypes["description"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["name"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["rules"] = basetypes.ListType{
+		ElemType: RulesValue{}.Type(ctx),
+	}.TerraformType(ctx)
+	attrTypes["state"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["url"] = basetypes.StringType{}.TerraformType(ctx)
 
 	objectType := tftypes.Object{AttributeTypes: attrTypes}
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 1)
+		vals := make(map[string]tftypes.Value, 5)
+
+		val, err = v.Description.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["description"] = val
+
+		val, err = v.Name.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["name"] = val
+
+		val, err = v.Rules.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["rules"] = val
+
+		val, err = v.State.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["state"] = val
 
 		val, err = v.Url.ToTerraformValue(ctx)
 
@@ -7586,8 +7838,43 @@ func (v SecurityGroupsValue) String() string {
 func (v SecurityGroupsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	rules := types.ListValueMust(
+		RulesType{
+			basetypes.ObjectType{
+				AttrTypes: RulesValue{}.AttributeTypes(ctx),
+			},
+		},
+		v.Rules.Elements(),
+	)
+
+	if v.Rules.IsNull() {
+		rules = types.ListNull(
+			RulesType{
+				basetypes.ObjectType{
+					AttrTypes: RulesValue{}.AttributeTypes(ctx),
+				},
+			},
+		)
+	}
+
+	if v.Rules.IsUnknown() {
+		rules = types.ListUnknown(
+			RulesType{
+				basetypes.ObjectType{
+					AttrTypes: RulesValue{}.AttributeTypes(ctx),
+				},
+			},
+		)
+	}
+
 	attributeTypes := map[string]attr.Type{
-		"url": basetypes.StringType{},
+		"description": basetypes.StringType{},
+		"name":        basetypes.StringType{},
+		"rules": basetypes.ListType{
+			ElemType: RulesValue{}.Type(ctx),
+		},
+		"state": basetypes.StringType{},
+		"url":   basetypes.StringType{},
 	}
 
 	if v.IsNull() {
@@ -7601,7 +7888,11 @@ func (v SecurityGroupsValue) ToObjectValue(ctx context.Context) (basetypes.Objec
 	objVal, diags := types.ObjectValue(
 		attributeTypes,
 		map[string]attr.Value{
-			"url": v.Url,
+			"description": v.Description,
+			"name":        v.Name,
+			"rules":       rules,
+			"state":       v.State,
+			"url":         v.Url,
 		})
 
 	return objVal, diags
@@ -7622,6 +7913,22 @@ func (v SecurityGroupsValue) Equal(o attr.Value) bool {
 		return true
 	}
 
+	if !v.Description.Equal(other.Description) {
+		return false
+	}
+
+	if !v.Name.Equal(other.Name) {
+		return false
+	}
+
+	if !v.Rules.Equal(other.Rules) {
+		return false
+	}
+
+	if !v.State.Equal(other.State) {
+		return false
+	}
+
 	if !v.Url.Equal(other.Url) {
 		return false
 	}
@@ -7639,7 +7946,777 @@ func (v SecurityGroupsValue) Type(ctx context.Context) attr.Type {
 
 func (v SecurityGroupsValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 	return map[string]attr.Type{
-		"url": basetypes.StringType{},
+		"description": basetypes.StringType{},
+		"name":        basetypes.StringType{},
+		"rules": basetypes.ListType{
+			ElemType: RulesValue{}.Type(ctx),
+		},
+		"state": basetypes.StringType{},
+		"url":   basetypes.StringType{},
+	}
+}
+
+var _ basetypes.ObjectTypable = RulesType{}
+
+type RulesType struct {
+	basetypes.ObjectType
+}
+
+func (t RulesType) Equal(o attr.Type) bool {
+	other, ok := o.(RulesType)
+
+	if !ok {
+		return false
+	}
+
+	return t.ObjectType.Equal(other.ObjectType)
+}
+
+func (t RulesType) String() string {
+	return "RulesType"
+}
+
+func (t RulesType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributes := in.Attributes()
+
+	cidrAttribute, ok := attributes["cidr"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`cidr is missing from object`)
+
+		return nil, diags
+	}
+
+	cidrVal, ok := cidrAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`cidr expected to be basetypes.StringValue, was: %T`, cidrAttribute))
+	}
+
+	descriptionAttribute, ok := attributes["description"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`description is missing from object`)
+
+		return nil, diags
+	}
+
+	descriptionVal, ok := descriptionAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`description expected to be basetypes.StringValue, was: %T`, descriptionAttribute))
+	}
+
+	directionAttribute, ok := attributes["direction"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`direction is missing from object`)
+
+		return nil, diags
+	}
+
+	directionVal, ok := directionAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`direction expected to be basetypes.StringValue, was: %T`, directionAttribute))
+	}
+
+	ethertypeAttribute, ok := attributes["ethertype"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`ethertype is missing from object`)
+
+		return nil, diags
+	}
+
+	ethertypeVal, ok := ethertypeAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`ethertype expected to be basetypes.StringValue, was: %T`, ethertypeAttribute))
+	}
+
+	fromPortAttribute, ok := attributes["from_port"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`from_port is missing from object`)
+
+		return nil, diags
+	}
+
+	fromPortVal, ok := fromPortAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`from_port expected to be basetypes.Int64Value, was: %T`, fromPortAttribute))
+	}
+
+	idAttribute, ok := attributes["id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`id is missing from object`)
+
+		return nil, diags
+	}
+
+	idVal, ok := idAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`id expected to be basetypes.Int64Value, was: %T`, idAttribute))
+	}
+
+	remoteGroupNameAttribute, ok := attributes["remote_group_name"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`remote_group_name is missing from object`)
+
+		return nil, diags
+	}
+
+	remoteGroupNameVal, ok := remoteGroupNameAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`remote_group_name expected to be basetypes.StringValue, was: %T`, remoteGroupNameAttribute))
+	}
+
+	remoteGroupUuidAttribute, ok := attributes["remote_group_uuid"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`remote_group_uuid is missing from object`)
+
+		return nil, diags
+	}
+
+	remoteGroupUuidVal, ok := remoteGroupUuidAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`remote_group_uuid expected to be basetypes.StringValue, was: %T`, remoteGroupUuidAttribute))
+	}
+
+	toPortAttribute, ok := attributes["to_port"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`to_port is missing from object`)
+
+		return nil, diags
+	}
+
+	toPortVal, ok := toPortAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`to_port expected to be basetypes.Int64Value, was: %T`, toPortAttribute))
+	}
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	return RulesValue{
+		Cidr:            cidrVal,
+		Description:     descriptionVal,
+		Direction:       directionVal,
+		Ethertype:       ethertypeVal,
+		FromPort:        fromPortVal,
+		Id:              idVal,
+		RemoteGroupName: remoteGroupNameVal,
+		RemoteGroupUuid: remoteGroupUuidVal,
+		ToPort:          toPortVal,
+		state:           attr.ValueStateKnown,
+	}, diags
+}
+
+func NewRulesValueNull() RulesValue {
+	return RulesValue{
+		state: attr.ValueStateNull,
+	}
+}
+
+func NewRulesValueUnknown() RulesValue {
+	return RulesValue{
+		state: attr.ValueStateUnknown,
+	}
+}
+
+func NewRulesValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (RulesValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	// Reference: https://github.com/hashicorp/terraform-plugin-framework/issues/521
+	ctx := context.Background()
+
+	for name, attributeType := range attributeTypes {
+		attribute, ok := attributes[name]
+
+		if !ok {
+			diags.AddError(
+				"Missing RulesValue Attribute Value",
+				"While creating a RulesValue value, a missing attribute value was detected. "+
+					"A RulesValue must contain values for all attributes, even if null or unknown. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("RulesValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
+			)
+
+			continue
+		}
+
+		if !attributeType.Equal(attribute.Type(ctx)) {
+			diags.AddError(
+				"Invalid RulesValue Attribute Type",
+				"While creating a RulesValue value, an invalid attribute value was detected. "+
+					"A RulesValue must use a matching attribute type for the value. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("RulesValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
+					fmt.Sprintf("RulesValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
+			)
+		}
+	}
+
+	for name := range attributes {
+		_, ok := attributeTypes[name]
+
+		if !ok {
+			diags.AddError(
+				"Extra RulesValue Attribute Value",
+				"While creating a RulesValue value, an extra attribute value was detected. "+
+					"A RulesValue must not contain values beyond the expected attribute types. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("Extra RulesValue Attribute Name: %s", name),
+			)
+		}
+	}
+
+	if diags.HasError() {
+		return NewRulesValueUnknown(), diags
+	}
+
+	cidrAttribute, ok := attributes["cidr"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`cidr is missing from object`)
+
+		return NewRulesValueUnknown(), diags
+	}
+
+	cidrVal, ok := cidrAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`cidr expected to be basetypes.StringValue, was: %T`, cidrAttribute))
+	}
+
+	descriptionAttribute, ok := attributes["description"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`description is missing from object`)
+
+		return NewRulesValueUnknown(), diags
+	}
+
+	descriptionVal, ok := descriptionAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`description expected to be basetypes.StringValue, was: %T`, descriptionAttribute))
+	}
+
+	directionAttribute, ok := attributes["direction"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`direction is missing from object`)
+
+		return NewRulesValueUnknown(), diags
+	}
+
+	directionVal, ok := directionAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`direction expected to be basetypes.StringValue, was: %T`, directionAttribute))
+	}
+
+	ethertypeAttribute, ok := attributes["ethertype"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`ethertype is missing from object`)
+
+		return NewRulesValueUnknown(), diags
+	}
+
+	ethertypeVal, ok := ethertypeAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`ethertype expected to be basetypes.StringValue, was: %T`, ethertypeAttribute))
+	}
+
+	fromPortAttribute, ok := attributes["from_port"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`from_port is missing from object`)
+
+		return NewRulesValueUnknown(), diags
+	}
+
+	fromPortVal, ok := fromPortAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`from_port expected to be basetypes.Int64Value, was: %T`, fromPortAttribute))
+	}
+
+	idAttribute, ok := attributes["id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`id is missing from object`)
+
+		return NewRulesValueUnknown(), diags
+	}
+
+	idVal, ok := idAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`id expected to be basetypes.Int64Value, was: %T`, idAttribute))
+	}
+
+	remoteGroupNameAttribute, ok := attributes["remote_group_name"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`remote_group_name is missing from object`)
+
+		return NewRulesValueUnknown(), diags
+	}
+
+	remoteGroupNameVal, ok := remoteGroupNameAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`remote_group_name expected to be basetypes.StringValue, was: %T`, remoteGroupNameAttribute))
+	}
+
+	remoteGroupUuidAttribute, ok := attributes["remote_group_uuid"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`remote_group_uuid is missing from object`)
+
+		return NewRulesValueUnknown(), diags
+	}
+
+	remoteGroupUuidVal, ok := remoteGroupUuidAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`remote_group_uuid expected to be basetypes.StringValue, was: %T`, remoteGroupUuidAttribute))
+	}
+
+	toPortAttribute, ok := attributes["to_port"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`to_port is missing from object`)
+
+		return NewRulesValueUnknown(), diags
+	}
+
+	toPortVal, ok := toPortAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`to_port expected to be basetypes.Int64Value, was: %T`, toPortAttribute))
+	}
+
+	if diags.HasError() {
+		return NewRulesValueUnknown(), diags
+	}
+
+	return RulesValue{
+		Cidr:            cidrVal,
+		Description:     descriptionVal,
+		Direction:       directionVal,
+		Ethertype:       ethertypeVal,
+		FromPort:        fromPortVal,
+		Id:              idVal,
+		RemoteGroupName: remoteGroupNameVal,
+		RemoteGroupUuid: remoteGroupUuidVal,
+		ToPort:          toPortVal,
+		state:           attr.ValueStateKnown,
+	}, diags
+}
+
+func NewRulesValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) RulesValue {
+	object, diags := NewRulesValue(attributeTypes, attributes)
+
+	if diags.HasError() {
+		// This could potentially be added to the diag package.
+		diagsStrings := make([]string, 0, len(diags))
+
+		for _, diagnostic := range diags {
+			diagsStrings = append(diagsStrings, fmt.Sprintf(
+				"%s | %s | %s",
+				diagnostic.Severity(),
+				diagnostic.Summary(),
+				diagnostic.Detail()))
+		}
+
+		panic("NewRulesValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
+	}
+
+	return object
+}
+
+func (t RulesType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+	if in.Type() == nil {
+		return NewRulesValueNull(), nil
+	}
+
+	if !in.Type().Equal(t.TerraformType(ctx)) {
+		return nil, fmt.Errorf("expected %s, got %s", t.TerraformType(ctx), in.Type())
+	}
+
+	if !in.IsKnown() {
+		return NewRulesValueUnknown(), nil
+	}
+
+	if in.IsNull() {
+		return NewRulesValueNull(), nil
+	}
+
+	attributes := map[string]attr.Value{}
+
+	val := map[string]tftypes.Value{}
+
+	err := in.As(&val)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for k, v := range val {
+		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
+
+		if err != nil {
+			return nil, err
+		}
+
+		attributes[k] = a
+	}
+
+	return NewRulesValueMust(RulesValue{}.AttributeTypes(ctx), attributes), nil
+}
+
+func (t RulesType) ValueType(ctx context.Context) attr.Value {
+	return RulesValue{}
+}
+
+var _ basetypes.ObjectValuable = RulesValue{}
+
+type RulesValue struct {
+	Cidr            basetypes.StringValue `tfsdk:"cidr"`
+	Description     basetypes.StringValue `tfsdk:"description"`
+	Direction       basetypes.StringValue `tfsdk:"direction"`
+	Ethertype       basetypes.StringValue `tfsdk:"ethertype"`
+	FromPort        basetypes.Int64Value  `tfsdk:"from_port"`
+	Id              basetypes.Int64Value  `tfsdk:"id"`
+	RemoteGroupName basetypes.StringValue `tfsdk:"remote_group_name"`
+	RemoteGroupUuid basetypes.StringValue `tfsdk:"remote_group_uuid"`
+	ToPort          basetypes.Int64Value  `tfsdk:"to_port"`
+	state           attr.ValueState
+}
+
+func (v RulesValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+	attrTypes := make(map[string]tftypes.Type, 9)
+
+	var val tftypes.Value
+	var err error
+
+	attrTypes["cidr"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["description"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["direction"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["ethertype"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["from_port"] = basetypes.Int64Type{}.TerraformType(ctx)
+	attrTypes["id"] = basetypes.Int64Type{}.TerraformType(ctx)
+	attrTypes["remote_group_name"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["remote_group_uuid"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["to_port"] = basetypes.Int64Type{}.TerraformType(ctx)
+
+	objectType := tftypes.Object{AttributeTypes: attrTypes}
+
+	switch v.state {
+	case attr.ValueStateKnown:
+		vals := make(map[string]tftypes.Value, 9)
+
+		val, err = v.Cidr.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["cidr"] = val
+
+		val, err = v.Description.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["description"] = val
+
+		val, err = v.Direction.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["direction"] = val
+
+		val, err = v.Ethertype.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["ethertype"] = val
+
+		val, err = v.FromPort.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["from_port"] = val
+
+		val, err = v.Id.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["id"] = val
+
+		val, err = v.RemoteGroupName.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["remote_group_name"] = val
+
+		val, err = v.RemoteGroupUuid.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["remote_group_uuid"] = val
+
+		val, err = v.ToPort.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["to_port"] = val
+
+		if err := tftypes.ValidateValue(objectType, vals); err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		return tftypes.NewValue(objectType, vals), nil
+	case attr.ValueStateNull:
+		return tftypes.NewValue(objectType, nil), nil
+	case attr.ValueStateUnknown:
+		return tftypes.NewValue(objectType, tftypes.UnknownValue), nil
+	default:
+		panic(fmt.Sprintf("unhandled Object state in ToTerraformValue: %s", v.state))
+	}
+}
+
+func (v RulesValue) IsNull() bool {
+	return v.state == attr.ValueStateNull
+}
+
+func (v RulesValue) IsUnknown() bool {
+	return v.state == attr.ValueStateUnknown
+}
+
+func (v RulesValue) String() string {
+	return "RulesValue"
+}
+
+func (v RulesValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributeTypes := map[string]attr.Type{
+		"cidr":              basetypes.StringType{},
+		"description":       basetypes.StringType{},
+		"direction":         basetypes.StringType{},
+		"ethertype":         basetypes.StringType{},
+		"from_port":         basetypes.Int64Type{},
+		"id":                basetypes.Int64Type{},
+		"remote_group_name": basetypes.StringType{},
+		"remote_group_uuid": basetypes.StringType{},
+		"to_port":           basetypes.Int64Type{},
+	}
+
+	if v.IsNull() {
+		return types.ObjectNull(attributeTypes), diags
+	}
+
+	if v.IsUnknown() {
+		return types.ObjectUnknown(attributeTypes), diags
+	}
+
+	objVal, diags := types.ObjectValue(
+		attributeTypes,
+		map[string]attr.Value{
+			"cidr":              v.Cidr,
+			"description":       v.Description,
+			"direction":         v.Direction,
+			"ethertype":         v.Ethertype,
+			"from_port":         v.FromPort,
+			"id":                v.Id,
+			"remote_group_name": v.RemoteGroupName,
+			"remote_group_uuid": v.RemoteGroupUuid,
+			"to_port":           v.ToPort,
+		})
+
+	return objVal, diags
+}
+
+func (v RulesValue) Equal(o attr.Value) bool {
+	other, ok := o.(RulesValue)
+
+	if !ok {
+		return false
+	}
+
+	if v.state != other.state {
+		return false
+	}
+
+	if v.state != attr.ValueStateKnown {
+		return true
+	}
+
+	if !v.Cidr.Equal(other.Cidr) {
+		return false
+	}
+
+	if !v.Description.Equal(other.Description) {
+		return false
+	}
+
+	if !v.Direction.Equal(other.Direction) {
+		return false
+	}
+
+	if !v.Ethertype.Equal(other.Ethertype) {
+		return false
+	}
+
+	if !v.FromPort.Equal(other.FromPort) {
+		return false
+	}
+
+	if !v.Id.Equal(other.Id) {
+		return false
+	}
+
+	if !v.RemoteGroupName.Equal(other.RemoteGroupName) {
+		return false
+	}
+
+	if !v.RemoteGroupUuid.Equal(other.RemoteGroupUuid) {
+		return false
+	}
+
+	if !v.ToPort.Equal(other.ToPort) {
+		return false
+	}
+
+	return true
+}
+
+func (v RulesValue) Type(ctx context.Context) attr.Type {
+	return RulesType{
+		basetypes.ObjectType{
+			AttrTypes: v.AttributeTypes(ctx),
+		},
+	}
+}
+
+func (v RulesValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
+	return map[string]attr.Type{
+		"cidr":              basetypes.StringType{},
+		"description":       basetypes.StringType{},
+		"direction":         basetypes.StringType{},
+		"ethertype":         basetypes.StringType{},
+		"from_port":         basetypes.Int64Type{},
+		"id":                basetypes.Int64Type{},
+		"remote_group_name": basetypes.StringType{},
+		"remote_group_uuid": basetypes.StringType{},
+		"to_port":           basetypes.Int64Type{},
 	}
 }
 
