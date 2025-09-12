@@ -963,6 +963,9 @@ func PublicOfferingsDataSourceSchema(ctx context.Context) schema.Schema {
 						"url": schema.StringAttribute{
 							Computed: true,
 						},
+						"user_has_consent": schema.BoolAttribute{
+							Computed: true,
+						},
 						"uuid": schema.StringAttribute{
 							Computed: true,
 						},
@@ -1016,6 +1019,12 @@ func PublicOfferingsDataSourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 				Computed:    true,
 			},
+			"user_has_consent": schema.BoolAttribute{
+				Optional:            true,
+				Computed:            true,
+				Description:         "User Has Consent",
+				MarkdownDescription: "User Has Consent",
+			},
 			"uuid_list": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
@@ -1057,6 +1066,7 @@ type PublicOfferingsModel struct {
 	Shared                  types.Bool   `tfsdk:"shared"`
 	State                   types.List   `tfsdk:"state"`
 	Type                    types.List   `tfsdk:"type"`
+	UserHasConsent          types.Bool   `tfsdk:"user_has_consent"`
 	UuidList                types.String `tfsdk:"uuid_list"`
 }
 
@@ -2129,6 +2139,24 @@ func (t PublicOfferingsType) ValueFromObject(ctx context.Context, in basetypes.O
 			fmt.Sprintf(`url expected to be basetypes.StringValue, was: %T`, urlAttribute))
 	}
 
+	userHasConsentAttribute, ok := attributes["user_has_consent"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`user_has_consent is missing from object`)
+
+		return nil, diags
+	}
+
+	userHasConsentVal, ok := userHasConsentAttribute.(basetypes.BoolValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`user_has_consent expected to be basetypes.BoolValue, was: %T`, userHasConsentAttribute))
+	}
+
 	uuidAttribute, ok := attributes["uuid"]
 
 	if !ok {
@@ -2228,6 +2256,7 @@ func (t PublicOfferingsType) ValueFromObject(ctx context.Context, in basetypes.O
 		TotalCustomers:            totalCustomersVal,
 		PublicOfferingsType:       typeVal,
 		Url:                       urlVal,
+		UserHasConsent:            userHasConsentVal,
 		Uuid:                      uuidVal,
 		VendorDetails:             vendorDetailsVal,
 		state:                     attr.ValueStateKnown,
@@ -3341,6 +3370,24 @@ func NewPublicOfferingsValue(attributeTypes map[string]attr.Type, attributes map
 			fmt.Sprintf(`url expected to be basetypes.StringValue, was: %T`, urlAttribute))
 	}
 
+	userHasConsentAttribute, ok := attributes["user_has_consent"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`user_has_consent is missing from object`)
+
+		return NewPublicOfferingsValueUnknown(), diags
+	}
+
+	userHasConsentVal, ok := userHasConsentAttribute.(basetypes.BoolValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`user_has_consent expected to be basetypes.BoolValue, was: %T`, userHasConsentAttribute))
+	}
+
 	uuidAttribute, ok := attributes["uuid"]
 
 	if !ok {
@@ -3440,6 +3487,7 @@ func NewPublicOfferingsValue(attributeTypes map[string]attr.Type, attributes map
 		TotalCustomers:            totalCustomersVal,
 		PublicOfferingsType:       typeVal,
 		Url:                       urlVal,
+		UserHasConsent:            userHasConsentVal,
 		Uuid:                      uuidVal,
 		VendorDetails:             vendorDetailsVal,
 		state:                     attr.ValueStateKnown,
@@ -3572,13 +3620,14 @@ type PublicOfferingsValue struct {
 	TotalCustomers            basetypes.Int64Value   `tfsdk:"total_customers"`
 	PublicOfferingsType       basetypes.StringValue  `tfsdk:"type"`
 	Url                       basetypes.StringValue  `tfsdk:"url"`
+	UserHasConsent            basetypes.BoolValue    `tfsdk:"user_has_consent"`
 	Uuid                      basetypes.StringValue  `tfsdk:"uuid"`
 	VendorDetails             basetypes.StringValue  `tfsdk:"vendor_details"`
 	state                     attr.ValueState
 }
 
 func (v PublicOfferingsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 60)
+	attrTypes := make(map[string]tftypes.Type, 61)
 
 	var val tftypes.Value
 	var err error
@@ -3665,6 +3714,7 @@ func (v PublicOfferingsValue) ToTerraformValue(ctx context.Context) (tftypes.Val
 	attrTypes["total_customers"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["type"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["url"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["user_has_consent"] = basetypes.BoolType{}.TerraformType(ctx)
 	attrTypes["uuid"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["vendor_details"] = basetypes.StringType{}.TerraformType(ctx)
 
@@ -3672,7 +3722,7 @@ func (v PublicOfferingsValue) ToTerraformValue(ctx context.Context) (tftypes.Val
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 60)
+		vals := make(map[string]tftypes.Value, 61)
 
 		val, err = v.AccessUrl.ToTerraformValue(ctx)
 
@@ -4138,6 +4188,14 @@ func (v PublicOfferingsValue) ToTerraformValue(ctx context.Context) (tftypes.Val
 
 		vals["url"] = val
 
+		val, err = v.UserHasConsent.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["user_has_consent"] = val
+
 		val, err = v.Uuid.ToTerraformValue(ctx)
 
 		if err != nil {
@@ -4590,6 +4648,7 @@ func (v PublicOfferingsValue) ToObjectValue(ctx context.Context) (basetypes.Obje
 		"total_customers":      basetypes.Int64Type{},
 		"type":                 basetypes.StringType{},
 		"url":                  basetypes.StringType{},
+		"user_has_consent":     basetypes.BoolType{},
 		"uuid":                 basetypes.StringType{},
 		"vendor_details":       basetypes.StringType{},
 	}
@@ -4663,6 +4722,7 @@ func (v PublicOfferingsValue) ToObjectValue(ctx context.Context) (basetypes.Obje
 			"total_customers":             v.TotalCustomers,
 			"type":                        v.PublicOfferingsType,
 			"url":                         v.Url,
+			"user_has_consent":            v.UserHasConsent,
 			"uuid":                        v.Uuid,
 			"vendor_details":              v.VendorDetails,
 		})
@@ -4917,6 +4977,10 @@ func (v PublicOfferingsValue) Equal(o attr.Value) bool {
 		return false
 	}
 
+	if !v.UserHasConsent.Equal(other.UserHasConsent) {
+		return false
+	}
+
 	if !v.Uuid.Equal(other.Uuid) {
 		return false
 	}
@@ -5020,6 +5084,7 @@ func (v PublicOfferingsValue) AttributeTypes(ctx context.Context) map[string]att
 		"total_customers":      basetypes.Int64Type{},
 		"type":                 basetypes.StringType{},
 		"url":                  basetypes.StringType{},
+		"user_has_consent":     basetypes.BoolType{},
 		"uuid":                 basetypes.StringType{},
 		"vendor_details":       basetypes.StringType{},
 	}

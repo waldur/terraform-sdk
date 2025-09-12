@@ -852,6 +852,9 @@ func PublicOfferingDataSourceSchema(ctx context.Context) schema.Schema {
 			"url": schema.StringAttribute{
 				Computed: true,
 			},
+			"user_has_consent": schema.BoolAttribute{
+				Computed: true,
+			},
 			"uuid": schema.StringAttribute{
 				Required: true,
 			},
@@ -922,6 +925,7 @@ type PublicOfferingModel struct {
 	TotalCustomers            types.Int64          `tfsdk:"total_customers"`
 	Type                      types.String         `tfsdk:"type"`
 	Url                       types.String         `tfsdk:"url"`
+	UserHasConsent            types.Bool           `tfsdk:"user_has_consent"`
 	Uuid                      types.String         `tfsdk:"uuid"`
 	VendorDetails             types.String         `tfsdk:"vendor_details"`
 }
