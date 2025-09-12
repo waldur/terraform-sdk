@@ -65,6 +65,18 @@ func PublicOfferingsDataSourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 				Computed:    true,
 			},
+			"has_active_terms_of_service": schema.BoolAttribute{
+				Optional:            true,
+				Computed:            true,
+				Description:         "Has Active Terms of Service",
+				MarkdownDescription: "Has Active Terms of Service",
+			},
+			"has_terms_of_service": schema.BoolAttribute{
+				Optional:            true,
+				Computed:            true,
+				Description:         "Has Terms of Service",
+				MarkdownDescription: "Has Terms of Service",
+			},
 			"keyword": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
@@ -1015,35 +1027,37 @@ func PublicOfferingsDataSourceSchema(ctx context.Context) schema.Schema {
 }
 
 type PublicOfferingsModel struct {
-	AccessibleViaCalls    types.Bool   `tfsdk:"accessible_via_calls"`
-	AllowedCustomerUuid   types.String `tfsdk:"allowed_customer_uuid"`
-	Billable              types.Bool   `tfsdk:"billable"`
-	CategoryGroupUuid     types.String `tfsdk:"category_group_uuid"`
-	CategoryUuid          types.String `tfsdk:"category_uuid"`
-	Created               types.String `tfsdk:"created"`
-	Customer              types.String `tfsdk:"customer"`
-	CustomerUuid          types.String `tfsdk:"customer_uuid"`
-	Description           types.String `tfsdk:"description"`
-	Field                 types.List   `tfsdk:"field"`
-	Keyword               types.String `tfsdk:"keyword"`
-	Modified              types.String `tfsdk:"modified"`
-	Name                  types.String `tfsdk:"name"`
-	NameExact             types.String `tfsdk:"name_exact"`
-	O                     types.List   `tfsdk:"o"`
-	OrganizationGroupUuid types.List   `tfsdk:"organization_group_uuid"`
-	Page                  types.Int64  `tfsdk:"page"`
-	PageSize              types.Int64  `tfsdk:"page_size"`
-	ParentUuid            types.String `tfsdk:"parent_uuid"`
-	ProjectUuid           types.String `tfsdk:"project_uuid"`
-	PublicOfferings       types.Set    `tfsdk:"public_offerings"`
-	ResourceCustomerUuid  types.String `tfsdk:"resource_customer_uuid"`
-	ResourceProjectUuid   types.String `tfsdk:"resource_project_uuid"`
-	ScopeUuid             types.String `tfsdk:"scope_uuid"`
-	ServiceManagerUuid    types.String `tfsdk:"service_manager_uuid"`
-	Shared                types.Bool   `tfsdk:"shared"`
-	State                 types.List   `tfsdk:"state"`
-	Type                  types.List   `tfsdk:"type"`
-	UuidList              types.String `tfsdk:"uuid_list"`
+	AccessibleViaCalls      types.Bool   `tfsdk:"accessible_via_calls"`
+	AllowedCustomerUuid     types.String `tfsdk:"allowed_customer_uuid"`
+	Billable                types.Bool   `tfsdk:"billable"`
+	CategoryGroupUuid       types.String `tfsdk:"category_group_uuid"`
+	CategoryUuid            types.String `tfsdk:"category_uuid"`
+	Created                 types.String `tfsdk:"created"`
+	Customer                types.String `tfsdk:"customer"`
+	CustomerUuid            types.String `tfsdk:"customer_uuid"`
+	Description             types.String `tfsdk:"description"`
+	Field                   types.List   `tfsdk:"field"`
+	HasActiveTermsOfService types.Bool   `tfsdk:"has_active_terms_of_service"`
+	HasTermsOfService       types.Bool   `tfsdk:"has_terms_of_service"`
+	Keyword                 types.String `tfsdk:"keyword"`
+	Modified                types.String `tfsdk:"modified"`
+	Name                    types.String `tfsdk:"name"`
+	NameExact               types.String `tfsdk:"name_exact"`
+	O                       types.List   `tfsdk:"o"`
+	OrganizationGroupUuid   types.List   `tfsdk:"organization_group_uuid"`
+	Page                    types.Int64  `tfsdk:"page"`
+	PageSize                types.Int64  `tfsdk:"page_size"`
+	ParentUuid              types.String `tfsdk:"parent_uuid"`
+	ProjectUuid             types.String `tfsdk:"project_uuid"`
+	PublicOfferings         types.Set    `tfsdk:"public_offerings"`
+	ResourceCustomerUuid    types.String `tfsdk:"resource_customer_uuid"`
+	ResourceProjectUuid     types.String `tfsdk:"resource_project_uuid"`
+	ScopeUuid               types.String `tfsdk:"scope_uuid"`
+	ServiceManagerUuid      types.String `tfsdk:"service_manager_uuid"`
+	Shared                  types.Bool   `tfsdk:"shared"`
+	State                   types.List   `tfsdk:"state"`
+	Type                    types.List   `tfsdk:"type"`
+	UuidList                types.String `tfsdk:"uuid_list"`
 }
 
 var _ basetypes.ObjectTypable = PublicOfferingsType{}
