@@ -27,6 +27,10 @@ func OrderResourceSchema(ctx context.Context) schema.Schema {
 			"activation_price": schema.Float64Attribute{
 				Computed: true,
 			},
+			"attachment": schema.StringAttribute{
+				Optional: true,
+				Computed: true,
+			},
 			"backend_id": schema.StringAttribute{
 				Computed: true,
 			},
@@ -98,6 +102,9 @@ func OrderResourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"error_message": schema.StringAttribute{
+				Computed: true,
+			},
+			"error_traceback": schema.StringAttribute{
 				Computed: true,
 			},
 			"field": schema.ListAttribute{
@@ -240,6 +247,13 @@ func OrderResourceSchema(ctx context.Context) schema.Schema {
 			"provider_uuid": schema.StringAttribute{
 				Computed: true,
 			},
+			"request_comment": schema.StringAttribute{
+				Optional: true,
+				Computed: true,
+				Validators: []validator.String{
+					stringvalidator.LengthAtMost(255),
+				},
+			},
 			"resource_name": schema.StringAttribute{
 				Computed: true,
 			},
@@ -279,6 +293,7 @@ func OrderResourceSchema(ctx context.Context) schema.Schema {
 type OrderModel struct {
 	AcceptingTermsOfService    types.Bool    `tfsdk:"accepting_terms_of_service"`
 	ActivationPrice            types.Float64 `tfsdk:"activation_price"`
+	Attachment                 types.String  `tfsdk:"attachment"`
 	BackendId                  types.String  `tfsdk:"backend_id"`
 	CallbackUrl                types.String  `tfsdk:"callback_url"`
 	CanTerminate               types.Bool    `tfsdk:"can_terminate"`
@@ -300,6 +315,7 @@ type OrderModel struct {
 	CustomerSlug               types.String  `tfsdk:"customer_slug"`
 	CustomerUuid               types.String  `tfsdk:"customer_uuid"`
 	ErrorMessage               types.String  `tfsdk:"error_message"`
+	ErrorTraceback             types.String  `tfsdk:"error_traceback"`
 	Field                      types.List    `tfsdk:"field"`
 	FixedPrice                 types.Float64 `tfsdk:"fixed_price"`
 	Issue                      IssueValue    `tfsdk:"issue"`
@@ -338,6 +354,7 @@ type OrderModel struct {
 	ProviderReviewedByFullName types.String  `tfsdk:"provider_reviewed_by_full_name"`
 	ProviderReviewedByUsername types.String  `tfsdk:"provider_reviewed_by_username"`
 	ProviderUuid               types.String  `tfsdk:"provider_uuid"`
+	RequestComment             types.String  `tfsdk:"request_comment"`
 	ResourceName               types.String  `tfsdk:"resource_name"`
 	ResourceType               types.String  `tfsdk:"resource_type"`
 	ResourceUuid               types.String  `tfsdk:"resource_uuid"`

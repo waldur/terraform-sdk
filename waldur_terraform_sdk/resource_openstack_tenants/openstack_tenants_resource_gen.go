@@ -189,14 +189,22 @@ func OpenstackTenantsResourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"user_password": schema.StringAttribute{
+				Optional:            true,
 				Computed:            true,
 				Description:         "Password of the tenant user",
 				MarkdownDescription: "Password of the tenant user",
+				Validators: []validator.String{
+					stringvalidator.LengthAtMost(50),
+				},
 			},
 			"user_username": schema.StringAttribute{
+				Optional:            true,
 				Computed:            true,
 				Description:         "Username of the tenant user",
 				MarkdownDescription: "Username of the tenant user",
+				Validators: []validator.String{
+					stringvalidator.LengthAtMost(50),
+				},
 			},
 			"uuid": schema.StringAttribute{
 				Computed: true,

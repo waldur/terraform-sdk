@@ -84,6 +84,9 @@ func OrdersDataSourceSchema(ctx context.Context) schema.Schema {
 						"activation_price": schema.Float64Attribute{
 							Computed: true,
 						},
+						"attachment": schema.StringAttribute{
+							Computed: true,
+						},
 						"backend_id": schema.StringAttribute{
 							Computed: true,
 						},
@@ -148,6 +151,9 @@ func OrdersDataSourceSchema(ctx context.Context) schema.Schema {
 							Computed: true,
 						},
 						"error_message": schema.StringAttribute{
+							Computed: true,
+						},
+						"error_traceback": schema.StringAttribute{
 							Computed: true,
 						},
 						"fixed_price": schema.Float64Attribute{
@@ -278,6 +284,9 @@ func OrdersDataSourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "Required. 128 characters or fewer. Lowercase letters, numbers and @/./+/-/_ characters",
 						},
 						"provider_uuid": schema.StringAttribute{
+							Computed: true,
+						},
+						"request_comment": schema.StringAttribute{
 							Computed: true,
 						},
 						"resource_name": schema.StringAttribute{
@@ -436,6 +445,24 @@ func (t OrdersType) ValueFromObject(ctx context.Context, in basetypes.ObjectValu
 			fmt.Sprintf(`activation_price expected to be basetypes.Float64Value, was: %T`, activationPriceAttribute))
 	}
 
+	attachmentAttribute, ok := attributes["attachment"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`attachment is missing from object`)
+
+		return nil, diags
+	}
+
+	attachmentVal, ok := attachmentAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`attachment expected to be basetypes.StringValue, was: %T`, attachmentAttribute))
+	}
+
 	backendIdAttribute, ok := attributes["backend_id"]
 
 	if !ok {
@@ -794,6 +821,24 @@ func (t OrdersType) ValueFromObject(ctx context.Context, in basetypes.ObjectValu
 		diags.AddError(
 			"Attribute Wrong Type",
 			fmt.Sprintf(`error_message expected to be basetypes.StringValue, was: %T`, errorMessageAttribute))
+	}
+
+	errorTracebackAttribute, ok := attributes["error_traceback"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`error_traceback is missing from object`)
+
+		return nil, diags
+	}
+
+	errorTracebackVal, ok := errorTracebackAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`error_traceback expected to be basetypes.StringValue, was: %T`, errorTracebackAttribute))
 	}
 
 	fixedPriceAttribute, ok := attributes["fixed_price"]
@@ -1444,6 +1489,24 @@ func (t OrdersType) ValueFromObject(ctx context.Context, in basetypes.ObjectValu
 			fmt.Sprintf(`provider_uuid expected to be basetypes.StringValue, was: %T`, providerUuidAttribute))
 	}
 
+	requestCommentAttribute, ok := attributes["request_comment"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`request_comment is missing from object`)
+
+		return nil, diags
+	}
+
+	requestCommentVal, ok := requestCommentAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`request_comment expected to be basetypes.StringValue, was: %T`, requestCommentAttribute))
+	}
+
 	resourceNameAttribute, ok := attributes["resource_name"]
 
 	if !ok {
@@ -1576,6 +1639,7 @@ func (t OrdersType) ValueFromObject(ctx context.Context, in basetypes.ObjectValu
 
 	return OrdersValue{
 		ActivationPrice:            activationPriceVal,
+		Attachment:                 attachmentVal,
 		BackendId:                  backendIdVal,
 		CallbackUrl:                callbackUrlVal,
 		CanTerminate:               canTerminateVal,
@@ -1596,6 +1660,7 @@ func (t OrdersType) ValueFromObject(ctx context.Context, in basetypes.ObjectValu
 		CustomerSlug:               customerSlugVal,
 		CustomerUuid:               customerUuidVal,
 		ErrorMessage:               errorMessageVal,
+		ErrorTraceback:             errorTracebackVal,
 		FixedPrice:                 fixedPriceVal,
 		Issue:                      issueVal,
 		Limits:                     limitsVal,
@@ -1632,6 +1697,7 @@ func (t OrdersType) ValueFromObject(ctx context.Context, in basetypes.ObjectValu
 		ProviderReviewedByFullName: providerReviewedByFullNameVal,
 		ProviderReviewedByUsername: providerReviewedByUsernameVal,
 		ProviderUuid:               providerUuidVal,
+		RequestComment:             requestCommentVal,
 		ResourceName:               resourceNameVal,
 		ResourceType:               resourceTypeVal,
 		ResourceUuid:               resourceUuidVal,
@@ -1724,6 +1790,24 @@ func NewOrdersValue(attributeTypes map[string]attr.Type, attributes map[string]a
 			fmt.Sprintf(`activation_price expected to be basetypes.Float64Value, was: %T`, activationPriceAttribute))
 	}
 
+	attachmentAttribute, ok := attributes["attachment"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`attachment is missing from object`)
+
+		return NewOrdersValueUnknown(), diags
+	}
+
+	attachmentVal, ok := attachmentAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`attachment expected to be basetypes.StringValue, was: %T`, attachmentAttribute))
+	}
+
 	backendIdAttribute, ok := attributes["backend_id"]
 
 	if !ok {
@@ -2082,6 +2166,24 @@ func NewOrdersValue(attributeTypes map[string]attr.Type, attributes map[string]a
 		diags.AddError(
 			"Attribute Wrong Type",
 			fmt.Sprintf(`error_message expected to be basetypes.StringValue, was: %T`, errorMessageAttribute))
+	}
+
+	errorTracebackAttribute, ok := attributes["error_traceback"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`error_traceback is missing from object`)
+
+		return NewOrdersValueUnknown(), diags
+	}
+
+	errorTracebackVal, ok := errorTracebackAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`error_traceback expected to be basetypes.StringValue, was: %T`, errorTracebackAttribute))
 	}
 
 	fixedPriceAttribute, ok := attributes["fixed_price"]
@@ -2732,6 +2834,24 @@ func NewOrdersValue(attributeTypes map[string]attr.Type, attributes map[string]a
 			fmt.Sprintf(`provider_uuid expected to be basetypes.StringValue, was: %T`, providerUuidAttribute))
 	}
 
+	requestCommentAttribute, ok := attributes["request_comment"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`request_comment is missing from object`)
+
+		return NewOrdersValueUnknown(), diags
+	}
+
+	requestCommentVal, ok := requestCommentAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`request_comment expected to be basetypes.StringValue, was: %T`, requestCommentAttribute))
+	}
+
 	resourceNameAttribute, ok := attributes["resource_name"]
 
 	if !ok {
@@ -2864,6 +2984,7 @@ func NewOrdersValue(attributeTypes map[string]attr.Type, attributes map[string]a
 
 	return OrdersValue{
 		ActivationPrice:            activationPriceVal,
+		Attachment:                 attachmentVal,
 		BackendId:                  backendIdVal,
 		CallbackUrl:                callbackUrlVal,
 		CanTerminate:               canTerminateVal,
@@ -2884,6 +3005,7 @@ func NewOrdersValue(attributeTypes map[string]attr.Type, attributes map[string]a
 		CustomerSlug:               customerSlugVal,
 		CustomerUuid:               customerUuidVal,
 		ErrorMessage:               errorMessageVal,
+		ErrorTraceback:             errorTracebackVal,
 		FixedPrice:                 fixedPriceVal,
 		Issue:                      issueVal,
 		Limits:                     limitsVal,
@@ -2920,6 +3042,7 @@ func NewOrdersValue(attributeTypes map[string]attr.Type, attributes map[string]a
 		ProviderReviewedByFullName: providerReviewedByFullNameVal,
 		ProviderReviewedByUsername: providerReviewedByUsernameVal,
 		ProviderUuid:               providerUuidVal,
+		RequestComment:             requestCommentVal,
 		ResourceName:               resourceNameVal,
 		ResourceType:               resourceTypeVal,
 		ResourceUuid:               resourceUuidVal,
@@ -3000,6 +3123,7 @@ var _ basetypes.ObjectValuable = OrdersValue{}
 
 type OrdersValue struct {
 	ActivationPrice            basetypes.Float64Value `tfsdk:"activation_price"`
+	Attachment                 basetypes.StringValue  `tfsdk:"attachment"`
 	BackendId                  basetypes.StringValue  `tfsdk:"backend_id"`
 	CallbackUrl                basetypes.StringValue  `tfsdk:"callback_url"`
 	CanTerminate               basetypes.BoolValue    `tfsdk:"can_terminate"`
@@ -3020,6 +3144,7 @@ type OrdersValue struct {
 	CustomerSlug               basetypes.StringValue  `tfsdk:"customer_slug"`
 	CustomerUuid               basetypes.StringValue  `tfsdk:"customer_uuid"`
 	ErrorMessage               basetypes.StringValue  `tfsdk:"error_message"`
+	ErrorTraceback             basetypes.StringValue  `tfsdk:"error_traceback"`
 	FixedPrice                 basetypes.Float64Value `tfsdk:"fixed_price"`
 	Issue                      basetypes.ObjectValue  `tfsdk:"issue"`
 	Limits                     basetypes.MapValue     `tfsdk:"limits"`
@@ -3056,6 +3181,7 @@ type OrdersValue struct {
 	ProviderReviewedByFullName basetypes.StringValue  `tfsdk:"provider_reviewed_by_full_name"`
 	ProviderReviewedByUsername basetypes.StringValue  `tfsdk:"provider_reviewed_by_username"`
 	ProviderUuid               basetypes.StringValue  `tfsdk:"provider_uuid"`
+	RequestComment             basetypes.StringValue  `tfsdk:"request_comment"`
 	ResourceName               basetypes.StringValue  `tfsdk:"resource_name"`
 	ResourceType               basetypes.StringValue  `tfsdk:"resource_type"`
 	ResourceUuid               basetypes.StringValue  `tfsdk:"resource_uuid"`
@@ -3067,12 +3193,13 @@ type OrdersValue struct {
 }
 
 func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 64)
+	attrTypes := make(map[string]tftypes.Type, 67)
 
 	var val tftypes.Value
 	var err error
 
 	attrTypes["activation_price"] = basetypes.Float64Type{}.TerraformType(ctx)
+	attrTypes["attachment"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["backend_id"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["callback_url"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["can_terminate"] = basetypes.BoolType{}.TerraformType(ctx)
@@ -3093,6 +3220,7 @@ func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 	attrTypes["customer_slug"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["customer_uuid"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["error_message"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["error_traceback"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["fixed_price"] = basetypes.Float64Type{}.TerraformType(ctx)
 	attrTypes["issue"] = basetypes.ObjectType{
 		AttrTypes: IssueValue{}.AttributeTypes(ctx),
@@ -3133,6 +3261,7 @@ func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 	attrTypes["provider_reviewed_by_full_name"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["provider_reviewed_by_username"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["provider_uuid"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["request_comment"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["resource_name"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["resource_type"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["resource_uuid"] = basetypes.StringType{}.TerraformType(ctx)
@@ -3145,7 +3274,7 @@ func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 64)
+		vals := make(map[string]tftypes.Value, 67)
 
 		val, err = v.ActivationPrice.ToTerraformValue(ctx)
 
@@ -3154,6 +3283,14 @@ func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 		}
 
 		vals["activation_price"] = val
+
+		val, err = v.Attachment.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["attachment"] = val
 
 		val, err = v.BackendId.ToTerraformValue(ctx)
 
@@ -3314,6 +3451,14 @@ func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 		}
 
 		vals["error_message"] = val
+
+		val, err = v.ErrorTraceback.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["error_traceback"] = val
 
 		val, err = v.FixedPrice.ToTerraformValue(ctx)
 
@@ -3603,6 +3748,14 @@ func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 
 		vals["provider_uuid"] = val
 
+		val, err = v.RequestComment.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["request_comment"] = val
+
 		val, err = v.ResourceName.ToTerraformValue(ctx)
 
 		if err != nil {
@@ -3724,6 +3877,7 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 	if diags.HasError() {
 		return types.ObjectUnknown(map[string]attr.Type{
 			"activation_price":               basetypes.Float64Type{},
+			"attachment":                     basetypes.StringType{},
 			"backend_id":                     basetypes.StringType{},
 			"callback_url":                   basetypes.StringType{},
 			"can_terminate":                  basetypes.BoolType{},
@@ -3744,6 +3898,7 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 			"customer_slug":                  basetypes.StringType{},
 			"customer_uuid":                  basetypes.StringType{},
 			"error_message":                  basetypes.StringType{},
+			"error_traceback":                basetypes.StringType{},
 			"fixed_price":                    basetypes.Float64Type{},
 			"issue": basetypes.ObjectType{
 				AttrTypes: IssueValue{}.AttributeTypes(ctx),
@@ -3784,6 +3939,7 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 			"provider_reviewed_by_full_name": basetypes.StringType{},
 			"provider_reviewed_by_username":  basetypes.StringType{},
 			"provider_uuid":                  basetypes.StringType{},
+			"request_comment":                basetypes.StringType{},
 			"resource_name":                  basetypes.StringType{},
 			"resource_type":                  basetypes.StringType{},
 			"resource_uuid":                  basetypes.StringType{},
@@ -3796,6 +3952,7 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 
 	attributeTypes := map[string]attr.Type{
 		"activation_price":               basetypes.Float64Type{},
+		"attachment":                     basetypes.StringType{},
 		"backend_id":                     basetypes.StringType{},
 		"callback_url":                   basetypes.StringType{},
 		"can_terminate":                  basetypes.BoolType{},
@@ -3816,6 +3973,7 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 		"customer_slug":                  basetypes.StringType{},
 		"customer_uuid":                  basetypes.StringType{},
 		"error_message":                  basetypes.StringType{},
+		"error_traceback":                basetypes.StringType{},
 		"fixed_price":                    basetypes.Float64Type{},
 		"issue": basetypes.ObjectType{
 			AttrTypes: IssueValue{}.AttributeTypes(ctx),
@@ -3856,6 +4014,7 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 		"provider_reviewed_by_full_name": basetypes.StringType{},
 		"provider_reviewed_by_username":  basetypes.StringType{},
 		"provider_uuid":                  basetypes.StringType{},
+		"request_comment":                basetypes.StringType{},
 		"resource_name":                  basetypes.StringType{},
 		"resource_type":                  basetypes.StringType{},
 		"resource_uuid":                  basetypes.StringType{},
@@ -3877,6 +4036,7 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 		attributeTypes,
 		map[string]attr.Value{
 			"activation_price":               v.ActivationPrice,
+			"attachment":                     v.Attachment,
 			"backend_id":                     v.BackendId,
 			"callback_url":                   v.CallbackUrl,
 			"can_terminate":                  v.CanTerminate,
@@ -3897,6 +4057,7 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 			"customer_slug":                  v.CustomerSlug,
 			"customer_uuid":                  v.CustomerUuid,
 			"error_message":                  v.ErrorMessage,
+			"error_traceback":                v.ErrorTraceback,
 			"fixed_price":                    v.FixedPrice,
 			"issue":                          issue,
 			"limits":                         limitsVal,
@@ -3933,6 +4094,7 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 			"provider_reviewed_by_full_name": v.ProviderReviewedByFullName,
 			"provider_reviewed_by_username":  v.ProviderReviewedByUsername,
 			"provider_uuid":                  v.ProviderUuid,
+			"request_comment":                v.RequestComment,
 			"resource_name":                  v.ResourceName,
 			"resource_type":                  v.ResourceType,
 			"resource_uuid":                  v.ResourceUuid,
@@ -3961,6 +4123,10 @@ func (v OrdersValue) Equal(o attr.Value) bool {
 	}
 
 	if !v.ActivationPrice.Equal(other.ActivationPrice) {
+		return false
+	}
+
+	if !v.Attachment.Equal(other.Attachment) {
 		return false
 	}
 
@@ -4041,6 +4207,10 @@ func (v OrdersValue) Equal(o attr.Value) bool {
 	}
 
 	if !v.ErrorMessage.Equal(other.ErrorMessage) {
+		return false
+	}
+
+	if !v.ErrorTraceback.Equal(other.ErrorTraceback) {
 		return false
 	}
 
@@ -4188,6 +4358,10 @@ func (v OrdersValue) Equal(o attr.Value) bool {
 		return false
 	}
 
+	if !v.RequestComment.Equal(other.RequestComment) {
+		return false
+	}
+
 	if !v.ResourceName.Equal(other.ResourceName) {
 		return false
 	}
@@ -4230,6 +4404,7 @@ func (v OrdersValue) Type(ctx context.Context) attr.Type {
 func (v OrdersValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 	return map[string]attr.Type{
 		"activation_price":               basetypes.Float64Type{},
+		"attachment":                     basetypes.StringType{},
 		"backend_id":                     basetypes.StringType{},
 		"callback_url":                   basetypes.StringType{},
 		"can_terminate":                  basetypes.BoolType{},
@@ -4250,6 +4425,7 @@ func (v OrdersValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 		"customer_slug":                  basetypes.StringType{},
 		"customer_uuid":                  basetypes.StringType{},
 		"error_message":                  basetypes.StringType{},
+		"error_traceback":                basetypes.StringType{},
 		"fixed_price":                    basetypes.Float64Type{},
 		"issue": basetypes.ObjectType{
 			AttrTypes: IssueValue{}.AttributeTypes(ctx),
@@ -4290,6 +4466,7 @@ func (v OrdersValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 		"provider_reviewed_by_full_name": basetypes.StringType{},
 		"provider_reviewed_by_username":  basetypes.StringType{},
 		"provider_uuid":                  basetypes.StringType{},
+		"request_comment":                basetypes.StringType{},
 		"resource_name":                  basetypes.StringType{},
 		"resource_type":                  basetypes.StringType{},
 		"resource_uuid":                  basetypes.StringType{},
