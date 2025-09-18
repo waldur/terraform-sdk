@@ -28,7 +28,6 @@ func OrderResourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"attachment": schema.StringAttribute{
-				Optional: true,
 				Computed: true,
 			},
 			"backend_id": schema.StringAttribute{
