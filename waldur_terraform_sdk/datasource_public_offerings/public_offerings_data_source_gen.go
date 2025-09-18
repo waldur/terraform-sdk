@@ -688,6 +688,11 @@ func PublicOfferingsDataSourceSchema(ctx context.Context) schema.Schema {
 									Description:         "List of UUID of OpenStack offerings where tenant can be created",
 									MarkdownDescription: "List of UUID of OpenStack offerings where tenant can be created",
 								},
+								"order_supports_comments_and_metadata": schema.BoolAttribute{
+									Computed:            true,
+									Description:         "If set to True, orders will support comments and metadata",
+									MarkdownDescription: "If set to True, orders will support comments and metadata",
+								},
 								"required_team_role_for_provisioning": schema.StringAttribute{
 									Computed:            true,
 									Description:         "Required user role in a project for provisioning of resources",
@@ -11830,6 +11835,24 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 			fmt.Sprintf(`openstack_offering_uuid_list expected to be basetypes.ListValue, was: %T`, openstackOfferingUuidListAttribute))
 	}
 
+	orderSupportsCommentsAndMetadataAttribute, ok := attributes["order_supports_comments_and_metadata"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`order_supports_comments_and_metadata is missing from object`)
+
+		return nil, diags
+	}
+
+	orderSupportsCommentsAndMetadataVal, ok := orderSupportsCommentsAndMetadataAttribute.(basetypes.BoolValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`order_supports_comments_and_metadata expected to be basetypes.BoolValue, was: %T`, orderSupportsCommentsAndMetadataAttribute))
+	}
+
 	requiredTeamRoleForProvisioningAttribute, ok := attributes["required_team_role_for_provisioning"]
 
 	if !ok {
@@ -12015,6 +12038,7 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 		MaxVolumes:                                     maxVolumesVal,
 		MinimalTeamCountForProvisioning:                minimalTeamCountForProvisioningVal,
 		OpenstackOfferingUuidList:                      openstackOfferingUuidListVal,
+		OrderSupportsCommentsAndMetadata:               orderSupportsCommentsAndMetadataVal,
 		RequiredTeamRoleForProvisioning:                requiredTeamRoleForProvisioningVal,
 		ServiceProviderCanCreateOfferingUser:           serviceProviderCanCreateOfferingUserVal,
 		SnapshotSizeLimitGb:                            snapshotSizeLimitGbVal,
@@ -12738,6 +12762,24 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 			fmt.Sprintf(`openstack_offering_uuid_list expected to be basetypes.ListValue, was: %T`, openstackOfferingUuidListAttribute))
 	}
 
+	orderSupportsCommentsAndMetadataAttribute, ok := attributes["order_supports_comments_and_metadata"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`order_supports_comments_and_metadata is missing from object`)
+
+		return NewPluginOptionsValueUnknown(), diags
+	}
+
+	orderSupportsCommentsAndMetadataVal, ok := orderSupportsCommentsAndMetadataAttribute.(basetypes.BoolValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`order_supports_comments_and_metadata expected to be basetypes.BoolValue, was: %T`, orderSupportsCommentsAndMetadataAttribute))
+	}
+
 	requiredTeamRoleForProvisioningAttribute, ok := attributes["required_team_role_for_provisioning"]
 
 	if !ok {
@@ -12923,6 +12965,7 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 		MaxVolumes:                                     maxVolumesVal,
 		MinimalTeamCountForProvisioning:                minimalTeamCountForProvisioningVal,
 		OpenstackOfferingUuidList:                      openstackOfferingUuidListVal,
+		OrderSupportsCommentsAndMetadata:               orderSupportsCommentsAndMetadataVal,
 		RequiredTeamRoleForProvisioning:                requiredTeamRoleForProvisioningVal,
 		ServiceProviderCanCreateOfferingUser:           serviceProviderCanCreateOfferingUserVal,
 		SnapshotSizeLimitGb:                            snapshotSizeLimitGbVal,
@@ -13039,6 +13082,7 @@ type PluginOptionsValue struct {
 	MaxVolumes                                     basetypes.Int64Value  `tfsdk:"max_volumes"`
 	MinimalTeamCountForProvisioning                basetypes.Int64Value  `tfsdk:"minimal_team_count_for_provisioning"`
 	OpenstackOfferingUuidList                      basetypes.ListValue   `tfsdk:"openstack_offering_uuid_list"`
+	OrderSupportsCommentsAndMetadata               basetypes.BoolValue   `tfsdk:"order_supports_comments_and_metadata"`
 	RequiredTeamRoleForProvisioning                basetypes.StringValue `tfsdk:"required_team_role_for_provisioning"`
 	ServiceProviderCanCreateOfferingUser           basetypes.BoolValue   `tfsdk:"service_provider_can_create_offering_user"`
 	SnapshotSizeLimitGb                            basetypes.Int64Value  `tfsdk:"snapshot_size_limit_gb"`
@@ -13051,7 +13095,7 @@ type PluginOptionsValue struct {
 }
 
 func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 44)
+	attrTypes := make(map[string]tftypes.Type, 45)
 
 	var val tftypes.Value
 	var err error
@@ -13094,6 +13138,7 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 	attrTypes["openstack_offering_uuid_list"] = basetypes.ListType{
 		ElemType: types.StringType,
 	}.TerraformType(ctx)
+	attrTypes["order_supports_comments_and_metadata"] = basetypes.BoolType{}.TerraformType(ctx)
 	attrTypes["required_team_role_for_provisioning"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["service_provider_can_create_offering_user"] = basetypes.BoolType{}.TerraformType(ctx)
 	attrTypes["snapshot_size_limit_gb"] = basetypes.Int64Type{}.TerraformType(ctx)
@@ -13107,7 +13152,7 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 44)
+		vals := make(map[string]tftypes.Value, 45)
 
 		val, err = v.AutoApproveInServiceProviderProjects.ToTerraformValue(ctx)
 
@@ -13397,6 +13442,14 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 
 		vals["openstack_offering_uuid_list"] = val
 
+		val, err = v.OrderSupportsCommentsAndMetadata.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["order_supports_comments_and_metadata"] = val
+
 		val, err = v.RequiredTeamRoleForProvisioning.ToTerraformValue(ctx)
 
 		if err != nil {
@@ -13542,6 +13595,7 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 			"openstack_offering_uuid_list": basetypes.ListType{
 				ElemType: types.StringType,
 			},
+			"order_supports_comments_and_metadata":      basetypes.BoolType{},
 			"required_team_role_for_provisioning":       basetypes.StringType{},
 			"service_provider_can_create_offering_user": basetypes.BoolType{},
 			"snapshot_size_limit_gb":                    basetypes.Int64Type{},
@@ -13592,6 +13646,7 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 		"openstack_offering_uuid_list": basetypes.ListType{
 			ElemType: types.StringType,
 		},
+		"order_supports_comments_and_metadata":      basetypes.BoolType{},
 		"required_team_role_for_provisioning":       basetypes.StringType{},
 		"service_provider_can_create_offering_user": basetypes.BoolType{},
 		"snapshot_size_limit_gb":                    basetypes.Int64Type{},
@@ -13649,6 +13704,7 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 			"max_volumes":                               v.MaxVolumes,
 			"minimal_team_count_for_provisioning":       v.MinimalTeamCountForProvisioning,
 			"openstack_offering_uuid_list":              openstackOfferingUuidListVal,
+			"order_supports_comments_and_metadata":      v.OrderSupportsCommentsAndMetadata,
 			"required_team_role_for_provisioning":       v.RequiredTeamRoleForProvisioning,
 			"service_provider_can_create_offering_user": v.ServiceProviderCanCreateOfferingUser,
 			"snapshot_size_limit_gb":                    v.SnapshotSizeLimitGb,
@@ -13821,6 +13877,10 @@ func (v PluginOptionsValue) Equal(o attr.Value) bool {
 		return false
 	}
 
+	if !v.OrderSupportsCommentsAndMetadata.Equal(other.OrderSupportsCommentsAndMetadata) {
+		return false
+	}
+
 	if !v.RequiredTeamRoleForProvisioning.Equal(other.RequiredTeamRoleForProvisioning) {
 		return false
 	}
@@ -13904,6 +13964,7 @@ func (v PluginOptionsValue) AttributeTypes(ctx context.Context) map[string]attr.
 		"openstack_offering_uuid_list": basetypes.ListType{
 			ElemType: types.StringType,
 		},
+		"order_supports_comments_and_metadata":      basetypes.BoolType{},
 		"required_team_role_for_provisioning":       basetypes.StringType{},
 		"service_provider_can_create_offering_user": basetypes.BoolType{},
 		"snapshot_size_limit_gb":                    basetypes.Int64Type{},
