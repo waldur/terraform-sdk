@@ -450,6 +450,11 @@ func PublicOfferingDataSourceSchema(ctx context.Context) schema.Schema {
 						Description:         "Enable issues for membership changes",
 						MarkdownDescription: "Enable issues for membership changes",
 					},
+					"flavors_regex": schema.StringAttribute{
+						Computed:            true,
+						Description:         "Regular expression to limit flavors list",
+						MarkdownDescription: "Regular expression to limit flavors list",
+					},
 					"heappe_cluster_id": schema.StringAttribute{
 						Computed:            true,
 						Description:         "HEAppE cluster id",
@@ -7135,6 +7140,24 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 			fmt.Sprintf(`enable_issues_for_membership_changes expected to be basetypes.BoolValue, was: %T`, enableIssuesForMembershipChangesAttribute))
 	}
 
+	flavorsRegexAttribute, ok := attributes["flavors_regex"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`flavors_regex is missing from object`)
+
+		return nil, diags
+	}
+
+	flavorsRegexVal, ok := flavorsRegexAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`flavors_regex expected to be basetypes.StringValue, was: %T`, flavorsRegexAttribute))
+	}
+
 	heappeClusterIdAttribute, ok := attributes["heappe_cluster_id"]
 
 	if !ok {
@@ -7848,6 +7871,7 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 		DefaultResourceTerminationOffsetInDays:         defaultResourceTerminationOffsetInDaysVal,
 		DeploymentMode:                                 deploymentModeVal,
 		EnableIssuesForMembershipChanges:               enableIssuesForMembershipChangesVal,
+		FlavorsRegex:                                   flavorsRegexVal,
 		HeappeClusterId:                                heappeClusterIdVal,
 		HeappeLocalBasePath:                            heappeLocalBasePathVal,
 		HeappeUrl:                                      heappeUrlVal,
@@ -8062,6 +8086,24 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 			fmt.Sprintf(`enable_issues_for_membership_changes expected to be basetypes.BoolValue, was: %T`, enableIssuesForMembershipChangesAttribute))
 	}
 
+	flavorsRegexAttribute, ok := attributes["flavors_regex"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`flavors_regex is missing from object`)
+
+		return NewPluginOptionsValueUnknown(), diags
+	}
+
+	flavorsRegexVal, ok := flavorsRegexAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`flavors_regex expected to be basetypes.StringValue, was: %T`, flavorsRegexAttribute))
+	}
+
 	heappeClusterIdAttribute, ok := attributes["heappe_cluster_id"]
 
 	if !ok {
@@ -8775,6 +8817,7 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 		DefaultResourceTerminationOffsetInDays:         defaultResourceTerminationOffsetInDaysVal,
 		DeploymentMode:                                 deploymentModeVal,
 		EnableIssuesForMembershipChanges:               enableIssuesForMembershipChangesVal,
+		FlavorsRegex:                                   flavorsRegexVal,
 		HeappeClusterId:                                heappeClusterIdVal,
 		HeappeLocalBasePath:                            heappeLocalBasePathVal,
 		HeappeUrl:                                      heappeUrlVal,
@@ -8892,6 +8935,7 @@ type PluginOptionsValue struct {
 	DefaultResourceTerminationOffsetInDays         basetypes.Int64Value  `tfsdk:"default_resource_termination_offset_in_days"`
 	DeploymentMode                                 basetypes.StringValue `tfsdk:"deployment_mode"`
 	EnableIssuesForMembershipChanges               basetypes.BoolValue   `tfsdk:"enable_issues_for_membership_changes"`
+	FlavorsRegex                                   basetypes.StringValue `tfsdk:"flavors_regex"`
 	HeappeClusterId                                basetypes.StringValue `tfsdk:"heappe_cluster_id"`
 	HeappeLocalBasePath                            basetypes.StringValue `tfsdk:"heappe_local_base_path"`
 	HeappeUrl                                      basetypes.StringValue `tfsdk:"heappe_url"`
@@ -8935,7 +8979,7 @@ type PluginOptionsValue struct {
 }
 
 func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 45)
+	attrTypes := make(map[string]tftypes.Type, 46)
 
 	var val tftypes.Value
 	var err error
@@ -8946,6 +8990,7 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 	attrTypes["default_resource_termination_offset_in_days"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["deployment_mode"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["enable_issues_for_membership_changes"] = basetypes.BoolType{}.TerraformType(ctx)
+	attrTypes["flavors_regex"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["heappe_cluster_id"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["heappe_local_base_path"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["heappe_url"] = basetypes.StringType{}.TerraformType(ctx)
@@ -8992,7 +9037,7 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 45)
+		vals := make(map[string]tftypes.Value, 46)
 
 		val, err = v.AutoApproveInServiceProviderProjects.ToTerraformValue(ctx)
 
@@ -9041,6 +9086,14 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 		}
 
 		vals["enable_issues_for_membership_changes"] = val
+
+		val, err = v.FlavorsRegex.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["flavors_regex"] = val
 
 		val, err = v.HeappeClusterId.ToTerraformValue(ctx)
 
@@ -9403,6 +9456,7 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 			"default_resource_termination_offset_in_days":           basetypes.Int64Type{},
 			"deployment_mode":                                       basetypes.StringType{},
 			"enable_issues_for_membership_changes":                  basetypes.BoolType{},
+			"flavors_regex":                                         basetypes.StringType{},
 			"heappe_cluster_id":                                     basetypes.StringType{},
 			"heappe_local_base_path":                                basetypes.StringType{},
 			"heappe_url":                                            basetypes.StringType{},
@@ -9430,8 +9484,8 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 			"managed_rancher_worker_system_volume_type_name":        basetypes.StringType{},
 			"max_instances":                                         basetypes.Int64Type{},
 			"max_resource_termination_offset_in_days":               basetypes.Int64Type{},
-			"max_volumes":                         basetypes.Int64Type{},
-			"minimal_team_count_for_provisioning": basetypes.Int64Type{},
+			"max_volumes":                                           basetypes.Int64Type{},
+			"minimal_team_count_for_provisioning":                   basetypes.Int64Type{},
 			"openstack_offering_uuid_list": basetypes.ListType{
 				ElemType: types.StringType,
 			},
@@ -9454,6 +9508,7 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 		"default_resource_termination_offset_in_days":           basetypes.Int64Type{},
 		"deployment_mode":                                       basetypes.StringType{},
 		"enable_issues_for_membership_changes":                  basetypes.BoolType{},
+		"flavors_regex":                                         basetypes.StringType{},
 		"heappe_cluster_id":                                     basetypes.StringType{},
 		"heappe_local_base_path":                                basetypes.StringType{},
 		"heappe_url":                                            basetypes.StringType{},
@@ -9481,8 +9536,8 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 		"managed_rancher_worker_system_volume_type_name":        basetypes.StringType{},
 		"max_instances":                                         basetypes.Int64Type{},
 		"max_resource_termination_offset_in_days":               basetypes.Int64Type{},
-		"max_volumes":                         basetypes.Int64Type{},
-		"minimal_team_count_for_provisioning": basetypes.Int64Type{},
+		"max_volumes":                                           basetypes.Int64Type{},
+		"minimal_team_count_for_provisioning":                   basetypes.Int64Type{},
 		"openstack_offering_uuid_list": basetypes.ListType{
 			ElemType: types.StringType,
 		},
@@ -9514,6 +9569,7 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 			"default_resource_termination_offset_in_days":           v.DefaultResourceTerminationOffsetInDays,
 			"deployment_mode":                                       v.DeploymentMode,
 			"enable_issues_for_membership_changes":                  v.EnableIssuesForMembershipChanges,
+			"flavors_regex":                                         v.FlavorsRegex,
 			"heappe_cluster_id":                                     v.HeappeClusterId,
 			"heappe_local_base_path":                                v.HeappeLocalBasePath,
 			"heappe_url":                                            v.HeappeUrl,
@@ -9541,18 +9597,18 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 			"managed_rancher_worker_system_volume_type_name":        v.ManagedRancherWorkerSystemVolumeTypeName,
 			"max_instances":                                         v.MaxInstances,
 			"max_resource_termination_offset_in_days":               v.MaxResourceTerminationOffsetInDays,
-			"max_volumes":                               v.MaxVolumes,
-			"minimal_team_count_for_provisioning":       v.MinimalTeamCountForProvisioning,
-			"openstack_offering_uuid_list":              openstackOfferingUuidListVal,
-			"order_supports_comments_and_metadata":      v.OrderSupportsCommentsAndMetadata,
-			"required_team_role_for_provisioning":       v.RequiredTeamRoleForProvisioning,
-			"service_provider_can_create_offering_user": v.ServiceProviderCanCreateOfferingUser,
-			"snapshot_size_limit_gb":                    v.SnapshotSizeLimitGb,
-			"storage_mode":                              v.StorageMode,
-			"supports_downscaling":                      v.SupportsDownscaling,
-			"supports_pausing":                          v.SupportsPausing,
-			"username_anonymized_prefix":                v.UsernameAnonymizedPrefix,
-			"username_generation_policy":                v.UsernameGenerationPolicy,
+			"max_volumes":                                           v.MaxVolumes,
+			"minimal_team_count_for_provisioning":                   v.MinimalTeamCountForProvisioning,
+			"openstack_offering_uuid_list":                          openstackOfferingUuidListVal,
+			"order_supports_comments_and_metadata":                  v.OrderSupportsCommentsAndMetadata,
+			"required_team_role_for_provisioning":                   v.RequiredTeamRoleForProvisioning,
+			"service_provider_can_create_offering_user":             v.ServiceProviderCanCreateOfferingUser,
+			"snapshot_size_limit_gb":                                v.SnapshotSizeLimitGb,
+			"storage_mode":                                          v.StorageMode,
+			"supports_downscaling":                                  v.SupportsDownscaling,
+			"supports_pausing":                                      v.SupportsPausing,
+			"username_anonymized_prefix":                            v.UsernameAnonymizedPrefix,
+			"username_generation_policy":                            v.UsernameGenerationPolicy,
 		})
 
 	return objVal, diags
@@ -9594,6 +9650,10 @@ func (v PluginOptionsValue) Equal(o attr.Value) bool {
 	}
 
 	if !v.EnableIssuesForMembershipChanges.Equal(other.EnableIssuesForMembershipChanges) {
+		return false
+	}
+
+	if !v.FlavorsRegex.Equal(other.FlavorsRegex) {
 		return false
 	}
 
@@ -9772,6 +9832,7 @@ func (v PluginOptionsValue) AttributeTypes(ctx context.Context) map[string]attr.
 		"default_resource_termination_offset_in_days":           basetypes.Int64Type{},
 		"deployment_mode":                                       basetypes.StringType{},
 		"enable_issues_for_membership_changes":                  basetypes.BoolType{},
+		"flavors_regex":                                         basetypes.StringType{},
 		"heappe_cluster_id":                                     basetypes.StringType{},
 		"heappe_local_base_path":                                basetypes.StringType{},
 		"heappe_url":                                            basetypes.StringType{},
@@ -9799,8 +9860,8 @@ func (v PluginOptionsValue) AttributeTypes(ctx context.Context) map[string]attr.
 		"managed_rancher_worker_system_volume_type_name":        basetypes.StringType{},
 		"max_instances":                                         basetypes.Int64Type{},
 		"max_resource_termination_offset_in_days":               basetypes.Int64Type{},
-		"max_volumes":                         basetypes.Int64Type{},
-		"minimal_team_count_for_provisioning": basetypes.Int64Type{},
+		"max_volumes":                                           basetypes.Int64Type{},
+		"minimal_team_count_for_provisioning":                   basetypes.Int64Type{},
 		"openstack_offering_uuid_list": basetypes.ListType{
 			ElemType: types.StringType,
 		},
