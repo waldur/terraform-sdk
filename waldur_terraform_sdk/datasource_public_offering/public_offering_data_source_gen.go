@@ -571,6 +571,11 @@ func PublicOfferingDataSourceSchema(ctx context.Context) schema.Schema {
 						Description:         "Default limit for number of volumes in OpenStack tenant",
 						MarkdownDescription: "Default limit for number of volumes in OpenStack tenant",
 					},
+					"maximal_resource_count_per_project": schema.Int64Attribute{
+						Computed:            true,
+						Description:         "Maximal number of offering resources allowed per project",
+						MarkdownDescription: "Maximal number of offering resources allowed per project",
+					},
 					"minimal_team_count_for_provisioning": schema.Int64Attribute{
 						Computed:            true,
 						Description:         "Minimal team count required for provisioning of resources",
@@ -7662,6 +7667,24 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 			fmt.Sprintf(`max_volumes expected to be basetypes.Int64Value, was: %T`, maxVolumesAttribute))
 	}
 
+	maximalResourceCountPerProjectAttribute, ok := attributes["maximal_resource_count_per_project"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`maximal_resource_count_per_project is missing from object`)
+
+		return nil, diags
+	}
+
+	maximalResourceCountPerProjectVal, ok := maximalResourceCountPerProjectAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`maximal_resource_count_per_project expected to be basetypes.Int64Value, was: %T`, maximalResourceCountPerProjectAttribute))
+	}
+
 	minimalTeamCountForProvisioningAttribute, ok := attributes["minimal_team_count_for_provisioning"]
 
 	if !ok {
@@ -7900,6 +7923,7 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 		MaxInstances:                                   maxInstancesVal,
 		MaxResourceTerminationOffsetInDays:             maxResourceTerminationOffsetInDaysVal,
 		MaxVolumes:                                     maxVolumesVal,
+		MaximalResourceCountPerProject:                 maximalResourceCountPerProjectVal,
 		MinimalTeamCountForProvisioning:                minimalTeamCountForProvisioningVal,
 		OpenstackOfferingUuidList:                      openstackOfferingUuidListVal,
 		OrderSupportsCommentsAndMetadata:               orderSupportsCommentsAndMetadataVal,
@@ -8608,6 +8632,24 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 			fmt.Sprintf(`max_volumes expected to be basetypes.Int64Value, was: %T`, maxVolumesAttribute))
 	}
 
+	maximalResourceCountPerProjectAttribute, ok := attributes["maximal_resource_count_per_project"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`maximal_resource_count_per_project is missing from object`)
+
+		return NewPluginOptionsValueUnknown(), diags
+	}
+
+	maximalResourceCountPerProjectVal, ok := maximalResourceCountPerProjectAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`maximal_resource_count_per_project expected to be basetypes.Int64Value, was: %T`, maximalResourceCountPerProjectAttribute))
+	}
+
 	minimalTeamCountForProvisioningAttribute, ok := attributes["minimal_team_count_for_provisioning"]
 
 	if !ok {
@@ -8846,6 +8888,7 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 		MaxInstances:                                   maxInstancesVal,
 		MaxResourceTerminationOffsetInDays:             maxResourceTerminationOffsetInDaysVal,
 		MaxVolumes:                                     maxVolumesVal,
+		MaximalResourceCountPerProject:                 maximalResourceCountPerProjectVal,
 		MinimalTeamCountForProvisioning:                minimalTeamCountForProvisioningVal,
 		OpenstackOfferingUuidList:                      openstackOfferingUuidListVal,
 		OrderSupportsCommentsAndMetadata:               orderSupportsCommentsAndMetadataVal,
@@ -8964,6 +9007,7 @@ type PluginOptionsValue struct {
 	MaxInstances                                   basetypes.Int64Value  `tfsdk:"max_instances"`
 	MaxResourceTerminationOffsetInDays             basetypes.Int64Value  `tfsdk:"max_resource_termination_offset_in_days"`
 	MaxVolumes                                     basetypes.Int64Value  `tfsdk:"max_volumes"`
+	MaximalResourceCountPerProject                 basetypes.Int64Value  `tfsdk:"maximal_resource_count_per_project"`
 	MinimalTeamCountForProvisioning                basetypes.Int64Value  `tfsdk:"minimal_team_count_for_provisioning"`
 	OpenstackOfferingUuidList                      basetypes.ListValue   `tfsdk:"openstack_offering_uuid_list"`
 	OrderSupportsCommentsAndMetadata               basetypes.BoolValue   `tfsdk:"order_supports_comments_and_metadata"`
@@ -8979,7 +9023,7 @@ type PluginOptionsValue struct {
 }
 
 func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 46)
+	attrTypes := make(map[string]tftypes.Type, 47)
 
 	var val tftypes.Value
 	var err error
@@ -9019,6 +9063,7 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 	attrTypes["max_instances"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["max_resource_termination_offset_in_days"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["max_volumes"] = basetypes.Int64Type{}.TerraformType(ctx)
+	attrTypes["maximal_resource_count_per_project"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["minimal_team_count_for_provisioning"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["openstack_offering_uuid_list"] = basetypes.ListType{
 		ElemType: types.StringType,
@@ -9037,7 +9082,7 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 46)
+		vals := make(map[string]tftypes.Value, 47)
 
 		val, err = v.AutoApproveInServiceProviderProjects.ToTerraformValue(ctx)
 
@@ -9319,6 +9364,14 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 
 		vals["max_volumes"] = val
 
+		val, err = v.MaximalResourceCountPerProject.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["maximal_resource_count_per_project"] = val
+
 		val, err = v.MinimalTeamCountForProvisioning.ToTerraformValue(ctx)
 
 		if err != nil {
@@ -9485,6 +9538,7 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 			"max_instances":                                         basetypes.Int64Type{},
 			"max_resource_termination_offset_in_days":               basetypes.Int64Type{},
 			"max_volumes":                                           basetypes.Int64Type{},
+			"maximal_resource_count_per_project":                    basetypes.Int64Type{},
 			"minimal_team_count_for_provisioning":                   basetypes.Int64Type{},
 			"openstack_offering_uuid_list": basetypes.ListType{
 				ElemType: types.StringType,
@@ -9537,6 +9591,7 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 		"max_instances":                                         basetypes.Int64Type{},
 		"max_resource_termination_offset_in_days":               basetypes.Int64Type{},
 		"max_volumes":                                           basetypes.Int64Type{},
+		"maximal_resource_count_per_project":                    basetypes.Int64Type{},
 		"minimal_team_count_for_provisioning":                   basetypes.Int64Type{},
 		"openstack_offering_uuid_list": basetypes.ListType{
 			ElemType: types.StringType,
@@ -9598,6 +9653,7 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 			"max_instances":                                         v.MaxInstances,
 			"max_resource_termination_offset_in_days":               v.MaxResourceTerminationOffsetInDays,
 			"max_volumes":                                           v.MaxVolumes,
+			"maximal_resource_count_per_project":                    v.MaximalResourceCountPerProject,
 			"minimal_team_count_for_provisioning":                   v.MinimalTeamCountForProvisioning,
 			"openstack_offering_uuid_list":                          openstackOfferingUuidListVal,
 			"order_supports_comments_and_metadata":                  v.OrderSupportsCommentsAndMetadata,
@@ -9769,6 +9825,10 @@ func (v PluginOptionsValue) Equal(o attr.Value) bool {
 		return false
 	}
 
+	if !v.MaximalResourceCountPerProject.Equal(other.MaximalResourceCountPerProject) {
+		return false
+	}
+
 	if !v.MinimalTeamCountForProvisioning.Equal(other.MinimalTeamCountForProvisioning) {
 		return false
 	}
@@ -9861,6 +9921,7 @@ func (v PluginOptionsValue) AttributeTypes(ctx context.Context) map[string]attr.
 		"max_instances":                                         basetypes.Int64Type{},
 		"max_resource_termination_offset_in_days":               basetypes.Int64Type{},
 		"max_volumes":                                           basetypes.Int64Type{},
+		"maximal_resource_count_per_project":                    basetypes.Int64Type{},
 		"minimal_team_count_for_provisioning":                   basetypes.Int64Type{},
 		"openstack_offering_uuid_list": basetypes.ListType{
 			ElemType: types.StringType,

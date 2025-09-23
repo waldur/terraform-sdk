@@ -144,6 +144,15 @@ func OrderDataSourceSchema(ctx context.Context) schema.Schema {
 				Description:         "Purchase and usage is invoiced.",
 				MarkdownDescription: "Purchase and usage is invoiced.",
 			},
+			"offering_customer_name": schema.StringAttribute{
+				Computed: true,
+			},
+			"offering_customer_slug": schema.StringAttribute{
+				Computed: true,
+			},
+			"offering_customer_uuid": schema.StringAttribute{
+				Computed: true,
+			},
 			"offering_description": schema.StringAttribute{
 				Computed: true,
 			},
@@ -291,6 +300,9 @@ type OrderModel struct {
 	NewPlanUuid                types.String  `tfsdk:"new_plan_uuid"`
 	Offering                   types.String  `tfsdk:"offering"`
 	OfferingBillable           types.Bool    `tfsdk:"offering_billable"`
+	OfferingCustomerName       types.String  `tfsdk:"offering_customer_name"`
+	OfferingCustomerSlug       types.String  `tfsdk:"offering_customer_slug"`
+	OfferingCustomerUuid       types.String  `tfsdk:"offering_customer_uuid"`
 	OfferingDescription        types.String  `tfsdk:"offering_description"`
 	OfferingImage              types.String  `tfsdk:"offering_image"`
 	OfferingName               types.String  `tfsdk:"offering_name"`
