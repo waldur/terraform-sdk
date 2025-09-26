@@ -46,9 +46,7 @@ func PublicOfferingDataSourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "Number of citations of a DOI",
 			},
 			"compliance_checklist": schema.StringAttribute{
-				Computed:            true,
-				Description:         "Checklist that offering users must complete for compliance",
-				MarkdownDescription: "Checklist that offering users must complete for compliance",
+				Computed: true,
 			},
 			"components": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
