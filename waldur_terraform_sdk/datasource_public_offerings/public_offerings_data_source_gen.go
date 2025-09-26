@@ -161,6 +161,11 @@ func PublicOfferingsDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "Number of citations of a DOI",
 							MarkdownDescription: "Number of citations of a DOI",
 						},
+						"compliance_checklist": schema.StringAttribute{
+							Computed:            true,
+							Description:         "Checklist that offering users must complete for compliance",
+							MarkdownDescription: "Checklist that offering users must complete for compliance",
+						},
 						"components": schema.ListNestedAttribute{
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
@@ -1236,6 +1241,24 @@ func (t PublicOfferingsType) ValueFromObject(ctx context.Context, in basetypes.O
 			fmt.Sprintf(`citation_count expected to be basetypes.Int64Value, was: %T`, citationCountAttribute))
 	}
 
+	complianceChecklistAttribute, ok := attributes["compliance_checklist"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`compliance_checklist is missing from object`)
+
+		return nil, diags
+	}
+
+	complianceChecklistVal, ok := complianceChecklistAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`compliance_checklist expected to be basetypes.StringValue, was: %T`, complianceChecklistAttribute))
+	}
+
 	componentsAttribute, ok := attributes["components"]
 
 	if !ok {
@@ -2220,6 +2243,7 @@ func (t PublicOfferingsType) ValueFromObject(ctx context.Context, in basetypes.O
 		CategoryTitle:             categoryTitleVal,
 		CategoryUuid:              categoryUuidVal,
 		CitationCount:             citationCountVal,
+		ComplianceChecklist:       complianceChecklistVal,
 		Components:                componentsVal,
 		Created:                   createdVal,
 		Customer:                  customerVal,
@@ -2467,6 +2491,24 @@ func NewPublicOfferingsValue(attributeTypes map[string]attr.Type, attributes map
 			fmt.Sprintf(`citation_count expected to be basetypes.Int64Value, was: %T`, citationCountAttribute))
 	}
 
+	complianceChecklistAttribute, ok := attributes["compliance_checklist"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`compliance_checklist is missing from object`)
+
+		return NewPublicOfferingsValueUnknown(), diags
+	}
+
+	complianceChecklistVal, ok := complianceChecklistAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`compliance_checklist expected to be basetypes.StringValue, was: %T`, complianceChecklistAttribute))
+	}
+
 	componentsAttribute, ok := attributes["components"]
 
 	if !ok {
@@ -3451,6 +3493,7 @@ func NewPublicOfferingsValue(attributeTypes map[string]attr.Type, attributes map
 		CategoryTitle:             categoryTitleVal,
 		CategoryUuid:              categoryUuidVal,
 		CitationCount:             citationCountVal,
+		ComplianceChecklist:       complianceChecklistVal,
 		Components:                componentsVal,
 		Created:                   createdVal,
 		Customer:                  customerVal,
@@ -3584,6 +3627,7 @@ type PublicOfferingsValue struct {
 	CategoryTitle             basetypes.StringValue  `tfsdk:"category_title"`
 	CategoryUuid              basetypes.StringValue  `tfsdk:"category_uuid"`
 	CitationCount             basetypes.Int64Value   `tfsdk:"citation_count"`
+	ComplianceChecklist       basetypes.StringValue  `tfsdk:"compliance_checklist"`
 	Components                basetypes.ListValue    `tfsdk:"components"`
 	Created                   basetypes.StringValue  `tfsdk:"created"`
 	Customer                  basetypes.StringValue  `tfsdk:"customer"`
@@ -3642,7 +3686,7 @@ type PublicOfferingsValue struct {
 }
 
 func (v PublicOfferingsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 61)
+	attrTypes := make(map[string]tftypes.Type, 62)
 
 	var val tftypes.Value
 	var err error
@@ -3654,6 +3698,7 @@ func (v PublicOfferingsValue) ToTerraformValue(ctx context.Context) (tftypes.Val
 	attrTypes["category_title"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["category_uuid"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["citation_count"] = basetypes.Int64Type{}.TerraformType(ctx)
+	attrTypes["compliance_checklist"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["components"] = basetypes.ListType{
 		ElemType: ComponentsValue{}.Type(ctx),
 	}.TerraformType(ctx)
@@ -3737,7 +3782,7 @@ func (v PublicOfferingsValue) ToTerraformValue(ctx context.Context) (tftypes.Val
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 61)
+		vals := make(map[string]tftypes.Value, 62)
 
 		val, err = v.AccessUrl.ToTerraformValue(ctx)
 
@@ -3794,6 +3839,14 @@ func (v PublicOfferingsValue) ToTerraformValue(ctx context.Context) (tftypes.Val
 		}
 
 		vals["citation_count"] = val
+
+		val, err = v.ComplianceChecklist.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["compliance_checklist"] = val
 
 		val, err = v.Components.ToTerraformValue(ctx)
 
@@ -4581,13 +4634,14 @@ func (v PublicOfferingsValue) ToObjectValue(ctx context.Context) (basetypes.Obje
 	}
 
 	attributeTypes := map[string]attr.Type{
-		"access_url":     basetypes.StringType{},
-		"backend_id":     basetypes.StringType{},
-		"billable":       basetypes.BoolType{},
-		"category":       basetypes.StringType{},
-		"category_title": basetypes.StringType{},
-		"category_uuid":  basetypes.StringType{},
-		"citation_count": basetypes.Int64Type{},
+		"access_url":           basetypes.StringType{},
+		"backend_id":           basetypes.StringType{},
+		"billable":             basetypes.BoolType{},
+		"category":             basetypes.StringType{},
+		"category_title":       basetypes.StringType{},
+		"category_uuid":        basetypes.StringType{},
+		"citation_count":       basetypes.Int64Type{},
+		"compliance_checklist": basetypes.StringType{},
 		"components": basetypes.ListType{
 			ElemType: ComponentsValue{}.Type(ctx),
 		},
@@ -4686,6 +4740,7 @@ func (v PublicOfferingsValue) ToObjectValue(ctx context.Context) (basetypes.Obje
 			"category_title":              v.CategoryTitle,
 			"category_uuid":               v.CategoryUuid,
 			"citation_count":              v.CitationCount,
+			"compliance_checklist":        v.ComplianceChecklist,
 			"components":                  components,
 			"created":                     v.Created,
 			"customer":                    v.Customer,
@@ -4785,6 +4840,10 @@ func (v PublicOfferingsValue) Equal(o attr.Value) bool {
 	}
 
 	if !v.CitationCount.Equal(other.CitationCount) {
+		return false
+	}
+
+	if !v.ComplianceChecklist.Equal(other.ComplianceChecklist) {
 		return false
 	}
 
@@ -5017,13 +5076,14 @@ func (v PublicOfferingsValue) Type(ctx context.Context) attr.Type {
 
 func (v PublicOfferingsValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 	return map[string]attr.Type{
-		"access_url":     basetypes.StringType{},
-		"backend_id":     basetypes.StringType{},
-		"billable":       basetypes.BoolType{},
-		"category":       basetypes.StringType{},
-		"category_title": basetypes.StringType{},
-		"category_uuid":  basetypes.StringType{},
-		"citation_count": basetypes.Int64Type{},
+		"access_url":           basetypes.StringType{},
+		"backend_id":           basetypes.StringType{},
+		"billable":             basetypes.BoolType{},
+		"category":             basetypes.StringType{},
+		"category_title":       basetypes.StringType{},
+		"category_uuid":        basetypes.StringType{},
+		"citation_count":       basetypes.Int64Type{},
+		"compliance_checklist": basetypes.StringType{},
 		"components": basetypes.ListType{
 			ElemType: ComponentsValue{}.Type(ctx),
 		},

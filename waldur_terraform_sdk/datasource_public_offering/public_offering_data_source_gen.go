@@ -45,6 +45,11 @@ func PublicOfferingDataSourceSchema(ctx context.Context) schema.Schema {
 				Description:         "Number of citations of a DOI",
 				MarkdownDescription: "Number of citations of a DOI",
 			},
+			"compliance_checklist": schema.StringAttribute{
+				Computed:            true,
+				Description:         "Checklist that offering users must complete for compliance",
+				MarkdownDescription: "Checklist that offering users must complete for compliance",
+			},
 			"components": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
@@ -888,6 +893,7 @@ type PublicOfferingModel struct {
 	CategoryTitle             types.String         `tfsdk:"category_title"`
 	CategoryUuid              types.String         `tfsdk:"category_uuid"`
 	CitationCount             types.Int64          `tfsdk:"citation_count"`
+	ComplianceChecklist       types.String         `tfsdk:"compliance_checklist"`
 	Components                types.List           `tfsdk:"components"`
 	Created                   types.String         `tfsdk:"created"`
 	Customer                  types.String         `tfsdk:"customer"`
