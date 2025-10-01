@@ -433,6 +433,11 @@ func PublicOfferingDataSourceSchema(ctx context.Context) schema.Schema {
 						Description:         "If set to True, an order can be processed without approval",
 						MarkdownDescription: "If set to True, an order can be processed without approval",
 					},
+					"conceal_billing_data": schema.BoolAttribute{
+						Computed:            true,
+						Description:         "If set to True, pricing and components tab would be concealed.",
+						MarkdownDescription: "If set to True, pricing and components tab would be concealed.",
+					},
 					"default_internal_network_mtu": schema.Int64Attribute{
 						Computed:            true,
 						Description:         "If set, it will be used as a default MTU for the first network in a tenant",
@@ -7077,6 +7082,24 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 			fmt.Sprintf(`auto_approve_remote_orders expected to be basetypes.BoolValue, was: %T`, autoApproveRemoteOrdersAttribute))
 	}
 
+	concealBillingDataAttribute, ok := attributes["conceal_billing_data"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`conceal_billing_data is missing from object`)
+
+		return nil, diags
+	}
+
+	concealBillingDataVal, ok := concealBillingDataAttribute.(basetypes.BoolValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`conceal_billing_data expected to be basetypes.BoolValue, was: %T`, concealBillingDataAttribute))
+	}
+
 	defaultInternalNetworkMtuAttribute, ok := attributes["default_internal_network_mtu"]
 
 	if !ok {
@@ -7894,6 +7917,7 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 	return PluginOptionsValue{
 		AutoApproveInServiceProviderProjects:           autoApproveInServiceProviderProjectsVal,
 		AutoApproveRemoteOrders:                        autoApproveRemoteOrdersVal,
+		ConcealBillingData:                             concealBillingDataVal,
 		DefaultInternalNetworkMtu:                      defaultInternalNetworkMtuVal,
 		DefaultResourceTerminationOffsetInDays:         defaultResourceTerminationOffsetInDaysVal,
 		DeploymentMode:                                 deploymentModeVal,
@@ -8042,6 +8066,24 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 			fmt.Sprintf(`auto_approve_remote_orders expected to be basetypes.BoolValue, was: %T`, autoApproveRemoteOrdersAttribute))
 	}
 
+	concealBillingDataAttribute, ok := attributes["conceal_billing_data"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`conceal_billing_data is missing from object`)
+
+		return NewPluginOptionsValueUnknown(), diags
+	}
+
+	concealBillingDataVal, ok := concealBillingDataAttribute.(basetypes.BoolValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`conceal_billing_data expected to be basetypes.BoolValue, was: %T`, concealBillingDataAttribute))
+	}
+
 	defaultInternalNetworkMtuAttribute, ok := attributes["default_internal_network_mtu"]
 
 	if !ok {
@@ -8859,6 +8901,7 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 	return PluginOptionsValue{
 		AutoApproveInServiceProviderProjects:           autoApproveInServiceProviderProjectsVal,
 		AutoApproveRemoteOrders:                        autoApproveRemoteOrdersVal,
+		ConcealBillingData:                             concealBillingDataVal,
 		DefaultInternalNetworkMtu:                      defaultInternalNetworkMtuVal,
 		DefaultResourceTerminationOffsetInDays:         defaultResourceTerminationOffsetInDaysVal,
 		DeploymentMode:                                 deploymentModeVal,
@@ -8978,6 +9021,7 @@ var _ basetypes.ObjectValuable = PluginOptionsValue{}
 type PluginOptionsValue struct {
 	AutoApproveInServiceProviderProjects           basetypes.BoolValue   `tfsdk:"auto_approve_in_service_provider_projects"`
 	AutoApproveRemoteOrders                        basetypes.BoolValue   `tfsdk:"auto_approve_remote_orders"`
+	ConcealBillingData                             basetypes.BoolValue   `tfsdk:"conceal_billing_data"`
 	DefaultInternalNetworkMtu                      basetypes.Int64Value  `tfsdk:"default_internal_network_mtu"`
 	DefaultResourceTerminationOffsetInDays         basetypes.Int64Value  `tfsdk:"default_resource_termination_offset_in_days"`
 	DeploymentMode                                 basetypes.StringValue `tfsdk:"deployment_mode"`
@@ -9027,13 +9071,14 @@ type PluginOptionsValue struct {
 }
 
 func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 47)
+	attrTypes := make(map[string]tftypes.Type, 48)
 
 	var val tftypes.Value
 	var err error
 
 	attrTypes["auto_approve_in_service_provider_projects"] = basetypes.BoolType{}.TerraformType(ctx)
 	attrTypes["auto_approve_remote_orders"] = basetypes.BoolType{}.TerraformType(ctx)
+	attrTypes["conceal_billing_data"] = basetypes.BoolType{}.TerraformType(ctx)
 	attrTypes["default_internal_network_mtu"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["default_resource_termination_offset_in_days"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["deployment_mode"] = basetypes.StringType{}.TerraformType(ctx)
@@ -9086,7 +9131,7 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 47)
+		vals := make(map[string]tftypes.Value, 48)
 
 		val, err = v.AutoApproveInServiceProviderProjects.ToTerraformValue(ctx)
 
@@ -9103,6 +9148,14 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 		}
 
 		vals["auto_approve_remote_orders"] = val
+
+		val, err = v.ConcealBillingData.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["conceal_billing_data"] = val
 
 		val, err = v.DefaultInternalNetworkMtu.ToTerraformValue(ctx)
 
@@ -9509,6 +9562,7 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 		return types.ObjectUnknown(map[string]attr.Type{
 			"auto_approve_in_service_provider_projects":             basetypes.BoolType{},
 			"auto_approve_remote_orders":                            basetypes.BoolType{},
+			"conceal_billing_data":                                  basetypes.BoolType{},
 			"default_internal_network_mtu":                          basetypes.Int64Type{},
 			"default_resource_termination_offset_in_days":           basetypes.Int64Type{},
 			"deployment_mode":                                       basetypes.StringType{},
@@ -9562,6 +9616,7 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 	attributeTypes := map[string]attr.Type{
 		"auto_approve_in_service_provider_projects":             basetypes.BoolType{},
 		"auto_approve_remote_orders":                            basetypes.BoolType{},
+		"conceal_billing_data":                                  basetypes.BoolType{},
 		"default_internal_network_mtu":                          basetypes.Int64Type{},
 		"default_resource_termination_offset_in_days":           basetypes.Int64Type{},
 		"deployment_mode":                                       basetypes.StringType{},
@@ -9624,6 +9679,7 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 		map[string]attr.Value{
 			"auto_approve_in_service_provider_projects":             v.AutoApproveInServiceProviderProjects,
 			"auto_approve_remote_orders":                            v.AutoApproveRemoteOrders,
+			"conceal_billing_data":                                  v.ConcealBillingData,
 			"default_internal_network_mtu":                          v.DefaultInternalNetworkMtu,
 			"default_resource_termination_offset_in_days":           v.DefaultResourceTerminationOffsetInDays,
 			"deployment_mode":                                       v.DeploymentMode,
@@ -9694,6 +9750,10 @@ func (v PluginOptionsValue) Equal(o attr.Value) bool {
 	}
 
 	if !v.AutoApproveRemoteOrders.Equal(other.AutoApproveRemoteOrders) {
+		return false
+	}
+
+	if !v.ConcealBillingData.Equal(other.ConcealBillingData) {
 		return false
 	}
 
@@ -9892,6 +9952,7 @@ func (v PluginOptionsValue) AttributeTypes(ctx context.Context) map[string]attr.
 	return map[string]attr.Type{
 		"auto_approve_in_service_provider_projects":             basetypes.BoolType{},
 		"auto_approve_remote_orders":                            basetypes.BoolType{},
+		"conceal_billing_data":                                  basetypes.BoolType{},
 		"default_internal_network_mtu":                          basetypes.Int64Type{},
 		"default_resource_termination_offset_in_days":           basetypes.Int64Type{},
 		"deployment_mode":                                       basetypes.StringType{},

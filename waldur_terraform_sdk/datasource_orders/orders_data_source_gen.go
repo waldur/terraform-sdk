@@ -202,15 +202,6 @@ func OrdersDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "Purchase and usage is invoiced.",
 							MarkdownDescription: "Purchase and usage is invoiced.",
 						},
-						"offering_customer_name": schema.StringAttribute{
-							Computed: true,
-						},
-						"offering_customer_slug": schema.StringAttribute{
-							Computed: true,
-						},
-						"offering_customer_uuid": schema.StringAttribute{
-							Computed: true,
-						},
 						"offering_description": schema.StringAttribute{
 							Computed: true,
 						},
@@ -291,6 +282,9 @@ func OrdersDataSourceSchema(ctx context.Context) schema.Schema {
 							Computed:            true,
 							Description:         "Required. 128 characters or fewer. Lowercase letters, numbers and @/./+/-/_ characters",
 							MarkdownDescription: "Required. 128 characters or fewer. Lowercase letters, numbers and @/./+/-/_ characters",
+						},
+						"provider_slug": schema.StringAttribute{
+							Computed: true,
 						},
 						"provider_uuid": schema.StringAttribute{
 							Computed: true,
@@ -1030,60 +1024,6 @@ func (t OrdersType) ValueFromObject(ctx context.Context, in basetypes.ObjectValu
 			fmt.Sprintf(`offering_billable expected to be basetypes.BoolValue, was: %T`, offeringBillableAttribute))
 	}
 
-	offeringCustomerNameAttribute, ok := attributes["offering_customer_name"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`offering_customer_name is missing from object`)
-
-		return nil, diags
-	}
-
-	offeringCustomerNameVal, ok := offeringCustomerNameAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`offering_customer_name expected to be basetypes.StringValue, was: %T`, offeringCustomerNameAttribute))
-	}
-
-	offeringCustomerSlugAttribute, ok := attributes["offering_customer_slug"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`offering_customer_slug is missing from object`)
-
-		return nil, diags
-	}
-
-	offeringCustomerSlugVal, ok := offeringCustomerSlugAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`offering_customer_slug expected to be basetypes.StringValue, was: %T`, offeringCustomerSlugAttribute))
-	}
-
-	offeringCustomerUuidAttribute, ok := attributes["offering_customer_uuid"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`offering_customer_uuid is missing from object`)
-
-		return nil, diags
-	}
-
-	offeringCustomerUuidVal, ok := offeringCustomerUuidAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`offering_customer_uuid expected to be basetypes.StringValue, was: %T`, offeringCustomerUuidAttribute))
-	}
-
 	offeringDescriptionAttribute, ok := attributes["offering_description"]
 
 	if !ok {
@@ -1534,6 +1474,24 @@ func (t OrdersType) ValueFromObject(ctx context.Context, in basetypes.ObjectValu
 			fmt.Sprintf(`provider_reviewed_by_username expected to be basetypes.StringValue, was: %T`, providerReviewedByUsernameAttribute))
 	}
 
+	providerSlugAttribute, ok := attributes["provider_slug"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`provider_slug is missing from object`)
+
+		return nil, diags
+	}
+
+	providerSlugVal, ok := providerSlugAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`provider_slug expected to be basetypes.StringValue, was: %T`, providerSlugAttribute))
+	}
+
 	providerUuidAttribute, ok := attributes["provider_uuid"]
 
 	if !ok {
@@ -1734,9 +1692,6 @@ func (t OrdersType) ValueFromObject(ctx context.Context, in basetypes.ObjectValu
 		NewPlanUuid:                newPlanUuidVal,
 		Offering:                   offeringVal,
 		OfferingBillable:           offeringBillableVal,
-		OfferingCustomerName:       offeringCustomerNameVal,
-		OfferingCustomerSlug:       offeringCustomerSlugVal,
-		OfferingCustomerUuid:       offeringCustomerUuidVal,
 		OfferingDescription:        offeringDescriptionVal,
 		OfferingImage:              offeringImageVal,
 		OfferingName:               offeringNameVal,
@@ -1762,6 +1717,7 @@ func (t OrdersType) ValueFromObject(ctx context.Context, in basetypes.ObjectValu
 		ProviderReviewedBy:         providerReviewedByVal,
 		ProviderReviewedByFullName: providerReviewedByFullNameVal,
 		ProviderReviewedByUsername: providerReviewedByUsernameVal,
+		ProviderSlug:               providerSlugVal,
 		ProviderUuid:               providerUuidVal,
 		RequestComment:             requestCommentVal,
 		ResourceName:               resourceNameVal,
@@ -2432,60 +2388,6 @@ func NewOrdersValue(attributeTypes map[string]attr.Type, attributes map[string]a
 			fmt.Sprintf(`offering_billable expected to be basetypes.BoolValue, was: %T`, offeringBillableAttribute))
 	}
 
-	offeringCustomerNameAttribute, ok := attributes["offering_customer_name"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`offering_customer_name is missing from object`)
-
-		return NewOrdersValueUnknown(), diags
-	}
-
-	offeringCustomerNameVal, ok := offeringCustomerNameAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`offering_customer_name expected to be basetypes.StringValue, was: %T`, offeringCustomerNameAttribute))
-	}
-
-	offeringCustomerSlugAttribute, ok := attributes["offering_customer_slug"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`offering_customer_slug is missing from object`)
-
-		return NewOrdersValueUnknown(), diags
-	}
-
-	offeringCustomerSlugVal, ok := offeringCustomerSlugAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`offering_customer_slug expected to be basetypes.StringValue, was: %T`, offeringCustomerSlugAttribute))
-	}
-
-	offeringCustomerUuidAttribute, ok := attributes["offering_customer_uuid"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`offering_customer_uuid is missing from object`)
-
-		return NewOrdersValueUnknown(), diags
-	}
-
-	offeringCustomerUuidVal, ok := offeringCustomerUuidAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`offering_customer_uuid expected to be basetypes.StringValue, was: %T`, offeringCustomerUuidAttribute))
-	}
-
 	offeringDescriptionAttribute, ok := attributes["offering_description"]
 
 	if !ok {
@@ -2936,6 +2838,24 @@ func NewOrdersValue(attributeTypes map[string]attr.Type, attributes map[string]a
 			fmt.Sprintf(`provider_reviewed_by_username expected to be basetypes.StringValue, was: %T`, providerReviewedByUsernameAttribute))
 	}
 
+	providerSlugAttribute, ok := attributes["provider_slug"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`provider_slug is missing from object`)
+
+		return NewOrdersValueUnknown(), diags
+	}
+
+	providerSlugVal, ok := providerSlugAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`provider_slug expected to be basetypes.StringValue, was: %T`, providerSlugAttribute))
+	}
+
 	providerUuidAttribute, ok := attributes["provider_uuid"]
 
 	if !ok {
@@ -3136,9 +3056,6 @@ func NewOrdersValue(attributeTypes map[string]attr.Type, attributes map[string]a
 		NewPlanUuid:                newPlanUuidVal,
 		Offering:                   offeringVal,
 		OfferingBillable:           offeringBillableVal,
-		OfferingCustomerName:       offeringCustomerNameVal,
-		OfferingCustomerSlug:       offeringCustomerSlugVal,
-		OfferingCustomerUuid:       offeringCustomerUuidVal,
 		OfferingDescription:        offeringDescriptionVal,
 		OfferingImage:              offeringImageVal,
 		OfferingName:               offeringNameVal,
@@ -3164,6 +3081,7 @@ func NewOrdersValue(attributeTypes map[string]attr.Type, attributes map[string]a
 		ProviderReviewedBy:         providerReviewedByVal,
 		ProviderReviewedByFullName: providerReviewedByFullNameVal,
 		ProviderReviewedByUsername: providerReviewedByUsernameVal,
+		ProviderSlug:               providerSlugVal,
 		ProviderUuid:               providerUuidVal,
 		RequestComment:             requestCommentVal,
 		ResourceName:               resourceNameVal,
@@ -3278,9 +3196,6 @@ type OrdersValue struct {
 	NewPlanUuid                basetypes.StringValue  `tfsdk:"new_plan_uuid"`
 	Offering                   basetypes.StringValue  `tfsdk:"offering"`
 	OfferingBillable           basetypes.BoolValue    `tfsdk:"offering_billable"`
-	OfferingCustomerName       basetypes.StringValue  `tfsdk:"offering_customer_name"`
-	OfferingCustomerSlug       basetypes.StringValue  `tfsdk:"offering_customer_slug"`
-	OfferingCustomerUuid       basetypes.StringValue  `tfsdk:"offering_customer_uuid"`
 	OfferingDescription        basetypes.StringValue  `tfsdk:"offering_description"`
 	OfferingImage              basetypes.StringValue  `tfsdk:"offering_image"`
 	OfferingName               basetypes.StringValue  `tfsdk:"offering_name"`
@@ -3306,6 +3221,7 @@ type OrdersValue struct {
 	ProviderReviewedBy         basetypes.StringValue  `tfsdk:"provider_reviewed_by"`
 	ProviderReviewedByFullName basetypes.StringValue  `tfsdk:"provider_reviewed_by_full_name"`
 	ProviderReviewedByUsername basetypes.StringValue  `tfsdk:"provider_reviewed_by_username"`
+	ProviderSlug               basetypes.StringValue  `tfsdk:"provider_slug"`
 	ProviderUuid               basetypes.StringValue  `tfsdk:"provider_uuid"`
 	RequestComment             basetypes.StringValue  `tfsdk:"request_comment"`
 	ResourceName               basetypes.StringValue  `tfsdk:"resource_name"`
@@ -3319,7 +3235,7 @@ type OrdersValue struct {
 }
 
 func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 70)
+	attrTypes := make(map[string]tftypes.Type, 68)
 
 	var val tftypes.Value
 	var err error
@@ -3361,9 +3277,6 @@ func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 	attrTypes["new_plan_uuid"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["offering"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["offering_billable"] = basetypes.BoolType{}.TerraformType(ctx)
-	attrTypes["offering_customer_name"] = basetypes.StringType{}.TerraformType(ctx)
-	attrTypes["offering_customer_slug"] = basetypes.StringType{}.TerraformType(ctx)
-	attrTypes["offering_customer_uuid"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["offering_description"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["offering_image"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["offering_name"] = basetypes.StringType{}.TerraformType(ctx)
@@ -3389,6 +3302,7 @@ func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 	attrTypes["provider_reviewed_by"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["provider_reviewed_by_full_name"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["provider_reviewed_by_username"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["provider_slug"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["provider_uuid"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["request_comment"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["resource_name"] = basetypes.StringType{}.TerraformType(ctx)
@@ -3403,7 +3317,7 @@ func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 70)
+		vals := make(map[string]tftypes.Value, 68)
 
 		val, err = v.ActivationPrice.ToTerraformValue(ctx)
 
@@ -3669,30 +3583,6 @@ func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 
 		vals["offering_billable"] = val
 
-		val, err = v.OfferingCustomerName.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["offering_customer_name"] = val
-
-		val, err = v.OfferingCustomerSlug.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["offering_customer_slug"] = val
-
-		val, err = v.OfferingCustomerUuid.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["offering_customer_uuid"] = val
-
 		val, err = v.OfferingDescription.ToTerraformValue(ctx)
 
 		if err != nil {
@@ -3893,6 +3783,14 @@ func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 
 		vals["provider_reviewed_by_username"] = val
 
+		val, err = v.ProviderSlug.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["provider_slug"] = val
+
 		val, err = v.ProviderUuid.ToTerraformValue(ctx)
 
 		if err != nil {
@@ -4066,9 +3964,6 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 			"new_plan_uuid":                  basetypes.StringType{},
 			"offering":                       basetypes.StringType{},
 			"offering_billable":              basetypes.BoolType{},
-			"offering_customer_name":         basetypes.StringType{},
-			"offering_customer_slug":         basetypes.StringType{},
-			"offering_customer_uuid":         basetypes.StringType{},
 			"offering_description":           basetypes.StringType{},
 			"offering_image":                 basetypes.StringType{},
 			"offering_name":                  basetypes.StringType{},
@@ -4094,6 +3989,7 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 			"provider_reviewed_by":           basetypes.StringType{},
 			"provider_reviewed_by_full_name": basetypes.StringType{},
 			"provider_reviewed_by_username":  basetypes.StringType{},
+			"provider_slug":                  basetypes.StringType{},
 			"provider_uuid":                  basetypes.StringType{},
 			"request_comment":                basetypes.StringType{},
 			"resource_name":                  basetypes.StringType{},
@@ -4144,9 +4040,6 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 		"new_plan_uuid":                  basetypes.StringType{},
 		"offering":                       basetypes.StringType{},
 		"offering_billable":              basetypes.BoolType{},
-		"offering_customer_name":         basetypes.StringType{},
-		"offering_customer_slug":         basetypes.StringType{},
-		"offering_customer_uuid":         basetypes.StringType{},
 		"offering_description":           basetypes.StringType{},
 		"offering_image":                 basetypes.StringType{},
 		"offering_name":                  basetypes.StringType{},
@@ -4172,6 +4065,7 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 		"provider_reviewed_by":           basetypes.StringType{},
 		"provider_reviewed_by_full_name": basetypes.StringType{},
 		"provider_reviewed_by_username":  basetypes.StringType{},
+		"provider_slug":                  basetypes.StringType{},
 		"provider_uuid":                  basetypes.StringType{},
 		"request_comment":                basetypes.StringType{},
 		"resource_name":                  basetypes.StringType{},
@@ -4227,9 +4121,6 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 			"new_plan_uuid":                  v.NewPlanUuid,
 			"offering":                       v.Offering,
 			"offering_billable":              v.OfferingBillable,
-			"offering_customer_name":         v.OfferingCustomerName,
-			"offering_customer_slug":         v.OfferingCustomerSlug,
-			"offering_customer_uuid":         v.OfferingCustomerUuid,
 			"offering_description":           v.OfferingDescription,
 			"offering_image":                 v.OfferingImage,
 			"offering_name":                  v.OfferingName,
@@ -4255,6 +4146,7 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 			"provider_reviewed_by":           v.ProviderReviewedBy,
 			"provider_reviewed_by_full_name": v.ProviderReviewedByFullName,
 			"provider_reviewed_by_username":  v.ProviderReviewedByUsername,
+			"provider_slug":                  v.ProviderSlug,
 			"provider_uuid":                  v.ProviderUuid,
 			"request_comment":                v.RequestComment,
 			"resource_name":                  v.ResourceName,
@@ -4416,18 +4308,6 @@ func (v OrdersValue) Equal(o attr.Value) bool {
 		return false
 	}
 
-	if !v.OfferingCustomerName.Equal(other.OfferingCustomerName) {
-		return false
-	}
-
-	if !v.OfferingCustomerSlug.Equal(other.OfferingCustomerSlug) {
-		return false
-	}
-
-	if !v.OfferingCustomerUuid.Equal(other.OfferingCustomerUuid) {
-		return false
-	}
-
 	if !v.OfferingDescription.Equal(other.OfferingDescription) {
 		return false
 	}
@@ -4528,6 +4408,10 @@ func (v OrdersValue) Equal(o attr.Value) bool {
 		return false
 	}
 
+	if !v.ProviderSlug.Equal(other.ProviderSlug) {
+		return false
+	}
+
 	if !v.ProviderUuid.Equal(other.ProviderUuid) {
 		return false
 	}
@@ -4614,9 +4498,6 @@ func (v OrdersValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 		"new_plan_uuid":                  basetypes.StringType{},
 		"offering":                       basetypes.StringType{},
 		"offering_billable":              basetypes.BoolType{},
-		"offering_customer_name":         basetypes.StringType{},
-		"offering_customer_slug":         basetypes.StringType{},
-		"offering_customer_uuid":         basetypes.StringType{},
 		"offering_description":           basetypes.StringType{},
 		"offering_image":                 basetypes.StringType{},
 		"offering_name":                  basetypes.StringType{},
@@ -4642,6 +4523,7 @@ func (v OrdersValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 		"provider_reviewed_by":           basetypes.StringType{},
 		"provider_reviewed_by_full_name": basetypes.StringType{},
 		"provider_reviewed_by_username":  basetypes.StringType{},
+		"provider_slug":                  basetypes.StringType{},
 		"provider_uuid":                  basetypes.StringType{},
 		"request_comment":                basetypes.StringType{},
 		"resource_name":                  basetypes.StringType{},
