@@ -188,10 +188,16 @@ func PublicOfferingsDataSourceSchema(ctx context.Context) schema.Schema {
 									"is_builtin": schema.BoolAttribute{
 										Computed: true,
 									},
+									"is_prepaid": schema.BoolAttribute{
+										Computed: true,
+									},
 									"limit_amount": schema.Int64Attribute{
 										Computed: true,
 									},
 									"max_available_limit": schema.Int64Attribute{
+										Computed: true,
+									},
+									"max_prepaid_duration": schema.Int64Attribute{
 										Computed: true,
 									},
 									"max_value": schema.Int64Attribute{
@@ -202,6 +208,9 @@ func PublicOfferingsDataSourceSchema(ctx context.Context) schema.Schema {
 										Description:         "Unit of measurement, for example, GB.",
 										MarkdownDescription: "Unit of measurement, for example, GB.",
 									},
+									"min_prepaid_duration": schema.Int64Attribute{
+										Computed: true,
+									},
 									"min_value": schema.Int64Attribute{
 										Computed: true,
 									},
@@ -209,6 +218,9 @@ func PublicOfferingsDataSourceSchema(ctx context.Context) schema.Schema {
 										Computed:            true,
 										Description:         "Display name for the measured unit, for example, Floating IP.",
 										MarkdownDescription: "Display name for the measured unit, for example, Floating IP.",
+									},
+									"overage_component": schema.StringAttribute{
+										Computed: true,
 									},
 									"type": schema.StringAttribute{
 										Computed:            true,
@@ -711,10 +723,20 @@ func PublicOfferingsDataSourceSchema(ctx context.Context) schema.Schema {
 									Description:         "If set to True, orders will support comments and metadata",
 									MarkdownDescription: "If set to True, orders will support comments and metadata",
 								},
+								"project_permanent_directory": schema.StringAttribute{
+									Computed:            true,
+									Description:         "HEAppE project permanent directory",
+									MarkdownDescription: "HEAppE project permanent directory",
+								},
 								"required_team_role_for_provisioning": schema.StringAttribute{
 									Computed:            true,
 									Description:         "Required user role in a project for provisioning of resources",
 									MarkdownDescription: "Required user role in a project for provisioning of resources",
+								},
+								"scratch_project_directory": schema.StringAttribute{
+									Computed:            true,
+									Description:         "HEAppE scratch project directory",
+									MarkdownDescription: "HEAppE scratch project directory",
 								},
 								"service_provider_can_create_offering_user": schema.BoolAttribute{
 									Computed:            true,
@@ -5319,6 +5341,24 @@ func (t ComponentsType) ValueFromObject(ctx context.Context, in basetypes.Object
 			fmt.Sprintf(`is_builtin expected to be basetypes.BoolValue, was: %T`, isBuiltinAttribute))
 	}
 
+	isPrepaidAttribute, ok := attributes["is_prepaid"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`is_prepaid is missing from object`)
+
+		return nil, diags
+	}
+
+	isPrepaidVal, ok := isPrepaidAttribute.(basetypes.BoolValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`is_prepaid expected to be basetypes.BoolValue, was: %T`, isPrepaidAttribute))
+	}
+
 	limitAmountAttribute, ok := attributes["limit_amount"]
 
 	if !ok {
@@ -5353,6 +5393,24 @@ func (t ComponentsType) ValueFromObject(ctx context.Context, in basetypes.Object
 		diags.AddError(
 			"Attribute Wrong Type",
 			fmt.Sprintf(`max_available_limit expected to be basetypes.Int64Value, was: %T`, maxAvailableLimitAttribute))
+	}
+
+	maxPrepaidDurationAttribute, ok := attributes["max_prepaid_duration"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`max_prepaid_duration is missing from object`)
+
+		return nil, diags
+	}
+
+	maxPrepaidDurationVal, ok := maxPrepaidDurationAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`max_prepaid_duration expected to be basetypes.Int64Value, was: %T`, maxPrepaidDurationAttribute))
 	}
 
 	maxValueAttribute, ok := attributes["max_value"]
@@ -5391,6 +5449,24 @@ func (t ComponentsType) ValueFromObject(ctx context.Context, in basetypes.Object
 			fmt.Sprintf(`measured_unit expected to be basetypes.StringValue, was: %T`, measuredUnitAttribute))
 	}
 
+	minPrepaidDurationAttribute, ok := attributes["min_prepaid_duration"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`min_prepaid_duration is missing from object`)
+
+		return nil, diags
+	}
+
+	minPrepaidDurationVal, ok := minPrepaidDurationAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`min_prepaid_duration expected to be basetypes.Int64Value, was: %T`, minPrepaidDurationAttribute))
+	}
+
 	minValueAttribute, ok := attributes["min_value"]
 
 	if !ok {
@@ -5425,6 +5501,24 @@ func (t ComponentsType) ValueFromObject(ctx context.Context, in basetypes.Object
 		diags.AddError(
 			"Attribute Wrong Type",
 			fmt.Sprintf(`name expected to be basetypes.StringValue, was: %T`, nameAttribute))
+	}
+
+	overageComponentAttribute, ok := attributes["overage_component"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`overage_component is missing from object`)
+
+		return nil, diags
+	}
+
+	overageComponentVal, ok := overageComponentAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`overage_component expected to be basetypes.StringValue, was: %T`, overageComponentAttribute))
 	}
 
 	typeAttribute, ok := attributes["type"]
@@ -5486,23 +5580,27 @@ func (t ComponentsType) ValueFromObject(ctx context.Context, in basetypes.Object
 	}
 
 	return ComponentsValue{
-		ArticleCode:       articleCodeVal,
-		BillingType:       billingTypeVal,
-		DefaultLimit:      defaultLimitVal,
-		Description:       descriptionVal,
-		Factor:            factorVal,
-		IsBoolean:         isBooleanVal,
-		IsBuiltin:         isBuiltinVal,
-		LimitAmount:       limitAmountVal,
-		MaxAvailableLimit: maxAvailableLimitVal,
-		MaxValue:          maxValueVal,
-		MeasuredUnit:      measuredUnitVal,
-		MinValue:          minValueVal,
-		Name:              nameVal,
-		ComponentsType:    typeVal,
-		UnitFactor:        unitFactorVal,
-		Uuid:              uuidVal,
-		state:             attr.ValueStateKnown,
+		ArticleCode:        articleCodeVal,
+		BillingType:        billingTypeVal,
+		DefaultLimit:       defaultLimitVal,
+		Description:        descriptionVal,
+		Factor:             factorVal,
+		IsBoolean:          isBooleanVal,
+		IsBuiltin:          isBuiltinVal,
+		IsPrepaid:          isPrepaidVal,
+		LimitAmount:        limitAmountVal,
+		MaxAvailableLimit:  maxAvailableLimitVal,
+		MaxPrepaidDuration: maxPrepaidDurationVal,
+		MaxValue:           maxValueVal,
+		MeasuredUnit:       measuredUnitVal,
+		MinPrepaidDuration: minPrepaidDurationVal,
+		MinValue:           minValueVal,
+		Name:               nameVal,
+		OverageComponent:   overageComponentVal,
+		ComponentsType:     typeVal,
+		UnitFactor:         unitFactorVal,
+		Uuid:               uuidVal,
+		state:              attr.ValueStateKnown,
 	}, diags
 }
 
@@ -5695,6 +5793,24 @@ func NewComponentsValue(attributeTypes map[string]attr.Type, attributes map[stri
 			fmt.Sprintf(`is_builtin expected to be basetypes.BoolValue, was: %T`, isBuiltinAttribute))
 	}
 
+	isPrepaidAttribute, ok := attributes["is_prepaid"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`is_prepaid is missing from object`)
+
+		return NewComponentsValueUnknown(), diags
+	}
+
+	isPrepaidVal, ok := isPrepaidAttribute.(basetypes.BoolValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`is_prepaid expected to be basetypes.BoolValue, was: %T`, isPrepaidAttribute))
+	}
+
 	limitAmountAttribute, ok := attributes["limit_amount"]
 
 	if !ok {
@@ -5729,6 +5845,24 @@ func NewComponentsValue(attributeTypes map[string]attr.Type, attributes map[stri
 		diags.AddError(
 			"Attribute Wrong Type",
 			fmt.Sprintf(`max_available_limit expected to be basetypes.Int64Value, was: %T`, maxAvailableLimitAttribute))
+	}
+
+	maxPrepaidDurationAttribute, ok := attributes["max_prepaid_duration"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`max_prepaid_duration is missing from object`)
+
+		return NewComponentsValueUnknown(), diags
+	}
+
+	maxPrepaidDurationVal, ok := maxPrepaidDurationAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`max_prepaid_duration expected to be basetypes.Int64Value, was: %T`, maxPrepaidDurationAttribute))
 	}
 
 	maxValueAttribute, ok := attributes["max_value"]
@@ -5767,6 +5901,24 @@ func NewComponentsValue(attributeTypes map[string]attr.Type, attributes map[stri
 			fmt.Sprintf(`measured_unit expected to be basetypes.StringValue, was: %T`, measuredUnitAttribute))
 	}
 
+	minPrepaidDurationAttribute, ok := attributes["min_prepaid_duration"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`min_prepaid_duration is missing from object`)
+
+		return NewComponentsValueUnknown(), diags
+	}
+
+	minPrepaidDurationVal, ok := minPrepaidDurationAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`min_prepaid_duration expected to be basetypes.Int64Value, was: %T`, minPrepaidDurationAttribute))
+	}
+
 	minValueAttribute, ok := attributes["min_value"]
 
 	if !ok {
@@ -5801,6 +5953,24 @@ func NewComponentsValue(attributeTypes map[string]attr.Type, attributes map[stri
 		diags.AddError(
 			"Attribute Wrong Type",
 			fmt.Sprintf(`name expected to be basetypes.StringValue, was: %T`, nameAttribute))
+	}
+
+	overageComponentAttribute, ok := attributes["overage_component"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`overage_component is missing from object`)
+
+		return NewComponentsValueUnknown(), diags
+	}
+
+	overageComponentVal, ok := overageComponentAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`overage_component expected to be basetypes.StringValue, was: %T`, overageComponentAttribute))
 	}
 
 	typeAttribute, ok := attributes["type"]
@@ -5862,23 +6032,27 @@ func NewComponentsValue(attributeTypes map[string]attr.Type, attributes map[stri
 	}
 
 	return ComponentsValue{
-		ArticleCode:       articleCodeVal,
-		BillingType:       billingTypeVal,
-		DefaultLimit:      defaultLimitVal,
-		Description:       descriptionVal,
-		Factor:            factorVal,
-		IsBoolean:         isBooleanVal,
-		IsBuiltin:         isBuiltinVal,
-		LimitAmount:       limitAmountVal,
-		MaxAvailableLimit: maxAvailableLimitVal,
-		MaxValue:          maxValueVal,
-		MeasuredUnit:      measuredUnitVal,
-		MinValue:          minValueVal,
-		Name:              nameVal,
-		ComponentsType:    typeVal,
-		UnitFactor:        unitFactorVal,
-		Uuid:              uuidVal,
-		state:             attr.ValueStateKnown,
+		ArticleCode:        articleCodeVal,
+		BillingType:        billingTypeVal,
+		DefaultLimit:       defaultLimitVal,
+		Description:        descriptionVal,
+		Factor:             factorVal,
+		IsBoolean:          isBooleanVal,
+		IsBuiltin:          isBuiltinVal,
+		IsPrepaid:          isPrepaidVal,
+		LimitAmount:        limitAmountVal,
+		MaxAvailableLimit:  maxAvailableLimitVal,
+		MaxPrepaidDuration: maxPrepaidDurationVal,
+		MaxValue:           maxValueVal,
+		MeasuredUnit:       measuredUnitVal,
+		MinPrepaidDuration: minPrepaidDurationVal,
+		MinValue:           minValueVal,
+		Name:               nameVal,
+		OverageComponent:   overageComponentVal,
+		ComponentsType:     typeVal,
+		UnitFactor:         unitFactorVal,
+		Uuid:               uuidVal,
+		state:              attr.ValueStateKnown,
 	}, diags
 }
 
@@ -5950,27 +6124,31 @@ func (t ComponentsType) ValueType(ctx context.Context) attr.Value {
 var _ basetypes.ObjectValuable = ComponentsValue{}
 
 type ComponentsValue struct {
-	ArticleCode       basetypes.StringValue `tfsdk:"article_code"`
-	BillingType       basetypes.StringValue `tfsdk:"billing_type"`
-	DefaultLimit      basetypes.Int64Value  `tfsdk:"default_limit"`
-	Description       basetypes.StringValue `tfsdk:"description"`
-	Factor            basetypes.Int64Value  `tfsdk:"factor"`
-	IsBoolean         basetypes.BoolValue   `tfsdk:"is_boolean"`
-	IsBuiltin         basetypes.BoolValue   `tfsdk:"is_builtin"`
-	LimitAmount       basetypes.Int64Value  `tfsdk:"limit_amount"`
-	MaxAvailableLimit basetypes.Int64Value  `tfsdk:"max_available_limit"`
-	MaxValue          basetypes.Int64Value  `tfsdk:"max_value"`
-	MeasuredUnit      basetypes.StringValue `tfsdk:"measured_unit"`
-	MinValue          basetypes.Int64Value  `tfsdk:"min_value"`
-	Name              basetypes.StringValue `tfsdk:"name"`
-	ComponentsType    basetypes.StringValue `tfsdk:"type"`
-	UnitFactor        basetypes.Int64Value  `tfsdk:"unit_factor"`
-	Uuid              basetypes.StringValue `tfsdk:"uuid"`
-	state             attr.ValueState
+	ArticleCode        basetypes.StringValue `tfsdk:"article_code"`
+	BillingType        basetypes.StringValue `tfsdk:"billing_type"`
+	DefaultLimit       basetypes.Int64Value  `tfsdk:"default_limit"`
+	Description        basetypes.StringValue `tfsdk:"description"`
+	Factor             basetypes.Int64Value  `tfsdk:"factor"`
+	IsBoolean          basetypes.BoolValue   `tfsdk:"is_boolean"`
+	IsBuiltin          basetypes.BoolValue   `tfsdk:"is_builtin"`
+	IsPrepaid          basetypes.BoolValue   `tfsdk:"is_prepaid"`
+	LimitAmount        basetypes.Int64Value  `tfsdk:"limit_amount"`
+	MaxAvailableLimit  basetypes.Int64Value  `tfsdk:"max_available_limit"`
+	MaxPrepaidDuration basetypes.Int64Value  `tfsdk:"max_prepaid_duration"`
+	MaxValue           basetypes.Int64Value  `tfsdk:"max_value"`
+	MeasuredUnit       basetypes.StringValue `tfsdk:"measured_unit"`
+	MinPrepaidDuration basetypes.Int64Value  `tfsdk:"min_prepaid_duration"`
+	MinValue           basetypes.Int64Value  `tfsdk:"min_value"`
+	Name               basetypes.StringValue `tfsdk:"name"`
+	OverageComponent   basetypes.StringValue `tfsdk:"overage_component"`
+	ComponentsType     basetypes.StringValue `tfsdk:"type"`
+	UnitFactor         basetypes.Int64Value  `tfsdk:"unit_factor"`
+	Uuid               basetypes.StringValue `tfsdk:"uuid"`
+	state              attr.ValueState
 }
 
 func (v ComponentsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 16)
+	attrTypes := make(map[string]tftypes.Type, 20)
 
 	var val tftypes.Value
 	var err error
@@ -5982,12 +6160,16 @@ func (v ComponentsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, e
 	attrTypes["factor"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["is_boolean"] = basetypes.BoolType{}.TerraformType(ctx)
 	attrTypes["is_builtin"] = basetypes.BoolType{}.TerraformType(ctx)
+	attrTypes["is_prepaid"] = basetypes.BoolType{}.TerraformType(ctx)
 	attrTypes["limit_amount"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["max_available_limit"] = basetypes.Int64Type{}.TerraformType(ctx)
+	attrTypes["max_prepaid_duration"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["max_value"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["measured_unit"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["min_prepaid_duration"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["min_value"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["name"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["overage_component"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["type"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["unit_factor"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["uuid"] = basetypes.StringType{}.TerraformType(ctx)
@@ -5996,7 +6178,7 @@ func (v ComponentsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, e
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 16)
+		vals := make(map[string]tftypes.Value, 20)
 
 		val, err = v.ArticleCode.ToTerraformValue(ctx)
 
@@ -6054,6 +6236,14 @@ func (v ComponentsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, e
 
 		vals["is_builtin"] = val
 
+		val, err = v.IsPrepaid.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["is_prepaid"] = val
+
 		val, err = v.LimitAmount.ToTerraformValue(ctx)
 
 		if err != nil {
@@ -6069,6 +6259,14 @@ func (v ComponentsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, e
 		}
 
 		vals["max_available_limit"] = val
+
+		val, err = v.MaxPrepaidDuration.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["max_prepaid_duration"] = val
 
 		val, err = v.MaxValue.ToTerraformValue(ctx)
 
@@ -6086,6 +6284,14 @@ func (v ComponentsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, e
 
 		vals["measured_unit"] = val
 
+		val, err = v.MinPrepaidDuration.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["min_prepaid_duration"] = val
+
 		val, err = v.MinValue.ToTerraformValue(ctx)
 
 		if err != nil {
@@ -6101,6 +6307,14 @@ func (v ComponentsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, e
 		}
 
 		vals["name"] = val
+
+		val, err = v.OverageComponent.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["overage_component"] = val
 
 		val, err = v.ComponentsType.ToTerraformValue(ctx)
 
@@ -6156,22 +6370,26 @@ func (v ComponentsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectVal
 	var diags diag.Diagnostics
 
 	attributeTypes := map[string]attr.Type{
-		"article_code":        basetypes.StringType{},
-		"billing_type":        basetypes.StringType{},
-		"default_limit":       basetypes.Int64Type{},
-		"description":         basetypes.StringType{},
-		"factor":              basetypes.Int64Type{},
-		"is_boolean":          basetypes.BoolType{},
-		"is_builtin":          basetypes.BoolType{},
-		"limit_amount":        basetypes.Int64Type{},
-		"max_available_limit": basetypes.Int64Type{},
-		"max_value":           basetypes.Int64Type{},
-		"measured_unit":       basetypes.StringType{},
-		"min_value":           basetypes.Int64Type{},
-		"name":                basetypes.StringType{},
-		"type":                basetypes.StringType{},
-		"unit_factor":         basetypes.Int64Type{},
-		"uuid":                basetypes.StringType{},
+		"article_code":         basetypes.StringType{},
+		"billing_type":         basetypes.StringType{},
+		"default_limit":        basetypes.Int64Type{},
+		"description":          basetypes.StringType{},
+		"factor":               basetypes.Int64Type{},
+		"is_boolean":           basetypes.BoolType{},
+		"is_builtin":           basetypes.BoolType{},
+		"is_prepaid":           basetypes.BoolType{},
+		"limit_amount":         basetypes.Int64Type{},
+		"max_available_limit":  basetypes.Int64Type{},
+		"max_prepaid_duration": basetypes.Int64Type{},
+		"max_value":            basetypes.Int64Type{},
+		"measured_unit":        basetypes.StringType{},
+		"min_prepaid_duration": basetypes.Int64Type{},
+		"min_value":            basetypes.Int64Type{},
+		"name":                 basetypes.StringType{},
+		"overage_component":    basetypes.StringType{},
+		"type":                 basetypes.StringType{},
+		"unit_factor":          basetypes.Int64Type{},
+		"uuid":                 basetypes.StringType{},
 	}
 
 	if v.IsNull() {
@@ -6185,22 +6403,26 @@ func (v ComponentsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectVal
 	objVal, diags := types.ObjectValue(
 		attributeTypes,
 		map[string]attr.Value{
-			"article_code":        v.ArticleCode,
-			"billing_type":        v.BillingType,
-			"default_limit":       v.DefaultLimit,
-			"description":         v.Description,
-			"factor":              v.Factor,
-			"is_boolean":          v.IsBoolean,
-			"is_builtin":          v.IsBuiltin,
-			"limit_amount":        v.LimitAmount,
-			"max_available_limit": v.MaxAvailableLimit,
-			"max_value":           v.MaxValue,
-			"measured_unit":       v.MeasuredUnit,
-			"min_value":           v.MinValue,
-			"name":                v.Name,
-			"type":                v.ComponentsType,
-			"unit_factor":         v.UnitFactor,
-			"uuid":                v.Uuid,
+			"article_code":         v.ArticleCode,
+			"billing_type":         v.BillingType,
+			"default_limit":        v.DefaultLimit,
+			"description":          v.Description,
+			"factor":               v.Factor,
+			"is_boolean":           v.IsBoolean,
+			"is_builtin":           v.IsBuiltin,
+			"is_prepaid":           v.IsPrepaid,
+			"limit_amount":         v.LimitAmount,
+			"max_available_limit":  v.MaxAvailableLimit,
+			"max_prepaid_duration": v.MaxPrepaidDuration,
+			"max_value":            v.MaxValue,
+			"measured_unit":        v.MeasuredUnit,
+			"min_prepaid_duration": v.MinPrepaidDuration,
+			"min_value":            v.MinValue,
+			"name":                 v.Name,
+			"overage_component":    v.OverageComponent,
+			"type":                 v.ComponentsType,
+			"unit_factor":          v.UnitFactor,
+			"uuid":                 v.Uuid,
 		})
 
 	return objVal, diags
@@ -6249,11 +6471,19 @@ func (v ComponentsValue) Equal(o attr.Value) bool {
 		return false
 	}
 
+	if !v.IsPrepaid.Equal(other.IsPrepaid) {
+		return false
+	}
+
 	if !v.LimitAmount.Equal(other.LimitAmount) {
 		return false
 	}
 
 	if !v.MaxAvailableLimit.Equal(other.MaxAvailableLimit) {
+		return false
+	}
+
+	if !v.MaxPrepaidDuration.Equal(other.MaxPrepaidDuration) {
 		return false
 	}
 
@@ -6265,11 +6495,19 @@ func (v ComponentsValue) Equal(o attr.Value) bool {
 		return false
 	}
 
+	if !v.MinPrepaidDuration.Equal(other.MinPrepaidDuration) {
+		return false
+	}
+
 	if !v.MinValue.Equal(other.MinValue) {
 		return false
 	}
 
 	if !v.Name.Equal(other.Name) {
+		return false
+	}
+
+	if !v.OverageComponent.Equal(other.OverageComponent) {
 		return false
 	}
 
@@ -6298,22 +6536,26 @@ func (v ComponentsValue) Type(ctx context.Context) attr.Type {
 
 func (v ComponentsValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 	return map[string]attr.Type{
-		"article_code":        basetypes.StringType{},
-		"billing_type":        basetypes.StringType{},
-		"default_limit":       basetypes.Int64Type{},
-		"description":         basetypes.StringType{},
-		"factor":              basetypes.Int64Type{},
-		"is_boolean":          basetypes.BoolType{},
-		"is_builtin":          basetypes.BoolType{},
-		"limit_amount":        basetypes.Int64Type{},
-		"max_available_limit": basetypes.Int64Type{},
-		"max_value":           basetypes.Int64Type{},
-		"measured_unit":       basetypes.StringType{},
-		"min_value":           basetypes.Int64Type{},
-		"name":                basetypes.StringType{},
-		"type":                basetypes.StringType{},
-		"unit_factor":         basetypes.Int64Type{},
-		"uuid":                basetypes.StringType{},
+		"article_code":         basetypes.StringType{},
+		"billing_type":         basetypes.StringType{},
+		"default_limit":        basetypes.Int64Type{},
+		"description":          basetypes.StringType{},
+		"factor":               basetypes.Int64Type{},
+		"is_boolean":           basetypes.BoolType{},
+		"is_builtin":           basetypes.BoolType{},
+		"is_prepaid":           basetypes.BoolType{},
+		"limit_amount":         basetypes.Int64Type{},
+		"max_available_limit":  basetypes.Int64Type{},
+		"max_prepaid_duration": basetypes.Int64Type{},
+		"max_value":            basetypes.Int64Type{},
+		"measured_unit":        basetypes.StringType{},
+		"min_prepaid_duration": basetypes.Int64Type{},
+		"min_value":            basetypes.Int64Type{},
+		"name":                 basetypes.StringType{},
+		"overage_component":    basetypes.StringType{},
+		"type":                 basetypes.StringType{},
+		"unit_factor":          basetypes.Int64Type{},
+		"uuid":                 basetypes.StringType{},
 	}
 }
 
@@ -11980,6 +12222,24 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 			fmt.Sprintf(`order_supports_comments_and_metadata expected to be basetypes.BoolValue, was: %T`, orderSupportsCommentsAndMetadataAttribute))
 	}
 
+	projectPermanentDirectoryAttribute, ok := attributes["project_permanent_directory"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`project_permanent_directory is missing from object`)
+
+		return nil, diags
+	}
+
+	projectPermanentDirectoryVal, ok := projectPermanentDirectoryAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`project_permanent_directory expected to be basetypes.StringValue, was: %T`, projectPermanentDirectoryAttribute))
+	}
+
 	requiredTeamRoleForProvisioningAttribute, ok := attributes["required_team_role_for_provisioning"]
 
 	if !ok {
@@ -11996,6 +12256,24 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 		diags.AddError(
 			"Attribute Wrong Type",
 			fmt.Sprintf(`required_team_role_for_provisioning expected to be basetypes.StringValue, was: %T`, requiredTeamRoleForProvisioningAttribute))
+	}
+
+	scratchProjectDirectoryAttribute, ok := attributes["scratch_project_directory"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`scratch_project_directory is missing from object`)
+
+		return nil, diags
+	}
+
+	scratchProjectDirectoryVal, ok := scratchProjectDirectoryAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`scratch_project_directory expected to be basetypes.StringValue, was: %T`, scratchProjectDirectoryAttribute))
 	}
 
 	serviceProviderCanCreateOfferingUserAttribute, ok := attributes["service_provider_can_create_offering_user"]
@@ -12169,7 +12447,9 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 		MinimalTeamCountForProvisioning:                minimalTeamCountForProvisioningVal,
 		OpenstackOfferingUuidList:                      openstackOfferingUuidListVal,
 		OrderSupportsCommentsAndMetadata:               orderSupportsCommentsAndMetadataVal,
+		ProjectPermanentDirectory:                      projectPermanentDirectoryVal,
 		RequiredTeamRoleForProvisioning:                requiredTeamRoleForProvisioningVal,
+		ScratchProjectDirectory:                        scratchProjectDirectoryVal,
 		ServiceProviderCanCreateOfferingUser:           serviceProviderCanCreateOfferingUserVal,
 		SnapshotSizeLimitGb:                            snapshotSizeLimitGbVal,
 		StorageMode:                                    storageModeVal,
@@ -12964,6 +13244,24 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 			fmt.Sprintf(`order_supports_comments_and_metadata expected to be basetypes.BoolValue, was: %T`, orderSupportsCommentsAndMetadataAttribute))
 	}
 
+	projectPermanentDirectoryAttribute, ok := attributes["project_permanent_directory"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`project_permanent_directory is missing from object`)
+
+		return NewPluginOptionsValueUnknown(), diags
+	}
+
+	projectPermanentDirectoryVal, ok := projectPermanentDirectoryAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`project_permanent_directory expected to be basetypes.StringValue, was: %T`, projectPermanentDirectoryAttribute))
+	}
+
 	requiredTeamRoleForProvisioningAttribute, ok := attributes["required_team_role_for_provisioning"]
 
 	if !ok {
@@ -12980,6 +13278,24 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 		diags.AddError(
 			"Attribute Wrong Type",
 			fmt.Sprintf(`required_team_role_for_provisioning expected to be basetypes.StringValue, was: %T`, requiredTeamRoleForProvisioningAttribute))
+	}
+
+	scratchProjectDirectoryAttribute, ok := attributes["scratch_project_directory"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`scratch_project_directory is missing from object`)
+
+		return NewPluginOptionsValueUnknown(), diags
+	}
+
+	scratchProjectDirectoryVal, ok := scratchProjectDirectoryAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`scratch_project_directory expected to be basetypes.StringValue, was: %T`, scratchProjectDirectoryAttribute))
 	}
 
 	serviceProviderCanCreateOfferingUserAttribute, ok := attributes["service_provider_can_create_offering_user"]
@@ -13153,7 +13469,9 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 		MinimalTeamCountForProvisioning:                minimalTeamCountForProvisioningVal,
 		OpenstackOfferingUuidList:                      openstackOfferingUuidListVal,
 		OrderSupportsCommentsAndMetadata:               orderSupportsCommentsAndMetadataVal,
+		ProjectPermanentDirectory:                      projectPermanentDirectoryVal,
 		RequiredTeamRoleForProvisioning:                requiredTeamRoleForProvisioningVal,
+		ScratchProjectDirectory:                        scratchProjectDirectoryVal,
 		ServiceProviderCanCreateOfferingUser:           serviceProviderCanCreateOfferingUserVal,
 		SnapshotSizeLimitGb:                            snapshotSizeLimitGbVal,
 		StorageMode:                                    storageModeVal,
@@ -13273,7 +13591,9 @@ type PluginOptionsValue struct {
 	MinimalTeamCountForProvisioning                basetypes.Int64Value  `tfsdk:"minimal_team_count_for_provisioning"`
 	OpenstackOfferingUuidList                      basetypes.ListValue   `tfsdk:"openstack_offering_uuid_list"`
 	OrderSupportsCommentsAndMetadata               basetypes.BoolValue   `tfsdk:"order_supports_comments_and_metadata"`
+	ProjectPermanentDirectory                      basetypes.StringValue `tfsdk:"project_permanent_directory"`
 	RequiredTeamRoleForProvisioning                basetypes.StringValue `tfsdk:"required_team_role_for_provisioning"`
+	ScratchProjectDirectory                        basetypes.StringValue `tfsdk:"scratch_project_directory"`
 	ServiceProviderCanCreateOfferingUser           basetypes.BoolValue   `tfsdk:"service_provider_can_create_offering_user"`
 	SnapshotSizeLimitGb                            basetypes.Int64Value  `tfsdk:"snapshot_size_limit_gb"`
 	StorageMode                                    basetypes.StringValue `tfsdk:"storage_mode"`
@@ -13285,7 +13605,7 @@ type PluginOptionsValue struct {
 }
 
 func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 48)
+	attrTypes := make(map[string]tftypes.Type, 50)
 
 	var val tftypes.Value
 	var err error
@@ -13332,7 +13652,9 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 		ElemType: types.StringType,
 	}.TerraformType(ctx)
 	attrTypes["order_supports_comments_and_metadata"] = basetypes.BoolType{}.TerraformType(ctx)
+	attrTypes["project_permanent_directory"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["required_team_role_for_provisioning"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["scratch_project_directory"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["service_provider_can_create_offering_user"] = basetypes.BoolType{}.TerraformType(ctx)
 	attrTypes["snapshot_size_limit_gb"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["storage_mode"] = basetypes.StringType{}.TerraformType(ctx)
@@ -13345,7 +13667,7 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 48)
+		vals := make(map[string]tftypes.Value, 50)
 
 		val, err = v.AutoApproveInServiceProviderProjects.ToTerraformValue(ctx)
 
@@ -13667,6 +13989,14 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 
 		vals["order_supports_comments_and_metadata"] = val
 
+		val, err = v.ProjectPermanentDirectory.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["project_permanent_directory"] = val
+
 		val, err = v.RequiredTeamRoleForProvisioning.ToTerraformValue(ctx)
 
 		if err != nil {
@@ -13674,6 +14004,14 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 		}
 
 		vals["required_team_role_for_provisioning"] = val
+
+		val, err = v.ScratchProjectDirectory.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["scratch_project_directory"] = val
 
 		val, err = v.ServiceProviderCanCreateOfferingUser.ToTerraformValue(ctx)
 
@@ -13816,7 +14154,9 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 				ElemType: types.StringType,
 			},
 			"order_supports_comments_and_metadata":      basetypes.BoolType{},
+			"project_permanent_directory":               basetypes.StringType{},
 			"required_team_role_for_provisioning":       basetypes.StringType{},
+			"scratch_project_directory":                 basetypes.StringType{},
 			"service_provider_can_create_offering_user": basetypes.BoolType{},
 			"snapshot_size_limit_gb":                    basetypes.Int64Type{},
 			"storage_mode":                              basetypes.StringType{},
@@ -13870,7 +14210,9 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 			ElemType: types.StringType,
 		},
 		"order_supports_comments_and_metadata":      basetypes.BoolType{},
+		"project_permanent_directory":               basetypes.StringType{},
 		"required_team_role_for_provisioning":       basetypes.StringType{},
+		"scratch_project_directory":                 basetypes.StringType{},
 		"service_provider_can_create_offering_user": basetypes.BoolType{},
 		"snapshot_size_limit_gb":                    basetypes.Int64Type{},
 		"storage_mode":                              basetypes.StringType{},
@@ -13931,7 +14273,9 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 			"minimal_team_count_for_provisioning":                   v.MinimalTeamCountForProvisioning,
 			"openstack_offering_uuid_list":                          openstackOfferingUuidListVal,
 			"order_supports_comments_and_metadata":                  v.OrderSupportsCommentsAndMetadata,
+			"project_permanent_directory":                           v.ProjectPermanentDirectory,
 			"required_team_role_for_provisioning":                   v.RequiredTeamRoleForProvisioning,
+			"scratch_project_directory":                             v.ScratchProjectDirectory,
 			"service_provider_can_create_offering_user":             v.ServiceProviderCanCreateOfferingUser,
 			"snapshot_size_limit_gb":                                v.SnapshotSizeLimitGb,
 			"storage_mode":                                          v.StorageMode,
@@ -14119,7 +14463,15 @@ func (v PluginOptionsValue) Equal(o attr.Value) bool {
 		return false
 	}
 
+	if !v.ProjectPermanentDirectory.Equal(other.ProjectPermanentDirectory) {
+		return false
+	}
+
 	if !v.RequiredTeamRoleForProvisioning.Equal(other.RequiredTeamRoleForProvisioning) {
+		return false
+	}
+
+	if !v.ScratchProjectDirectory.Equal(other.ScratchProjectDirectory) {
 		return false
 	}
 
@@ -14206,7 +14558,9 @@ func (v PluginOptionsValue) AttributeTypes(ctx context.Context) map[string]attr.
 			ElemType: types.StringType,
 		},
 		"order_supports_comments_and_metadata":      basetypes.BoolType{},
+		"project_permanent_directory":               basetypes.StringType{},
 		"required_team_role_for_provisioning":       basetypes.StringType{},
+		"scratch_project_directory":                 basetypes.StringType{},
 		"service_provider_can_create_offering_user": basetypes.BoolType{},
 		"snapshot_size_limit_gb":                    basetypes.Int64Type{},
 		"storage_mode":                              basetypes.StringType{},
