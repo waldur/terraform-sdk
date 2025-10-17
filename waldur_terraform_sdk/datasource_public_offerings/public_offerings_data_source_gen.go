@@ -1070,6 +1070,12 @@ func PublicOfferingsDataSourceSchema(ctx context.Context) schema.Schema {
 				Description:         "User Has Consent",
 				MarkdownDescription: "User Has Consent",
 			},
+			"user_has_offering_user": schema.BoolAttribute{
+				Optional:            true,
+				Computed:            true,
+				Description:         "User Has Offering User",
+				MarkdownDescription: "User Has Offering User",
+			},
 			"uuid_list": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
@@ -1112,6 +1118,7 @@ type PublicOfferingsModel struct {
 	State                   types.List   `tfsdk:"state"`
 	Type                    types.List   `tfsdk:"type"`
 	UserHasConsent          types.Bool   `tfsdk:"user_has_consent"`
+	UserHasOfferingUser     types.Bool   `tfsdk:"user_has_offering_user"`
 	UuidList                types.String `tfsdk:"uuid_list"`
 }
 
