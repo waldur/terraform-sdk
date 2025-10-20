@@ -45,7 +45,7 @@ func OpenstackServerGroupsResourceSchema(ctx context.Context) schema.Schema {
 				Optional: true,
 				Computed: true,
 				Validators: []validator.String{
-					stringvalidator.LengthAtMost(2000),
+					stringvalidator.LengthAtMost(4096),
 				},
 			},
 			"display_name": schema.StringAttribute{

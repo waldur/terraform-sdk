@@ -556,6 +556,11 @@ func PublicOfferingsDataSourceSchema(ctx context.Context) schema.Schema {
 									Description:         "If set to True, an order can be processed without approval",
 									MarkdownDescription: "If set to True, an order can be processed without approval",
 								},
+								"backend_id_display_label": schema.StringAttribute{
+									Computed:            true,
+									Description:         "Label used by UI for showing value of the backend_id",
+									MarkdownDescription: "Label used by UI for showing value of the backend_id",
+								},
 								"conceal_billing_data": schema.BoolAttribute{
 									Computed:            true,
 									Description:         "If set to True, pricing and components tab would be concealed.",
@@ -605,6 +610,11 @@ func PublicOfferingsDataSourceSchema(ctx context.Context) schema.Schema {
 									Computed:            true,
 									Description:         "HEAppE username",
 									MarkdownDescription: "HEAppE username",
+								},
+								"highlight_backend_id_display": schema.BoolAttribute{
+									Computed:            true,
+									Description:         "Defines if backend_id should be shown more prominently by the UI",
+									MarkdownDescription: "Defines if backend_id should be shown more prominently by the UI",
 								},
 								"homedir_prefix": schema.StringAttribute{
 									Computed:            true,
@@ -11545,6 +11555,24 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 			fmt.Sprintf(`auto_approve_remote_orders expected to be basetypes.BoolValue, was: %T`, autoApproveRemoteOrdersAttribute))
 	}
 
+	backendIdDisplayLabelAttribute, ok := attributes["backend_id_display_label"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`backend_id_display_label is missing from object`)
+
+		return nil, diags
+	}
+
+	backendIdDisplayLabelVal, ok := backendIdDisplayLabelAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`backend_id_display_label expected to be basetypes.StringValue, was: %T`, backendIdDisplayLabelAttribute))
+	}
+
 	concealBillingDataAttribute, ok := attributes["conceal_billing_data"]
 
 	if !ok {
@@ -11723,6 +11751,24 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 		diags.AddError(
 			"Attribute Wrong Type",
 			fmt.Sprintf(`heappe_username expected to be basetypes.StringValue, was: %T`, heappeUsernameAttribute))
+	}
+
+	highlightBackendIdDisplayAttribute, ok := attributes["highlight_backend_id_display"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`highlight_backend_id_display is missing from object`)
+
+		return nil, diags
+	}
+
+	highlightBackendIdDisplayVal, ok := highlightBackendIdDisplayAttribute.(basetypes.BoolValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`highlight_backend_id_display expected to be basetypes.BoolValue, was: %T`, highlightBackendIdDisplayAttribute))
 	}
 
 	homedirPrefixAttribute, ok := attributes["homedir_prefix"]
@@ -12416,6 +12462,7 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 	return PluginOptionsValue{
 		AutoApproveInServiceProviderProjects:           autoApproveInServiceProviderProjectsVal,
 		AutoApproveRemoteOrders:                        autoApproveRemoteOrdersVal,
+		BackendIdDisplayLabel:                          backendIdDisplayLabelVal,
 		ConcealBillingData:                             concealBillingDataVal,
 		DefaultInternalNetworkMtu:                      defaultInternalNetworkMtuVal,
 		DefaultResourceTerminationOffsetInDays:         defaultResourceTerminationOffsetInDaysVal,
@@ -12426,6 +12473,7 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 		HeappeLocalBasePath:                            heappeLocalBasePathVal,
 		HeappeUrl:                                      heappeUrlVal,
 		HeappeUsername:                                 heappeUsernameVal,
+		HighlightBackendIdDisplay:                      highlightBackendIdDisplayVal,
 		HomedirPrefix:                                  homedirPrefixVal,
 		InitialPrimarygroupNumber:                      initialPrimarygroupNumberVal,
 		InitialUidnumber:                               initialUidnumberVal,
@@ -12567,6 +12615,24 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 			fmt.Sprintf(`auto_approve_remote_orders expected to be basetypes.BoolValue, was: %T`, autoApproveRemoteOrdersAttribute))
 	}
 
+	backendIdDisplayLabelAttribute, ok := attributes["backend_id_display_label"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`backend_id_display_label is missing from object`)
+
+		return NewPluginOptionsValueUnknown(), diags
+	}
+
+	backendIdDisplayLabelVal, ok := backendIdDisplayLabelAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`backend_id_display_label expected to be basetypes.StringValue, was: %T`, backendIdDisplayLabelAttribute))
+	}
+
 	concealBillingDataAttribute, ok := attributes["conceal_billing_data"]
 
 	if !ok {
@@ -12745,6 +12811,24 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 		diags.AddError(
 			"Attribute Wrong Type",
 			fmt.Sprintf(`heappe_username expected to be basetypes.StringValue, was: %T`, heappeUsernameAttribute))
+	}
+
+	highlightBackendIdDisplayAttribute, ok := attributes["highlight_backend_id_display"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`highlight_backend_id_display is missing from object`)
+
+		return NewPluginOptionsValueUnknown(), diags
+	}
+
+	highlightBackendIdDisplayVal, ok := highlightBackendIdDisplayAttribute.(basetypes.BoolValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`highlight_backend_id_display expected to be basetypes.BoolValue, was: %T`, highlightBackendIdDisplayAttribute))
 	}
 
 	homedirPrefixAttribute, ok := attributes["homedir_prefix"]
@@ -13438,6 +13522,7 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 	return PluginOptionsValue{
 		AutoApproveInServiceProviderProjects:           autoApproveInServiceProviderProjectsVal,
 		AutoApproveRemoteOrders:                        autoApproveRemoteOrdersVal,
+		BackendIdDisplayLabel:                          backendIdDisplayLabelVal,
 		ConcealBillingData:                             concealBillingDataVal,
 		DefaultInternalNetworkMtu:                      defaultInternalNetworkMtuVal,
 		DefaultResourceTerminationOffsetInDays:         defaultResourceTerminationOffsetInDaysVal,
@@ -13448,6 +13533,7 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 		HeappeLocalBasePath:                            heappeLocalBasePathVal,
 		HeappeUrl:                                      heappeUrlVal,
 		HeappeUsername:                                 heappeUsernameVal,
+		HighlightBackendIdDisplay:                      highlightBackendIdDisplayVal,
 		HomedirPrefix:                                  homedirPrefixVal,
 		InitialPrimarygroupNumber:                      initialPrimarygroupNumberVal,
 		InitialUidnumber:                               initialUidnumberVal,
@@ -13560,6 +13646,7 @@ var _ basetypes.ObjectValuable = PluginOptionsValue{}
 type PluginOptionsValue struct {
 	AutoApproveInServiceProviderProjects           basetypes.BoolValue   `tfsdk:"auto_approve_in_service_provider_projects"`
 	AutoApproveRemoteOrders                        basetypes.BoolValue   `tfsdk:"auto_approve_remote_orders"`
+	BackendIdDisplayLabel                          basetypes.StringValue `tfsdk:"backend_id_display_label"`
 	ConcealBillingData                             basetypes.BoolValue   `tfsdk:"conceal_billing_data"`
 	DefaultInternalNetworkMtu                      basetypes.Int64Value  `tfsdk:"default_internal_network_mtu"`
 	DefaultResourceTerminationOffsetInDays         basetypes.Int64Value  `tfsdk:"default_resource_termination_offset_in_days"`
@@ -13570,6 +13657,7 @@ type PluginOptionsValue struct {
 	HeappeLocalBasePath                            basetypes.StringValue `tfsdk:"heappe_local_base_path"`
 	HeappeUrl                                      basetypes.StringValue `tfsdk:"heappe_url"`
 	HeappeUsername                                 basetypes.StringValue `tfsdk:"heappe_username"`
+	HighlightBackendIdDisplay                      basetypes.BoolValue   `tfsdk:"highlight_backend_id_display"`
 	HomedirPrefix                                  basetypes.StringValue `tfsdk:"homedir_prefix"`
 	InitialPrimarygroupNumber                      basetypes.Int64Value  `tfsdk:"initial_primarygroup_number"`
 	InitialUidnumber                               basetypes.Int64Value  `tfsdk:"initial_uidnumber"`
@@ -13612,13 +13700,14 @@ type PluginOptionsValue struct {
 }
 
 func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 50)
+	attrTypes := make(map[string]tftypes.Type, 52)
 
 	var val tftypes.Value
 	var err error
 
 	attrTypes["auto_approve_in_service_provider_projects"] = basetypes.BoolType{}.TerraformType(ctx)
 	attrTypes["auto_approve_remote_orders"] = basetypes.BoolType{}.TerraformType(ctx)
+	attrTypes["backend_id_display_label"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["conceal_billing_data"] = basetypes.BoolType{}.TerraformType(ctx)
 	attrTypes["default_internal_network_mtu"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["default_resource_termination_offset_in_days"] = basetypes.Int64Type{}.TerraformType(ctx)
@@ -13629,6 +13718,7 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 	attrTypes["heappe_local_base_path"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["heappe_url"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["heappe_username"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["highlight_backend_id_display"] = basetypes.BoolType{}.TerraformType(ctx)
 	attrTypes["homedir_prefix"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["initial_primarygroup_number"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["initial_uidnumber"] = basetypes.Int64Type{}.TerraformType(ctx)
@@ -13674,7 +13764,7 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 50)
+		vals := make(map[string]tftypes.Value, 52)
 
 		val, err = v.AutoApproveInServiceProviderProjects.ToTerraformValue(ctx)
 
@@ -13691,6 +13781,14 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 		}
 
 		vals["auto_approve_remote_orders"] = val
+
+		val, err = v.BackendIdDisplayLabel.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["backend_id_display_label"] = val
 
 		val, err = v.ConcealBillingData.ToTerraformValue(ctx)
 
@@ -13771,6 +13869,14 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 		}
 
 		vals["heappe_username"] = val
+
+		val, err = v.HighlightBackendIdDisplay.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["highlight_backend_id_display"] = val
 
 		val, err = v.HomedirPrefix.ToTerraformValue(ctx)
 
@@ -14121,6 +14227,7 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 		return types.ObjectUnknown(map[string]attr.Type{
 			"auto_approve_in_service_provider_projects":             basetypes.BoolType{},
 			"auto_approve_remote_orders":                            basetypes.BoolType{},
+			"backend_id_display_label":                              basetypes.StringType{},
 			"conceal_billing_data":                                  basetypes.BoolType{},
 			"default_internal_network_mtu":                          basetypes.Int64Type{},
 			"default_resource_termination_offset_in_days":           basetypes.Int64Type{},
@@ -14131,6 +14238,7 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 			"heappe_local_base_path":                                basetypes.StringType{},
 			"heappe_url":                                            basetypes.StringType{},
 			"heappe_username":                                       basetypes.StringType{},
+			"highlight_backend_id_display":                          basetypes.BoolType{},
 			"homedir_prefix":                                        basetypes.StringType{},
 			"initial_primarygroup_number":                           basetypes.Int64Type{},
 			"initial_uidnumber":                                     basetypes.Int64Type{},
@@ -14177,6 +14285,7 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 	attributeTypes := map[string]attr.Type{
 		"auto_approve_in_service_provider_projects":             basetypes.BoolType{},
 		"auto_approve_remote_orders":                            basetypes.BoolType{},
+		"backend_id_display_label":                              basetypes.StringType{},
 		"conceal_billing_data":                                  basetypes.BoolType{},
 		"default_internal_network_mtu":                          basetypes.Int64Type{},
 		"default_resource_termination_offset_in_days":           basetypes.Int64Type{},
@@ -14187,6 +14296,7 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 		"heappe_local_base_path":                                basetypes.StringType{},
 		"heappe_url":                                            basetypes.StringType{},
 		"heappe_username":                                       basetypes.StringType{},
+		"highlight_backend_id_display":                          basetypes.BoolType{},
 		"homedir_prefix":                                        basetypes.StringType{},
 		"initial_primarygroup_number":                           basetypes.Int64Type{},
 		"initial_uidnumber":                                     basetypes.Int64Type{},
@@ -14242,6 +14352,7 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 		map[string]attr.Value{
 			"auto_approve_in_service_provider_projects":             v.AutoApproveInServiceProviderProjects,
 			"auto_approve_remote_orders":                            v.AutoApproveRemoteOrders,
+			"backend_id_display_label":                              v.BackendIdDisplayLabel,
 			"conceal_billing_data":                                  v.ConcealBillingData,
 			"default_internal_network_mtu":                          v.DefaultInternalNetworkMtu,
 			"default_resource_termination_offset_in_days":           v.DefaultResourceTerminationOffsetInDays,
@@ -14252,6 +14363,7 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 			"heappe_local_base_path":                                v.HeappeLocalBasePath,
 			"heappe_url":                                            v.HeappeUrl,
 			"heappe_username":                                       v.HeappeUsername,
+			"highlight_backend_id_display":                          v.HighlightBackendIdDisplay,
 			"homedir_prefix":                                        v.HomedirPrefix,
 			"initial_primarygroup_number":                           v.InitialPrimarygroupNumber,
 			"initial_uidnumber":                                     v.InitialUidnumber,
@@ -14318,6 +14430,10 @@ func (v PluginOptionsValue) Equal(o attr.Value) bool {
 		return false
 	}
 
+	if !v.BackendIdDisplayLabel.Equal(other.BackendIdDisplayLabel) {
+		return false
+	}
+
 	if !v.ConcealBillingData.Equal(other.ConcealBillingData) {
 		return false
 	}
@@ -14355,6 +14471,10 @@ func (v PluginOptionsValue) Equal(o attr.Value) bool {
 	}
 
 	if !v.HeappeUsername.Equal(other.HeappeUsername) {
+		return false
+	}
+
+	if !v.HighlightBackendIdDisplay.Equal(other.HighlightBackendIdDisplay) {
 		return false
 	}
 
@@ -14525,6 +14645,7 @@ func (v PluginOptionsValue) AttributeTypes(ctx context.Context) map[string]attr.
 	return map[string]attr.Type{
 		"auto_approve_in_service_provider_projects":             basetypes.BoolType{},
 		"auto_approve_remote_orders":                            basetypes.BoolType{},
+		"backend_id_display_label":                              basetypes.StringType{},
 		"conceal_billing_data":                                  basetypes.BoolType{},
 		"default_internal_network_mtu":                          basetypes.Int64Type{},
 		"default_resource_termination_offset_in_days":           basetypes.Int64Type{},
@@ -14535,6 +14656,7 @@ func (v PluginOptionsValue) AttributeTypes(ctx context.Context) map[string]attr.
 		"heappe_local_base_path":                                basetypes.StringType{},
 		"heappe_url":                                            basetypes.StringType{},
 		"heappe_username":                                       basetypes.StringType{},
+		"highlight_backend_id_display":                          basetypes.BoolType{},
 		"homedir_prefix":                                        basetypes.StringType{},
 		"initial_primarygroup_number":                           basetypes.Int64Type{},
 		"initial_uidnumber":                                     basetypes.Int64Type{},

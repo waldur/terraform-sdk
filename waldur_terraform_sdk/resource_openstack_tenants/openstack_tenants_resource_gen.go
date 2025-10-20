@@ -66,7 +66,7 @@ func OpenstackTenantsResourceSchema(ctx context.Context) schema.Schema {
 				Optional: true,
 				Computed: true,
 				Validators: []validator.String{
-					stringvalidator.LengthAtMost(2000),
+					stringvalidator.LengthAtMost(4096),
 				},
 			},
 			"error_message": schema.StringAttribute{
