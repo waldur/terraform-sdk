@@ -586,6 +586,11 @@ func PublicOfferingsDataSourceSchema(ctx context.Context) schema.Schema {
 									Description:         "Enable issues for membership changes",
 									MarkdownDescription: "Enable issues for membership changes",
 								},
+								"enable_purchase_order_upload": schema.BoolAttribute{
+									Computed:            true,
+									Description:         "If set to True, users will be able to upload purchase orders.",
+									MarkdownDescription: "If set to True, users will be able to upload purchase orders.",
+								},
 								"flavors_regex": schema.StringAttribute{
 									Computed:            true,
 									Description:         "Regular expression to limit flavors list",
@@ -728,15 +733,15 @@ func PublicOfferingsDataSourceSchema(ctx context.Context) schema.Schema {
 									Description:         "List of UUID of OpenStack offerings where tenant can be created",
 									MarkdownDescription: "List of UUID of OpenStack offerings where tenant can be created",
 								},
-								"order_supports_comments_and_metadata": schema.BoolAttribute{
-									Computed:            true,
-									Description:         "If set to True, orders will support comments and metadata",
-									MarkdownDescription: "If set to True, orders will support comments and metadata",
-								},
 								"project_permanent_directory": schema.StringAttribute{
 									Computed:            true,
 									Description:         "HEAppE project permanent directory",
 									MarkdownDescription: "HEAppE project permanent directory",
+								},
+								"require_purchase_order_upload": schema.BoolAttribute{
+									Computed:            true,
+									Description:         "If set to True, users will be required to upload purchase orders.",
+									MarkdownDescription: "If set to True, users will be required to upload purchase orders.",
 								},
 								"required_team_role_for_provisioning": schema.StringAttribute{
 									Computed:            true,
@@ -11663,6 +11668,24 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 			fmt.Sprintf(`enable_issues_for_membership_changes expected to be basetypes.BoolValue, was: %T`, enableIssuesForMembershipChangesAttribute))
 	}
 
+	enablePurchaseOrderUploadAttribute, ok := attributes["enable_purchase_order_upload"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`enable_purchase_order_upload is missing from object`)
+
+		return nil, diags
+	}
+
+	enablePurchaseOrderUploadVal, ok := enablePurchaseOrderUploadAttribute.(basetypes.BoolValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`enable_purchase_order_upload expected to be basetypes.BoolValue, was: %T`, enablePurchaseOrderUploadAttribute))
+	}
+
 	flavorsRegexAttribute, ok := attributes["flavors_regex"]
 
 	if !ok {
@@ -12257,24 +12280,6 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 			fmt.Sprintf(`openstack_offering_uuid_list expected to be basetypes.ListValue, was: %T`, openstackOfferingUuidListAttribute))
 	}
 
-	orderSupportsCommentsAndMetadataAttribute, ok := attributes["order_supports_comments_and_metadata"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`order_supports_comments_and_metadata is missing from object`)
-
-		return nil, diags
-	}
-
-	orderSupportsCommentsAndMetadataVal, ok := orderSupportsCommentsAndMetadataAttribute.(basetypes.BoolValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`order_supports_comments_and_metadata expected to be basetypes.BoolValue, was: %T`, orderSupportsCommentsAndMetadataAttribute))
-	}
-
 	projectPermanentDirectoryAttribute, ok := attributes["project_permanent_directory"]
 
 	if !ok {
@@ -12291,6 +12296,24 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 		diags.AddError(
 			"Attribute Wrong Type",
 			fmt.Sprintf(`project_permanent_directory expected to be basetypes.StringValue, was: %T`, projectPermanentDirectoryAttribute))
+	}
+
+	requirePurchaseOrderUploadAttribute, ok := attributes["require_purchase_order_upload"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`require_purchase_order_upload is missing from object`)
+
+		return nil, diags
+	}
+
+	requirePurchaseOrderUploadVal, ok := requirePurchaseOrderUploadAttribute.(basetypes.BoolValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`require_purchase_order_upload expected to be basetypes.BoolValue, was: %T`, requirePurchaseOrderUploadAttribute))
 	}
 
 	requiredTeamRoleForProvisioningAttribute, ok := attributes["required_team_role_for_provisioning"]
@@ -12468,6 +12491,7 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 		DefaultResourceTerminationOffsetInDays:         defaultResourceTerminationOffsetInDaysVal,
 		DeploymentMode:                                 deploymentModeVal,
 		EnableIssuesForMembershipChanges:               enableIssuesForMembershipChangesVal,
+		EnablePurchaseOrderUpload:                      enablePurchaseOrderUploadVal,
 		FlavorsRegex:                                   flavorsRegexVal,
 		HeappeClusterId:                                heappeClusterIdVal,
 		HeappeLocalBasePath:                            heappeLocalBasePathVal,
@@ -12501,8 +12525,8 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 		MaximalResourceCountPerProject:                 maximalResourceCountPerProjectVal,
 		MinimalTeamCountForProvisioning:                minimalTeamCountForProvisioningVal,
 		OpenstackOfferingUuidList:                      openstackOfferingUuidListVal,
-		OrderSupportsCommentsAndMetadata:               orderSupportsCommentsAndMetadataVal,
 		ProjectPermanentDirectory:                      projectPermanentDirectoryVal,
+		RequirePurchaseOrderUpload:                     requirePurchaseOrderUploadVal,
 		RequiredTeamRoleForProvisioning:                requiredTeamRoleForProvisioningVal,
 		ScratchProjectDirectory:                        scratchProjectDirectoryVal,
 		ServiceProviderCanCreateOfferingUser:           serviceProviderCanCreateOfferingUserVal,
@@ -12723,6 +12747,24 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 			fmt.Sprintf(`enable_issues_for_membership_changes expected to be basetypes.BoolValue, was: %T`, enableIssuesForMembershipChangesAttribute))
 	}
 
+	enablePurchaseOrderUploadAttribute, ok := attributes["enable_purchase_order_upload"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`enable_purchase_order_upload is missing from object`)
+
+		return NewPluginOptionsValueUnknown(), diags
+	}
+
+	enablePurchaseOrderUploadVal, ok := enablePurchaseOrderUploadAttribute.(basetypes.BoolValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`enable_purchase_order_upload expected to be basetypes.BoolValue, was: %T`, enablePurchaseOrderUploadAttribute))
+	}
+
 	flavorsRegexAttribute, ok := attributes["flavors_regex"]
 
 	if !ok {
@@ -13317,24 +13359,6 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 			fmt.Sprintf(`openstack_offering_uuid_list expected to be basetypes.ListValue, was: %T`, openstackOfferingUuidListAttribute))
 	}
 
-	orderSupportsCommentsAndMetadataAttribute, ok := attributes["order_supports_comments_and_metadata"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`order_supports_comments_and_metadata is missing from object`)
-
-		return NewPluginOptionsValueUnknown(), diags
-	}
-
-	orderSupportsCommentsAndMetadataVal, ok := orderSupportsCommentsAndMetadataAttribute.(basetypes.BoolValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`order_supports_comments_and_metadata expected to be basetypes.BoolValue, was: %T`, orderSupportsCommentsAndMetadataAttribute))
-	}
-
 	projectPermanentDirectoryAttribute, ok := attributes["project_permanent_directory"]
 
 	if !ok {
@@ -13351,6 +13375,24 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 		diags.AddError(
 			"Attribute Wrong Type",
 			fmt.Sprintf(`project_permanent_directory expected to be basetypes.StringValue, was: %T`, projectPermanentDirectoryAttribute))
+	}
+
+	requirePurchaseOrderUploadAttribute, ok := attributes["require_purchase_order_upload"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`require_purchase_order_upload is missing from object`)
+
+		return NewPluginOptionsValueUnknown(), diags
+	}
+
+	requirePurchaseOrderUploadVal, ok := requirePurchaseOrderUploadAttribute.(basetypes.BoolValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`require_purchase_order_upload expected to be basetypes.BoolValue, was: %T`, requirePurchaseOrderUploadAttribute))
 	}
 
 	requiredTeamRoleForProvisioningAttribute, ok := attributes["required_team_role_for_provisioning"]
@@ -13528,6 +13570,7 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 		DefaultResourceTerminationOffsetInDays:         defaultResourceTerminationOffsetInDaysVal,
 		DeploymentMode:                                 deploymentModeVal,
 		EnableIssuesForMembershipChanges:               enableIssuesForMembershipChangesVal,
+		EnablePurchaseOrderUpload:                      enablePurchaseOrderUploadVal,
 		FlavorsRegex:                                   flavorsRegexVal,
 		HeappeClusterId:                                heappeClusterIdVal,
 		HeappeLocalBasePath:                            heappeLocalBasePathVal,
@@ -13561,8 +13604,8 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 		MaximalResourceCountPerProject:                 maximalResourceCountPerProjectVal,
 		MinimalTeamCountForProvisioning:                minimalTeamCountForProvisioningVal,
 		OpenstackOfferingUuidList:                      openstackOfferingUuidListVal,
-		OrderSupportsCommentsAndMetadata:               orderSupportsCommentsAndMetadataVal,
 		ProjectPermanentDirectory:                      projectPermanentDirectoryVal,
+		RequirePurchaseOrderUpload:                     requirePurchaseOrderUploadVal,
 		RequiredTeamRoleForProvisioning:                requiredTeamRoleForProvisioningVal,
 		ScratchProjectDirectory:                        scratchProjectDirectoryVal,
 		ServiceProviderCanCreateOfferingUser:           serviceProviderCanCreateOfferingUserVal,
@@ -13652,6 +13695,7 @@ type PluginOptionsValue struct {
 	DefaultResourceTerminationOffsetInDays         basetypes.Int64Value  `tfsdk:"default_resource_termination_offset_in_days"`
 	DeploymentMode                                 basetypes.StringValue `tfsdk:"deployment_mode"`
 	EnableIssuesForMembershipChanges               basetypes.BoolValue   `tfsdk:"enable_issues_for_membership_changes"`
+	EnablePurchaseOrderUpload                      basetypes.BoolValue   `tfsdk:"enable_purchase_order_upload"`
 	FlavorsRegex                                   basetypes.StringValue `tfsdk:"flavors_regex"`
 	HeappeClusterId                                basetypes.StringValue `tfsdk:"heappe_cluster_id"`
 	HeappeLocalBasePath                            basetypes.StringValue `tfsdk:"heappe_local_base_path"`
@@ -13685,8 +13729,8 @@ type PluginOptionsValue struct {
 	MaximalResourceCountPerProject                 basetypes.Int64Value  `tfsdk:"maximal_resource_count_per_project"`
 	MinimalTeamCountForProvisioning                basetypes.Int64Value  `tfsdk:"minimal_team_count_for_provisioning"`
 	OpenstackOfferingUuidList                      basetypes.ListValue   `tfsdk:"openstack_offering_uuid_list"`
-	OrderSupportsCommentsAndMetadata               basetypes.BoolValue   `tfsdk:"order_supports_comments_and_metadata"`
 	ProjectPermanentDirectory                      basetypes.StringValue `tfsdk:"project_permanent_directory"`
+	RequirePurchaseOrderUpload                     basetypes.BoolValue   `tfsdk:"require_purchase_order_upload"`
 	RequiredTeamRoleForProvisioning                basetypes.StringValue `tfsdk:"required_team_role_for_provisioning"`
 	ScratchProjectDirectory                        basetypes.StringValue `tfsdk:"scratch_project_directory"`
 	ServiceProviderCanCreateOfferingUser           basetypes.BoolValue   `tfsdk:"service_provider_can_create_offering_user"`
@@ -13700,7 +13744,7 @@ type PluginOptionsValue struct {
 }
 
 func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 52)
+	attrTypes := make(map[string]tftypes.Type, 53)
 
 	var val tftypes.Value
 	var err error
@@ -13713,6 +13757,7 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 	attrTypes["default_resource_termination_offset_in_days"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["deployment_mode"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["enable_issues_for_membership_changes"] = basetypes.BoolType{}.TerraformType(ctx)
+	attrTypes["enable_purchase_order_upload"] = basetypes.BoolType{}.TerraformType(ctx)
 	attrTypes["flavors_regex"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["heappe_cluster_id"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["heappe_local_base_path"] = basetypes.StringType{}.TerraformType(ctx)
@@ -13748,8 +13793,8 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 	attrTypes["openstack_offering_uuid_list"] = basetypes.ListType{
 		ElemType: types.StringType,
 	}.TerraformType(ctx)
-	attrTypes["order_supports_comments_and_metadata"] = basetypes.BoolType{}.TerraformType(ctx)
 	attrTypes["project_permanent_directory"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["require_purchase_order_upload"] = basetypes.BoolType{}.TerraformType(ctx)
 	attrTypes["required_team_role_for_provisioning"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["scratch_project_directory"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["service_provider_can_create_offering_user"] = basetypes.BoolType{}.TerraformType(ctx)
@@ -13764,7 +13809,7 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 52)
+		vals := make(map[string]tftypes.Value, 53)
 
 		val, err = v.AutoApproveInServiceProviderProjects.ToTerraformValue(ctx)
 
@@ -13829,6 +13874,14 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 		}
 
 		vals["enable_issues_for_membership_changes"] = val
+
+		val, err = v.EnablePurchaseOrderUpload.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["enable_purchase_order_upload"] = val
 
 		val, err = v.FlavorsRegex.ToTerraformValue(ctx)
 
@@ -14094,14 +14147,6 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 
 		vals["openstack_offering_uuid_list"] = val
 
-		val, err = v.OrderSupportsCommentsAndMetadata.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["order_supports_comments_and_metadata"] = val
-
 		val, err = v.ProjectPermanentDirectory.ToTerraformValue(ctx)
 
 		if err != nil {
@@ -14109,6 +14154,14 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 		}
 
 		vals["project_permanent_directory"] = val
+
+		val, err = v.RequirePurchaseOrderUpload.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["require_purchase_order_upload"] = val
 
 		val, err = v.RequiredTeamRoleForProvisioning.ToTerraformValue(ctx)
 
@@ -14233,6 +14286,7 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 			"default_resource_termination_offset_in_days":           basetypes.Int64Type{},
 			"deployment_mode":                                       basetypes.StringType{},
 			"enable_issues_for_membership_changes":                  basetypes.BoolType{},
+			"enable_purchase_order_upload":                          basetypes.BoolType{},
 			"flavors_regex":                                         basetypes.StringType{},
 			"heappe_cluster_id":                                     basetypes.StringType{},
 			"heappe_local_base_path":                                basetypes.StringType{},
@@ -14268,8 +14322,8 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 			"openstack_offering_uuid_list": basetypes.ListType{
 				ElemType: types.StringType,
 			},
-			"order_supports_comments_and_metadata":      basetypes.BoolType{},
 			"project_permanent_directory":               basetypes.StringType{},
+			"require_purchase_order_upload":             basetypes.BoolType{},
 			"required_team_role_for_provisioning":       basetypes.StringType{},
 			"scratch_project_directory":                 basetypes.StringType{},
 			"service_provider_can_create_offering_user": basetypes.BoolType{},
@@ -14291,6 +14345,7 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 		"default_resource_termination_offset_in_days":           basetypes.Int64Type{},
 		"deployment_mode":                                       basetypes.StringType{},
 		"enable_issues_for_membership_changes":                  basetypes.BoolType{},
+		"enable_purchase_order_upload":                          basetypes.BoolType{},
 		"flavors_regex":                                         basetypes.StringType{},
 		"heappe_cluster_id":                                     basetypes.StringType{},
 		"heappe_local_base_path":                                basetypes.StringType{},
@@ -14326,8 +14381,8 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 		"openstack_offering_uuid_list": basetypes.ListType{
 			ElemType: types.StringType,
 		},
-		"order_supports_comments_and_metadata":      basetypes.BoolType{},
 		"project_permanent_directory":               basetypes.StringType{},
+		"require_purchase_order_upload":             basetypes.BoolType{},
 		"required_team_role_for_provisioning":       basetypes.StringType{},
 		"scratch_project_directory":                 basetypes.StringType{},
 		"service_provider_can_create_offering_user": basetypes.BoolType{},
@@ -14358,6 +14413,7 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 			"default_resource_termination_offset_in_days":           v.DefaultResourceTerminationOffsetInDays,
 			"deployment_mode":                                       v.DeploymentMode,
 			"enable_issues_for_membership_changes":                  v.EnableIssuesForMembershipChanges,
+			"enable_purchase_order_upload":                          v.EnablePurchaseOrderUpload,
 			"flavors_regex":                                         v.FlavorsRegex,
 			"heappe_cluster_id":                                     v.HeappeClusterId,
 			"heappe_local_base_path":                                v.HeappeLocalBasePath,
@@ -14391,8 +14447,8 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 			"maximal_resource_count_per_project":                    v.MaximalResourceCountPerProject,
 			"minimal_team_count_for_provisioning":                   v.MinimalTeamCountForProvisioning,
 			"openstack_offering_uuid_list":                          openstackOfferingUuidListVal,
-			"order_supports_comments_and_metadata":                  v.OrderSupportsCommentsAndMetadata,
 			"project_permanent_directory":                           v.ProjectPermanentDirectory,
+			"require_purchase_order_upload":                         v.RequirePurchaseOrderUpload,
 			"required_team_role_for_provisioning":                   v.RequiredTeamRoleForProvisioning,
 			"scratch_project_directory":                             v.ScratchProjectDirectory,
 			"service_provider_can_create_offering_user":             v.ServiceProviderCanCreateOfferingUser,
@@ -14451,6 +14507,10 @@ func (v PluginOptionsValue) Equal(o attr.Value) bool {
 	}
 
 	if !v.EnableIssuesForMembershipChanges.Equal(other.EnableIssuesForMembershipChanges) {
+		return false
+	}
+
+	if !v.EnablePurchaseOrderUpload.Equal(other.EnablePurchaseOrderUpload) {
 		return false
 	}
 
@@ -14586,11 +14646,11 @@ func (v PluginOptionsValue) Equal(o attr.Value) bool {
 		return false
 	}
 
-	if !v.OrderSupportsCommentsAndMetadata.Equal(other.OrderSupportsCommentsAndMetadata) {
+	if !v.ProjectPermanentDirectory.Equal(other.ProjectPermanentDirectory) {
 		return false
 	}
 
-	if !v.ProjectPermanentDirectory.Equal(other.ProjectPermanentDirectory) {
+	if !v.RequirePurchaseOrderUpload.Equal(other.RequirePurchaseOrderUpload) {
 		return false
 	}
 
@@ -14651,6 +14711,7 @@ func (v PluginOptionsValue) AttributeTypes(ctx context.Context) map[string]attr.
 		"default_resource_termination_offset_in_days":           basetypes.Int64Type{},
 		"deployment_mode":                                       basetypes.StringType{},
 		"enable_issues_for_membership_changes":                  basetypes.BoolType{},
+		"enable_purchase_order_upload":                          basetypes.BoolType{},
 		"flavors_regex":                                         basetypes.StringType{},
 		"heappe_cluster_id":                                     basetypes.StringType{},
 		"heappe_local_base_path":                                basetypes.StringType{},
@@ -14686,8 +14747,8 @@ func (v PluginOptionsValue) AttributeTypes(ctx context.Context) map[string]attr.
 		"openstack_offering_uuid_list": basetypes.ListType{
 			ElemType: types.StringType,
 		},
-		"order_supports_comments_and_metadata":      basetypes.BoolType{},
 		"project_permanent_directory":               basetypes.StringType{},
+		"require_purchase_order_upload":             basetypes.BoolType{},
 		"required_team_role_for_provisioning":       basetypes.StringType{},
 		"scratch_project_directory":                 basetypes.StringType{},
 		"service_provider_can_create_offering_user": basetypes.BoolType{},
