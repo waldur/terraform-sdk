@@ -252,6 +252,9 @@ func OrderDataSourceSchema(ctx context.Context) schema.Schema {
 			"type": schema.StringAttribute{
 				Computed: true,
 			},
+			"url": schema.StringAttribute{
+				Computed: true,
+			},
 			"uuid": schema.StringAttribute{
 				Required: true,
 			},
@@ -328,6 +331,7 @@ type OrderModel struct {
 	State                      types.String  `tfsdk:"state"`
 	TerminationComment         types.String  `tfsdk:"termination_comment"`
 	Type                       types.String  `tfsdk:"type"`
+	Url                        types.String  `tfsdk:"url"`
 	Uuid                       types.String  `tfsdk:"uuid"`
 }
 

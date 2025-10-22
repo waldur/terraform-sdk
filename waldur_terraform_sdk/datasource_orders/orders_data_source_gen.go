@@ -310,6 +310,9 @@ func OrdersDataSourceSchema(ctx context.Context) schema.Schema {
 						"type": schema.StringAttribute{
 							Computed: true,
 						},
+						"url": schema.StringAttribute{
+							Computed: true,
+						},
 						"uuid": schema.StringAttribute{
 							Computed: true,
 						},
@@ -1636,6 +1639,24 @@ func (t OrdersType) ValueFromObject(ctx context.Context, in basetypes.ObjectValu
 			fmt.Sprintf(`type expected to be basetypes.StringValue, was: %T`, typeAttribute))
 	}
 
+	urlAttribute, ok := attributes["url"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`url is missing from object`)
+
+		return nil, diags
+	}
+
+	urlVal, ok := urlAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`url expected to be basetypes.StringValue, was: %T`, urlAttribute))
+	}
+
 	uuidAttribute, ok := attributes["uuid"]
 
 	if !ok {
@@ -1726,6 +1747,7 @@ func (t OrdersType) ValueFromObject(ctx context.Context, in basetypes.ObjectValu
 		State:                      stateVal,
 		TerminationComment:         terminationCommentVal,
 		OrdersType:                 typeVal,
+		Url:                        urlVal,
 		Uuid:                       uuidVal,
 		state:                      attr.ValueStateKnown,
 	}, diags
@@ -3000,6 +3022,24 @@ func NewOrdersValue(attributeTypes map[string]attr.Type, attributes map[string]a
 			fmt.Sprintf(`type expected to be basetypes.StringValue, was: %T`, typeAttribute))
 	}
 
+	urlAttribute, ok := attributes["url"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`url is missing from object`)
+
+		return NewOrdersValueUnknown(), diags
+	}
+
+	urlVal, ok := urlAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`url expected to be basetypes.StringValue, was: %T`, urlAttribute))
+	}
+
 	uuidAttribute, ok := attributes["uuid"]
 
 	if !ok {
@@ -3090,6 +3130,7 @@ func NewOrdersValue(attributeTypes map[string]attr.Type, attributes map[string]a
 		State:                      stateVal,
 		TerminationComment:         terminationCommentVal,
 		OrdersType:                 typeVal,
+		Url:                        urlVal,
 		Uuid:                       uuidVal,
 		state:                      attr.ValueStateKnown,
 	}, diags
@@ -3230,12 +3271,13 @@ type OrdersValue struct {
 	State                      basetypes.StringValue  `tfsdk:"state"`
 	TerminationComment         basetypes.StringValue  `tfsdk:"termination_comment"`
 	OrdersType                 basetypes.StringValue  `tfsdk:"type"`
+	Url                        basetypes.StringValue  `tfsdk:"url"`
 	Uuid                       basetypes.StringValue  `tfsdk:"uuid"`
 	state                      attr.ValueState
 }
 
 func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 68)
+	attrTypes := make(map[string]tftypes.Type, 69)
 
 	var val tftypes.Value
 	var err error
@@ -3311,13 +3353,14 @@ func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 	attrTypes["state"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["termination_comment"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["type"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["url"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["uuid"] = basetypes.StringType{}.TerraformType(ctx)
 
 	objectType := tftypes.Object{AttributeTypes: attrTypes}
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 68)
+		vals := make(map[string]tftypes.Value, 69)
 
 		val, err = v.ActivationPrice.ToTerraformValue(ctx)
 
@@ -3855,6 +3898,14 @@ func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 
 		vals["type"] = val
 
+		val, err = v.Url.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["url"] = val
+
 		val, err = v.Uuid.ToTerraformValue(ctx)
 
 		if err != nil {
@@ -3998,6 +4049,7 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 			"state":                          basetypes.StringType{},
 			"termination_comment":            basetypes.StringType{},
 			"type":                           basetypes.StringType{},
+			"url":                            basetypes.StringType{},
 			"uuid":                           basetypes.StringType{},
 		}), diags
 	}
@@ -4074,6 +4126,7 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 		"state":                          basetypes.StringType{},
 		"termination_comment":            basetypes.StringType{},
 		"type":                           basetypes.StringType{},
+		"url":                            basetypes.StringType{},
 		"uuid":                           basetypes.StringType{},
 	}
 
@@ -4155,6 +4208,7 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 			"state":                          v.State,
 			"termination_comment":            v.TerminationComment,
 			"type":                           v.OrdersType,
+			"url":                            v.Url,
 			"uuid":                           v.Uuid,
 		})
 
@@ -4444,6 +4498,10 @@ func (v OrdersValue) Equal(o attr.Value) bool {
 		return false
 	}
 
+	if !v.Url.Equal(other.Url) {
+		return false
+	}
+
 	if !v.Uuid.Equal(other.Uuid) {
 		return false
 	}
@@ -4532,6 +4590,7 @@ func (v OrdersValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 		"state":                          basetypes.StringType{},
 		"termination_comment":            basetypes.StringType{},
 		"type":                           basetypes.StringType{},
+		"url":                            basetypes.StringType{},
 		"uuid":                           basetypes.StringType{},
 	}
 }

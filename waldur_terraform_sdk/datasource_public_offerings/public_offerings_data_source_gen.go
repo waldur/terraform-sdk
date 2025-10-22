@@ -449,6 +449,52 @@ func PublicOfferingsDataSourceSchema(ctx context.Context) schema.Schema {
 									"backend_id": schema.StringAttribute{
 										Computed: true,
 									},
+									"components": schema.ListNestedAttribute{
+										NestedObject: schema.NestedAttributeObject{
+											Attributes: map[string]schema.Attribute{
+												"amount": schema.Int64Attribute{
+													Computed: true,
+												},
+												"discount_rate": schema.Int64Attribute{
+													Computed:            true,
+													Description:         "Discount rate in percentage.",
+													MarkdownDescription: "Discount rate in percentage.",
+												},
+												"discount_threshold": schema.Int64Attribute{
+													Computed:            true,
+													Description:         "Minimum amount to be eligible for discount.",
+													MarkdownDescription: "Minimum amount to be eligible for discount.",
+												},
+												"future_price": schema.StringAttribute{
+													Computed: true,
+												},
+												"measured_unit": schema.StringAttribute{
+													Computed:            true,
+													Description:         "Unit of measurement, for example, GB.",
+													MarkdownDescription: "Unit of measurement, for example, GB.",
+												},
+												"name": schema.StringAttribute{
+													Computed:            true,
+													Description:         "Display name for the measured unit, for example, Floating IP.",
+													MarkdownDescription: "Display name for the measured unit, for example, Floating IP.",
+												},
+												"price": schema.StringAttribute{
+													Computed: true,
+												},
+												"type": schema.StringAttribute{
+													Computed:            true,
+													Description:         "Unique internal name of the measured unit, for example floating_ip.",
+													MarkdownDescription: "Unique internal name of the measured unit, for example floating_ip.",
+												},
+											},
+											CustomType: ComponentsType{
+												ObjectType: types.ObjectType{
+													AttrTypes: ComponentsValue{}.AttributeTypes(ctx),
+												},
+											},
+										},
+										Computed: true,
+									},
 									"description": schema.StringAttribute{
 										Computed: true,
 									},
@@ -565,6 +611,11 @@ func PublicOfferingsDataSourceSchema(ctx context.Context) schema.Schema {
 									Computed:            true,
 									Description:         "If set to True, pricing and components tab would be concealed.",
 									MarkdownDescription: "If set to True, pricing and components tab would be concealed.",
+								},
+								"create_orders_on_resource_option_change": schema.BoolAttribute{
+									Computed:            true,
+									Description:         "If set to True, create orders when options of related resources are changed.",
+									MarkdownDescription: "If set to True, create orders when options of related resources are changed.",
 								},
 								"default_internal_network_mtu": schema.Int64Attribute{
 									Computed:            true,
@@ -9367,6 +9418,24 @@ func (t PlansType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue
 			fmt.Sprintf(`backend_id expected to be basetypes.StringValue, was: %T`, backendIdAttribute))
 	}
 
+	componentsAttribute, ok := attributes["components"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`components is missing from object`)
+
+		return nil, diags
+	}
+
+	componentsVal, ok := componentsAttribute.(basetypes.ListValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`components expected to be basetypes.ListValue, was: %T`, componentsAttribute))
+	}
+
 	descriptionAttribute, ok := attributes["description"]
 
 	if !ok {
@@ -9681,6 +9750,7 @@ func (t PlansType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue
 		Archived:           archivedVal,
 		ArticleCode:        articleCodeVal,
 		BackendId:          backendIdVal,
+		Components:         componentsVal,
 		Description:        descriptionVal,
 		FuturePrices:       futurePricesVal,
 		InitPrice:          initPriceVal,
@@ -9819,6 +9889,24 @@ func NewPlansValue(attributeTypes map[string]attr.Type, attributes map[string]at
 			fmt.Sprintf(`backend_id expected to be basetypes.StringValue, was: %T`, backendIdAttribute))
 	}
 
+	componentsAttribute, ok := attributes["components"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`components is missing from object`)
+
+		return NewPlansValueUnknown(), diags
+	}
+
+	componentsVal, ok := componentsAttribute.(basetypes.ListValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`components expected to be basetypes.ListValue, was: %T`, componentsAttribute))
+	}
+
 	descriptionAttribute, ok := attributes["description"]
 
 	if !ok {
@@ -10133,6 +10221,7 @@ func NewPlansValue(attributeTypes map[string]attr.Type, attributes map[string]at
 		Archived:           archivedVal,
 		ArticleCode:        articleCodeVal,
 		BackendId:          backendIdVal,
+		Components:         componentsVal,
 		Description:        descriptionVal,
 		FuturePrices:       futurePricesVal,
 		InitPrice:          initPriceVal,
@@ -10225,6 +10314,7 @@ type PlansValue struct {
 	Archived           basetypes.BoolValue    `tfsdk:"archived"`
 	ArticleCode        basetypes.StringValue  `tfsdk:"article_code"`
 	BackendId          basetypes.StringValue  `tfsdk:"backend_id"`
+	Components         basetypes.ListValue    `tfsdk:"components"`
 	Description        basetypes.StringValue  `tfsdk:"description"`
 	FuturePrices       basetypes.MapValue     `tfsdk:"future_prices"`
 	InitPrice          basetypes.Float64Value `tfsdk:"init_price"`
@@ -10246,7 +10336,7 @@ type PlansValue struct {
 }
 
 func (v PlansValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 20)
+	attrTypes := make(map[string]tftypes.Type, 21)
 
 	var val tftypes.Value
 	var err error
@@ -10254,6 +10344,9 @@ func (v PlansValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error)
 	attrTypes["archived"] = basetypes.BoolType{}.TerraformType(ctx)
 	attrTypes["article_code"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["backend_id"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["components"] = basetypes.ListType{
+		ElemType: ComponentsValue{}.Type(ctx),
+	}.TerraformType(ctx)
 	attrTypes["description"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["future_prices"] = basetypes.MapType{
 		ElemType: types.Float64Type,
@@ -10284,7 +10377,7 @@ func (v PlansValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error)
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 20)
+		vals := make(map[string]tftypes.Value, 21)
 
 		val, err = v.Archived.ToTerraformValue(ctx)
 
@@ -10309,6 +10402,14 @@ func (v PlansValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error)
 		}
 
 		vals["backend_id"] = val
+
+		val, err = v.Components.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["components"] = val
 
 		val, err = v.Description.ToTerraformValue(ctx)
 
@@ -10475,6 +10576,35 @@ func (v PlansValue) String() string {
 func (v PlansValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	components := types.ListValueMust(
+		ComponentsType{
+			basetypes.ObjectType{
+				AttrTypes: ComponentsValue{}.AttributeTypes(ctx),
+			},
+		},
+		v.Components.Elements(),
+	)
+
+	if v.Components.IsNull() {
+		components = types.ListNull(
+			ComponentsType{
+				basetypes.ObjectType{
+					AttrTypes: ComponentsValue{}.AttributeTypes(ctx),
+				},
+			},
+		)
+	}
+
+	if v.Components.IsUnknown() {
+		components = types.ListUnknown(
+			ComponentsType{
+				basetypes.ObjectType{
+					AttrTypes: ComponentsValue{}.AttributeTypes(ctx),
+				},
+			},
+		)
+	}
+
 	organizationGroups := types.ListValueMust(
 		OrganizationGroupsType{
 			basetypes.ObjectType{
@@ -10521,7 +10651,10 @@ func (v PlansValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, d
 			"archived":     basetypes.BoolType{},
 			"article_code": basetypes.StringType{},
 			"backend_id":   basetypes.StringType{},
-			"description":  basetypes.StringType{},
+			"components": basetypes.ListType{
+				ElemType: ComponentsValue{}.Type(ctx),
+			},
+			"description": basetypes.StringType{},
 			"future_prices": basetypes.MapType{
 				ElemType: types.Float64Type,
 			},
@@ -10566,7 +10699,10 @@ func (v PlansValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, d
 			"archived":     basetypes.BoolType{},
 			"article_code": basetypes.StringType{},
 			"backend_id":   basetypes.StringType{},
-			"description":  basetypes.StringType{},
+			"components": basetypes.ListType{
+				ElemType: ComponentsValue{}.Type(ctx),
+			},
+			"description": basetypes.StringType{},
 			"future_prices": basetypes.MapType{
 				ElemType: types.Float64Type,
 			},
@@ -10611,7 +10747,10 @@ func (v PlansValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, d
 			"archived":     basetypes.BoolType{},
 			"article_code": basetypes.StringType{},
 			"backend_id":   basetypes.StringType{},
-			"description":  basetypes.StringType{},
+			"components": basetypes.ListType{
+				ElemType: ComponentsValue{}.Type(ctx),
+			},
+			"description": basetypes.StringType{},
 			"future_prices": basetypes.MapType{
 				ElemType: types.Float64Type,
 			},
@@ -10643,7 +10782,10 @@ func (v PlansValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, d
 		"archived":     basetypes.BoolType{},
 		"article_code": basetypes.StringType{},
 		"backend_id":   basetypes.StringType{},
-		"description":  basetypes.StringType{},
+		"components": basetypes.ListType{
+			ElemType: ComponentsValue{}.Type(ctx),
+		},
+		"description": basetypes.StringType{},
 		"future_prices": basetypes.MapType{
 			ElemType: types.Float64Type,
 		},
@@ -10684,6 +10826,7 @@ func (v PlansValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, d
 			"archived":            v.Archived,
 			"article_code":        v.ArticleCode,
 			"backend_id":          v.BackendId,
+			"components":          components,
 			"description":         v.Description,
 			"future_prices":       futurePricesVal,
 			"init_price":          v.InitPrice,
@@ -10730,6 +10873,10 @@ func (v PlansValue) Equal(o attr.Value) bool {
 	}
 
 	if !v.BackendId.Equal(other.BackendId) {
+		return false
+	}
+
+	if !v.Components.Equal(other.Components) {
 		return false
 	}
 
@@ -10817,7 +10964,10 @@ func (v PlansValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 		"archived":     basetypes.BoolType{},
 		"article_code": basetypes.StringType{},
 		"backend_id":   basetypes.StringType{},
-		"description":  basetypes.StringType{},
+		"components": basetypes.ListType{
+			ElemType: ComponentsValue{}.Type(ctx),
+		},
+		"description": basetypes.StringType{},
 		"future_prices": basetypes.MapType{
 			ElemType: types.Float64Type,
 		},
@@ -10842,6 +10992,715 @@ func (v PlansValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 		"unit_price":      basetypes.StringType{},
 		"url":             basetypes.StringType{},
 		"uuid":            basetypes.StringType{},
+	}
+}
+
+var _ basetypes.ObjectTypable = ComponentsType{}
+
+type ComponentsType struct {
+	basetypes.ObjectType
+}
+
+func (t ComponentsType) Equal(o attr.Type) bool {
+	other, ok := o.(ComponentsType)
+
+	if !ok {
+		return false
+	}
+
+	return t.ObjectType.Equal(other.ObjectType)
+}
+
+func (t ComponentsType) String() string {
+	return "ComponentsType"
+}
+
+func (t ComponentsType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributes := in.Attributes()
+
+	amountAttribute, ok := attributes["amount"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`amount is missing from object`)
+
+		return nil, diags
+	}
+
+	amountVal, ok := amountAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`amount expected to be basetypes.Int64Value, was: %T`, amountAttribute))
+	}
+
+	discountRateAttribute, ok := attributes["discount_rate"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`discount_rate is missing from object`)
+
+		return nil, diags
+	}
+
+	discountRateVal, ok := discountRateAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`discount_rate expected to be basetypes.Int64Value, was: %T`, discountRateAttribute))
+	}
+
+	discountThresholdAttribute, ok := attributes["discount_threshold"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`discount_threshold is missing from object`)
+
+		return nil, diags
+	}
+
+	discountThresholdVal, ok := discountThresholdAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`discount_threshold expected to be basetypes.Int64Value, was: %T`, discountThresholdAttribute))
+	}
+
+	futurePriceAttribute, ok := attributes["future_price"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`future_price is missing from object`)
+
+		return nil, diags
+	}
+
+	futurePriceVal, ok := futurePriceAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`future_price expected to be basetypes.StringValue, was: %T`, futurePriceAttribute))
+	}
+
+	measuredUnitAttribute, ok := attributes["measured_unit"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`measured_unit is missing from object`)
+
+		return nil, diags
+	}
+
+	measuredUnitVal, ok := measuredUnitAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`measured_unit expected to be basetypes.StringValue, was: %T`, measuredUnitAttribute))
+	}
+
+	nameAttribute, ok := attributes["name"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`name is missing from object`)
+
+		return nil, diags
+	}
+
+	nameVal, ok := nameAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`name expected to be basetypes.StringValue, was: %T`, nameAttribute))
+	}
+
+	priceAttribute, ok := attributes["price"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`price is missing from object`)
+
+		return nil, diags
+	}
+
+	priceVal, ok := priceAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`price expected to be basetypes.StringValue, was: %T`, priceAttribute))
+	}
+
+	typeAttribute, ok := attributes["type"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`type is missing from object`)
+
+		return nil, diags
+	}
+
+	typeVal, ok := typeAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`type expected to be basetypes.StringValue, was: %T`, typeAttribute))
+	}
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	return ComponentsValue{
+		Amount:            amountVal,
+		DiscountRate:      discountRateVal,
+		DiscountThreshold: discountThresholdVal,
+		FuturePrice:       futurePriceVal,
+		MeasuredUnit:      measuredUnitVal,
+		Name:              nameVal,
+		Price:             priceVal,
+		ComponentsType:    typeVal,
+		state:             attr.ValueStateKnown,
+	}, diags
+}
+
+func NewComponentsValueNull() ComponentsValue {
+	return ComponentsValue{
+		state: attr.ValueStateNull,
+	}
+}
+
+func NewComponentsValueUnknown() ComponentsValue {
+	return ComponentsValue{
+		state: attr.ValueStateUnknown,
+	}
+}
+
+func NewComponentsValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (ComponentsValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	// Reference: https://github.com/hashicorp/terraform-plugin-framework/issues/521
+	ctx := context.Background()
+
+	for name, attributeType := range attributeTypes {
+		attribute, ok := attributes[name]
+
+		if !ok {
+			diags.AddError(
+				"Missing ComponentsValue Attribute Value",
+				"While creating a ComponentsValue value, a missing attribute value was detected. "+
+					"A ComponentsValue must contain values for all attributes, even if null or unknown. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("ComponentsValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
+			)
+
+			continue
+		}
+
+		if !attributeType.Equal(attribute.Type(ctx)) {
+			diags.AddError(
+				"Invalid ComponentsValue Attribute Type",
+				"While creating a ComponentsValue value, an invalid attribute value was detected. "+
+					"A ComponentsValue must use a matching attribute type for the value. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("ComponentsValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
+					fmt.Sprintf("ComponentsValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
+			)
+		}
+	}
+
+	for name := range attributes {
+		_, ok := attributeTypes[name]
+
+		if !ok {
+			diags.AddError(
+				"Extra ComponentsValue Attribute Value",
+				"While creating a ComponentsValue value, an extra attribute value was detected. "+
+					"A ComponentsValue must not contain values beyond the expected attribute types. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("Extra ComponentsValue Attribute Name: %s", name),
+			)
+		}
+	}
+
+	if diags.HasError() {
+		return NewComponentsValueUnknown(), diags
+	}
+
+	amountAttribute, ok := attributes["amount"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`amount is missing from object`)
+
+		return NewComponentsValueUnknown(), diags
+	}
+
+	amountVal, ok := amountAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`amount expected to be basetypes.Int64Value, was: %T`, amountAttribute))
+	}
+
+	discountRateAttribute, ok := attributes["discount_rate"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`discount_rate is missing from object`)
+
+		return NewComponentsValueUnknown(), diags
+	}
+
+	discountRateVal, ok := discountRateAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`discount_rate expected to be basetypes.Int64Value, was: %T`, discountRateAttribute))
+	}
+
+	discountThresholdAttribute, ok := attributes["discount_threshold"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`discount_threshold is missing from object`)
+
+		return NewComponentsValueUnknown(), diags
+	}
+
+	discountThresholdVal, ok := discountThresholdAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`discount_threshold expected to be basetypes.Int64Value, was: %T`, discountThresholdAttribute))
+	}
+
+	futurePriceAttribute, ok := attributes["future_price"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`future_price is missing from object`)
+
+		return NewComponentsValueUnknown(), diags
+	}
+
+	futurePriceVal, ok := futurePriceAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`future_price expected to be basetypes.StringValue, was: %T`, futurePriceAttribute))
+	}
+
+	measuredUnitAttribute, ok := attributes["measured_unit"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`measured_unit is missing from object`)
+
+		return NewComponentsValueUnknown(), diags
+	}
+
+	measuredUnitVal, ok := measuredUnitAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`measured_unit expected to be basetypes.StringValue, was: %T`, measuredUnitAttribute))
+	}
+
+	nameAttribute, ok := attributes["name"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`name is missing from object`)
+
+		return NewComponentsValueUnknown(), diags
+	}
+
+	nameVal, ok := nameAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`name expected to be basetypes.StringValue, was: %T`, nameAttribute))
+	}
+
+	priceAttribute, ok := attributes["price"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`price is missing from object`)
+
+		return NewComponentsValueUnknown(), diags
+	}
+
+	priceVal, ok := priceAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`price expected to be basetypes.StringValue, was: %T`, priceAttribute))
+	}
+
+	typeAttribute, ok := attributes["type"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`type is missing from object`)
+
+		return NewComponentsValueUnknown(), diags
+	}
+
+	typeVal, ok := typeAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`type expected to be basetypes.StringValue, was: %T`, typeAttribute))
+	}
+
+	if diags.HasError() {
+		return NewComponentsValueUnknown(), diags
+	}
+
+	return ComponentsValue{
+		Amount:            amountVal,
+		DiscountRate:      discountRateVal,
+		DiscountThreshold: discountThresholdVal,
+		FuturePrice:       futurePriceVal,
+		MeasuredUnit:      measuredUnitVal,
+		Name:              nameVal,
+		Price:             priceVal,
+		ComponentsType:    typeVal,
+		state:             attr.ValueStateKnown,
+	}, diags
+}
+
+func NewComponentsValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) ComponentsValue {
+	object, diags := NewComponentsValue(attributeTypes, attributes)
+
+	if diags.HasError() {
+		// This could potentially be added to the diag package.
+		diagsStrings := make([]string, 0, len(diags))
+
+		for _, diagnostic := range diags {
+			diagsStrings = append(diagsStrings, fmt.Sprintf(
+				"%s | %s | %s",
+				diagnostic.Severity(),
+				diagnostic.Summary(),
+				diagnostic.Detail()))
+		}
+
+		panic("NewComponentsValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
+	}
+
+	return object
+}
+
+func (t ComponentsType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+	if in.Type() == nil {
+		return NewComponentsValueNull(), nil
+	}
+
+	if !in.Type().Equal(t.TerraformType(ctx)) {
+		return nil, fmt.Errorf("expected %s, got %s", t.TerraformType(ctx), in.Type())
+	}
+
+	if !in.IsKnown() {
+		return NewComponentsValueUnknown(), nil
+	}
+
+	if in.IsNull() {
+		return NewComponentsValueNull(), nil
+	}
+
+	attributes := map[string]attr.Value{}
+
+	val := map[string]tftypes.Value{}
+
+	err := in.As(&val)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for k, v := range val {
+		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
+
+		if err != nil {
+			return nil, err
+		}
+
+		attributes[k] = a
+	}
+
+	return NewComponentsValueMust(ComponentsValue{}.AttributeTypes(ctx), attributes), nil
+}
+
+func (t ComponentsType) ValueType(ctx context.Context) attr.Value {
+	return ComponentsValue{}
+}
+
+var _ basetypes.ObjectValuable = ComponentsValue{}
+
+type ComponentsValue struct {
+	Amount            basetypes.Int64Value  `tfsdk:"amount"`
+	DiscountRate      basetypes.Int64Value  `tfsdk:"discount_rate"`
+	DiscountThreshold basetypes.Int64Value  `tfsdk:"discount_threshold"`
+	FuturePrice       basetypes.StringValue `tfsdk:"future_price"`
+	MeasuredUnit      basetypes.StringValue `tfsdk:"measured_unit"`
+	Name              basetypes.StringValue `tfsdk:"name"`
+	Price             basetypes.StringValue `tfsdk:"price"`
+	ComponentsType    basetypes.StringValue `tfsdk:"type"`
+	state             attr.ValueState
+}
+
+func (v ComponentsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+	attrTypes := make(map[string]tftypes.Type, 8)
+
+	var val tftypes.Value
+	var err error
+
+	attrTypes["amount"] = basetypes.Int64Type{}.TerraformType(ctx)
+	attrTypes["discount_rate"] = basetypes.Int64Type{}.TerraformType(ctx)
+	attrTypes["discount_threshold"] = basetypes.Int64Type{}.TerraformType(ctx)
+	attrTypes["future_price"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["measured_unit"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["name"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["price"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["type"] = basetypes.StringType{}.TerraformType(ctx)
+
+	objectType := tftypes.Object{AttributeTypes: attrTypes}
+
+	switch v.state {
+	case attr.ValueStateKnown:
+		vals := make(map[string]tftypes.Value, 8)
+
+		val, err = v.Amount.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["amount"] = val
+
+		val, err = v.DiscountRate.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["discount_rate"] = val
+
+		val, err = v.DiscountThreshold.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["discount_threshold"] = val
+
+		val, err = v.FuturePrice.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["future_price"] = val
+
+		val, err = v.MeasuredUnit.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["measured_unit"] = val
+
+		val, err = v.Name.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["name"] = val
+
+		val, err = v.Price.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["price"] = val
+
+		val, err = v.ComponentsType.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["type"] = val
+
+		if err := tftypes.ValidateValue(objectType, vals); err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		return tftypes.NewValue(objectType, vals), nil
+	case attr.ValueStateNull:
+		return tftypes.NewValue(objectType, nil), nil
+	case attr.ValueStateUnknown:
+		return tftypes.NewValue(objectType, tftypes.UnknownValue), nil
+	default:
+		panic(fmt.Sprintf("unhandled Object state in ToTerraformValue: %s", v.state))
+	}
+}
+
+func (v ComponentsValue) IsNull() bool {
+	return v.state == attr.ValueStateNull
+}
+
+func (v ComponentsValue) IsUnknown() bool {
+	return v.state == attr.ValueStateUnknown
+}
+
+func (v ComponentsValue) String() string {
+	return "ComponentsValue"
+}
+
+func (v ComponentsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributeTypes := map[string]attr.Type{
+		"amount":             basetypes.Int64Type{},
+		"discount_rate":      basetypes.Int64Type{},
+		"discount_threshold": basetypes.Int64Type{},
+		"future_price":       basetypes.StringType{},
+		"measured_unit":      basetypes.StringType{},
+		"name":               basetypes.StringType{},
+		"price":              basetypes.StringType{},
+		"type":               basetypes.StringType{},
+	}
+
+	if v.IsNull() {
+		return types.ObjectNull(attributeTypes), diags
+	}
+
+	if v.IsUnknown() {
+		return types.ObjectUnknown(attributeTypes), diags
+	}
+
+	objVal, diags := types.ObjectValue(
+		attributeTypes,
+		map[string]attr.Value{
+			"amount":             v.Amount,
+			"discount_rate":      v.DiscountRate,
+			"discount_threshold": v.DiscountThreshold,
+			"future_price":       v.FuturePrice,
+			"measured_unit":      v.MeasuredUnit,
+			"name":               v.Name,
+			"price":              v.Price,
+			"type":               v.ComponentsType,
+		})
+
+	return objVal, diags
+}
+
+func (v ComponentsValue) Equal(o attr.Value) bool {
+	other, ok := o.(ComponentsValue)
+
+	if !ok {
+		return false
+	}
+
+	if v.state != other.state {
+		return false
+	}
+
+	if v.state != attr.ValueStateKnown {
+		return true
+	}
+
+	if !v.Amount.Equal(other.Amount) {
+		return false
+	}
+
+	if !v.DiscountRate.Equal(other.DiscountRate) {
+		return false
+	}
+
+	if !v.DiscountThreshold.Equal(other.DiscountThreshold) {
+		return false
+	}
+
+	if !v.FuturePrice.Equal(other.FuturePrice) {
+		return false
+	}
+
+	if !v.MeasuredUnit.Equal(other.MeasuredUnit) {
+		return false
+	}
+
+	if !v.Name.Equal(other.Name) {
+		return false
+	}
+
+	if !v.Price.Equal(other.Price) {
+		return false
+	}
+
+	if !v.ComponentsType.Equal(other.ComponentsType) {
+		return false
+	}
+
+	return true
+}
+
+func (v ComponentsValue) Type(ctx context.Context) attr.Type {
+	return ComponentsType{
+		basetypes.ObjectType{
+			AttrTypes: v.AttributeTypes(ctx),
+		},
+	}
+}
+
+func (v ComponentsValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
+	return map[string]attr.Type{
+		"amount":             basetypes.Int64Type{},
+		"discount_rate":      basetypes.Int64Type{},
+		"discount_threshold": basetypes.Int64Type{},
+		"future_price":       basetypes.StringType{},
+		"measured_unit":      basetypes.StringType{},
+		"name":               basetypes.StringType{},
+		"price":              basetypes.StringType{},
+		"type":               basetypes.StringType{},
 	}
 }
 
@@ -11596,6 +12455,24 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 			fmt.Sprintf(`conceal_billing_data expected to be basetypes.BoolValue, was: %T`, concealBillingDataAttribute))
 	}
 
+	createOrdersOnResourceOptionChangeAttribute, ok := attributes["create_orders_on_resource_option_change"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`create_orders_on_resource_option_change is missing from object`)
+
+		return nil, diags
+	}
+
+	createOrdersOnResourceOptionChangeVal, ok := createOrdersOnResourceOptionChangeAttribute.(basetypes.BoolValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`create_orders_on_resource_option_change expected to be basetypes.BoolValue, was: %T`, createOrdersOnResourceOptionChangeAttribute))
+	}
+
 	defaultInternalNetworkMtuAttribute, ok := attributes["default_internal_network_mtu"]
 
 	if !ok {
@@ -12487,6 +13364,7 @@ func (t PluginOptionsType) ValueFromObject(ctx context.Context, in basetypes.Obj
 		AutoApproveRemoteOrders:                        autoApproveRemoteOrdersVal,
 		BackendIdDisplayLabel:                          backendIdDisplayLabelVal,
 		ConcealBillingData:                             concealBillingDataVal,
+		CreateOrdersOnResourceOptionChange:             createOrdersOnResourceOptionChangeVal,
 		DefaultInternalNetworkMtu:                      defaultInternalNetworkMtuVal,
 		DefaultResourceTerminationOffsetInDays:         defaultResourceTerminationOffsetInDaysVal,
 		DeploymentMode:                                 deploymentModeVal,
@@ -12675,6 +13553,24 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 			fmt.Sprintf(`conceal_billing_data expected to be basetypes.BoolValue, was: %T`, concealBillingDataAttribute))
 	}
 
+	createOrdersOnResourceOptionChangeAttribute, ok := attributes["create_orders_on_resource_option_change"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`create_orders_on_resource_option_change is missing from object`)
+
+		return NewPluginOptionsValueUnknown(), diags
+	}
+
+	createOrdersOnResourceOptionChangeVal, ok := createOrdersOnResourceOptionChangeAttribute.(basetypes.BoolValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`create_orders_on_resource_option_change expected to be basetypes.BoolValue, was: %T`, createOrdersOnResourceOptionChangeAttribute))
+	}
+
 	defaultInternalNetworkMtuAttribute, ok := attributes["default_internal_network_mtu"]
 
 	if !ok {
@@ -13566,6 +14462,7 @@ func NewPluginOptionsValue(attributeTypes map[string]attr.Type, attributes map[s
 		AutoApproveRemoteOrders:                        autoApproveRemoteOrdersVal,
 		BackendIdDisplayLabel:                          backendIdDisplayLabelVal,
 		ConcealBillingData:                             concealBillingDataVal,
+		CreateOrdersOnResourceOptionChange:             createOrdersOnResourceOptionChangeVal,
 		DefaultInternalNetworkMtu:                      defaultInternalNetworkMtuVal,
 		DefaultResourceTerminationOffsetInDays:         defaultResourceTerminationOffsetInDaysVal,
 		DeploymentMode:                                 deploymentModeVal,
@@ -13691,6 +14588,7 @@ type PluginOptionsValue struct {
 	AutoApproveRemoteOrders                        basetypes.BoolValue   `tfsdk:"auto_approve_remote_orders"`
 	BackendIdDisplayLabel                          basetypes.StringValue `tfsdk:"backend_id_display_label"`
 	ConcealBillingData                             basetypes.BoolValue   `tfsdk:"conceal_billing_data"`
+	CreateOrdersOnResourceOptionChange             basetypes.BoolValue   `tfsdk:"create_orders_on_resource_option_change"`
 	DefaultInternalNetworkMtu                      basetypes.Int64Value  `tfsdk:"default_internal_network_mtu"`
 	DefaultResourceTerminationOffsetInDays         basetypes.Int64Value  `tfsdk:"default_resource_termination_offset_in_days"`
 	DeploymentMode                                 basetypes.StringValue `tfsdk:"deployment_mode"`
@@ -13744,7 +14642,7 @@ type PluginOptionsValue struct {
 }
 
 func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 53)
+	attrTypes := make(map[string]tftypes.Type, 54)
 
 	var val tftypes.Value
 	var err error
@@ -13753,6 +14651,7 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 	attrTypes["auto_approve_remote_orders"] = basetypes.BoolType{}.TerraformType(ctx)
 	attrTypes["backend_id_display_label"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["conceal_billing_data"] = basetypes.BoolType{}.TerraformType(ctx)
+	attrTypes["create_orders_on_resource_option_change"] = basetypes.BoolType{}.TerraformType(ctx)
 	attrTypes["default_internal_network_mtu"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["default_resource_termination_offset_in_days"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["deployment_mode"] = basetypes.StringType{}.TerraformType(ctx)
@@ -13809,7 +14708,7 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 53)
+		vals := make(map[string]tftypes.Value, 54)
 
 		val, err = v.AutoApproveInServiceProviderProjects.ToTerraformValue(ctx)
 
@@ -13842,6 +14741,14 @@ func (v PluginOptionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 		}
 
 		vals["conceal_billing_data"] = val
+
+		val, err = v.CreateOrdersOnResourceOptionChange.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["create_orders_on_resource_option_change"] = val
 
 		val, err = v.DefaultInternalNetworkMtu.ToTerraformValue(ctx)
 
@@ -14282,6 +15189,7 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 			"auto_approve_remote_orders":                            basetypes.BoolType{},
 			"backend_id_display_label":                              basetypes.StringType{},
 			"conceal_billing_data":                                  basetypes.BoolType{},
+			"create_orders_on_resource_option_change":               basetypes.BoolType{},
 			"default_internal_network_mtu":                          basetypes.Int64Type{},
 			"default_resource_termination_offset_in_days":           basetypes.Int64Type{},
 			"deployment_mode":                                       basetypes.StringType{},
@@ -14341,6 +15249,7 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 		"auto_approve_remote_orders":                            basetypes.BoolType{},
 		"backend_id_display_label":                              basetypes.StringType{},
 		"conceal_billing_data":                                  basetypes.BoolType{},
+		"create_orders_on_resource_option_change":               basetypes.BoolType{},
 		"default_internal_network_mtu":                          basetypes.Int64Type{},
 		"default_resource_termination_offset_in_days":           basetypes.Int64Type{},
 		"deployment_mode":                                       basetypes.StringType{},
@@ -14409,6 +15318,7 @@ func (v PluginOptionsValue) ToObjectValue(ctx context.Context) (basetypes.Object
 			"auto_approve_remote_orders":                            v.AutoApproveRemoteOrders,
 			"backend_id_display_label":                              v.BackendIdDisplayLabel,
 			"conceal_billing_data":                                  v.ConcealBillingData,
+			"create_orders_on_resource_option_change":               v.CreateOrdersOnResourceOptionChange,
 			"default_internal_network_mtu":                          v.DefaultInternalNetworkMtu,
 			"default_resource_termination_offset_in_days":           v.DefaultResourceTerminationOffsetInDays,
 			"deployment_mode":                                       v.DeploymentMode,
@@ -14491,6 +15401,10 @@ func (v PluginOptionsValue) Equal(o attr.Value) bool {
 	}
 
 	if !v.ConcealBillingData.Equal(other.ConcealBillingData) {
+		return false
+	}
+
+	if !v.CreateOrdersOnResourceOptionChange.Equal(other.CreateOrdersOnResourceOptionChange) {
 		return false
 	}
 
@@ -14707,6 +15621,7 @@ func (v PluginOptionsValue) AttributeTypes(ctx context.Context) map[string]attr.
 		"auto_approve_remote_orders":                            basetypes.BoolType{},
 		"backend_id_display_label":                              basetypes.StringType{},
 		"conceal_billing_data":                                  basetypes.BoolType{},
+		"create_orders_on_resource_option_change":               basetypes.BoolType{},
 		"default_internal_network_mtu":                          basetypes.Int64Type{},
 		"default_resource_termination_offset_in_days":           basetypes.Int64Type{},
 		"deployment_mode":                                       basetypes.StringType{},
