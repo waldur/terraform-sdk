@@ -301,6 +301,11 @@ func OrdersDataSourceSchema(ctx context.Context) schema.Schema {
 						"resource_uuid": schema.StringAttribute{
 							Computed: true,
 						},
+						"start_date": schema.StringAttribute{
+							Computed:            true,
+							Description:         "Enables delayed processing of resource provisioning order.",
+							MarkdownDescription: "Enables delayed processing of resource provisioning order.",
+						},
 						"state": schema.StringAttribute{
 							Computed: true,
 						},
@@ -1585,6 +1590,24 @@ func (t OrdersType) ValueFromObject(ctx context.Context, in basetypes.ObjectValu
 			fmt.Sprintf(`resource_uuid expected to be basetypes.StringValue, was: %T`, resourceUuidAttribute))
 	}
 
+	startDateAttribute, ok := attributes["start_date"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`start_date is missing from object`)
+
+		return nil, diags
+	}
+
+	startDateVal, ok := startDateAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`start_date expected to be basetypes.StringValue, was: %T`, startDateAttribute))
+	}
+
 	stateAttribute, ok := attributes["state"]
 
 	if !ok {
@@ -1744,6 +1767,7 @@ func (t OrdersType) ValueFromObject(ctx context.Context, in basetypes.ObjectValu
 		ResourceName:               resourceNameVal,
 		ResourceType:               resourceTypeVal,
 		ResourceUuid:               resourceUuidVal,
+		StartDate:                  startDateVal,
 		State:                      stateVal,
 		TerminationComment:         terminationCommentVal,
 		OrdersType:                 typeVal,
@@ -2968,6 +2992,24 @@ func NewOrdersValue(attributeTypes map[string]attr.Type, attributes map[string]a
 			fmt.Sprintf(`resource_uuid expected to be basetypes.StringValue, was: %T`, resourceUuidAttribute))
 	}
 
+	startDateAttribute, ok := attributes["start_date"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`start_date is missing from object`)
+
+		return NewOrdersValueUnknown(), diags
+	}
+
+	startDateVal, ok := startDateAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`start_date expected to be basetypes.StringValue, was: %T`, startDateAttribute))
+	}
+
 	stateAttribute, ok := attributes["state"]
 
 	if !ok {
@@ -3127,6 +3169,7 @@ func NewOrdersValue(attributeTypes map[string]attr.Type, attributes map[string]a
 		ResourceName:               resourceNameVal,
 		ResourceType:               resourceTypeVal,
 		ResourceUuid:               resourceUuidVal,
+		StartDate:                  startDateVal,
 		State:                      stateVal,
 		TerminationComment:         terminationCommentVal,
 		OrdersType:                 typeVal,
@@ -3268,6 +3311,7 @@ type OrdersValue struct {
 	ResourceName               basetypes.StringValue  `tfsdk:"resource_name"`
 	ResourceType               basetypes.StringValue  `tfsdk:"resource_type"`
 	ResourceUuid               basetypes.StringValue  `tfsdk:"resource_uuid"`
+	StartDate                  basetypes.StringValue  `tfsdk:"start_date"`
 	State                      basetypes.StringValue  `tfsdk:"state"`
 	TerminationComment         basetypes.StringValue  `tfsdk:"termination_comment"`
 	OrdersType                 basetypes.StringValue  `tfsdk:"type"`
@@ -3277,7 +3321,7 @@ type OrdersValue struct {
 }
 
 func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 69)
+	attrTypes := make(map[string]tftypes.Type, 70)
 
 	var val tftypes.Value
 	var err error
@@ -3350,6 +3394,7 @@ func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 	attrTypes["resource_name"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["resource_type"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["resource_uuid"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["start_date"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["state"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["termination_comment"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["type"] = basetypes.StringType{}.TerraformType(ctx)
@@ -3360,7 +3405,7 @@ func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 69)
+		vals := make(map[string]tftypes.Value, 70)
 
 		val, err = v.ActivationPrice.ToTerraformValue(ctx)
 
@@ -3874,6 +3919,14 @@ func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 
 		vals["resource_uuid"] = val
 
+		val, err = v.StartDate.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["start_date"] = val
+
 		val, err = v.State.ToTerraformValue(ctx)
 
 		if err != nil {
@@ -4046,6 +4099,7 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 			"resource_name":                  basetypes.StringType{},
 			"resource_type":                  basetypes.StringType{},
 			"resource_uuid":                  basetypes.StringType{},
+			"start_date":                     basetypes.StringType{},
 			"state":                          basetypes.StringType{},
 			"termination_comment":            basetypes.StringType{},
 			"type":                           basetypes.StringType{},
@@ -4123,6 +4177,7 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 		"resource_name":                  basetypes.StringType{},
 		"resource_type":                  basetypes.StringType{},
 		"resource_uuid":                  basetypes.StringType{},
+		"start_date":                     basetypes.StringType{},
 		"state":                          basetypes.StringType{},
 		"termination_comment":            basetypes.StringType{},
 		"type":                           basetypes.StringType{},
@@ -4205,6 +4260,7 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 			"resource_name":                  v.ResourceName,
 			"resource_type":                  v.ResourceType,
 			"resource_uuid":                  v.ResourceUuid,
+			"start_date":                     v.StartDate,
 			"state":                          v.State,
 			"termination_comment":            v.TerminationComment,
 			"type":                           v.OrdersType,
@@ -4486,6 +4542,10 @@ func (v OrdersValue) Equal(o attr.Value) bool {
 		return false
 	}
 
+	if !v.StartDate.Equal(other.StartDate) {
+		return false
+	}
+
 	if !v.State.Equal(other.State) {
 		return false
 	}
@@ -4587,6 +4647,7 @@ func (v OrdersValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 		"resource_name":                  basetypes.StringType{},
 		"resource_type":                  basetypes.StringType{},
 		"resource_uuid":                  basetypes.StringType{},
+		"start_date":                     basetypes.StringType{},
 		"state":                          basetypes.StringType{},
 		"termination_comment":            basetypes.StringType{},
 		"type":                           basetypes.StringType{},
