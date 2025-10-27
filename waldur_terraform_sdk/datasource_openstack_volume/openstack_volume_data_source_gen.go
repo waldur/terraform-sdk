@@ -51,6 +51,9 @@ func OpenstackVolumeDataSourceSchema(ctx context.Context) schema.Schema {
 			"customer_native_name": schema.StringAttribute{
 				Computed: true,
 			},
+			"customer_uuid": schema.StringAttribute{
+				Computed: true,
+			},
 			"description": schema.StringAttribute{
 				Computed: true,
 			},
@@ -211,6 +214,7 @@ type OpenstackVolumeModel struct {
 	CustomerAbbreviation        types.String `tfsdk:"customer_abbreviation"`
 	CustomerName                types.String `tfsdk:"customer_name"`
 	CustomerNativeName          types.String `tfsdk:"customer_native_name"`
+	CustomerUuid                types.String `tfsdk:"customer_uuid"`
 	Description                 types.String `tfsdk:"description"`
 	Device                      types.String `tfsdk:"device"`
 	ErrorMessage                types.String `tfsdk:"error_message"`

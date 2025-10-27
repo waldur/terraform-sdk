@@ -44,6 +44,9 @@ func OpenstackSnapshotDataSourceSchema(ctx context.Context) schema.Schema {
 			"customer_native_name": schema.StringAttribute{
 				Computed: true,
 			},
+			"customer_uuid": schema.StringAttribute{
+				Computed: true,
+			},
 			"description": schema.StringAttribute{
 				Computed: true,
 			},
@@ -211,6 +214,7 @@ type OpenstackSnapshotModel struct {
 	CustomerAbbreviation        types.String `tfsdk:"customer_abbreviation"`
 	CustomerName                types.String `tfsdk:"customer_name"`
 	CustomerNativeName          types.String `tfsdk:"customer_native_name"`
+	CustomerUuid                types.String `tfsdk:"customer_uuid"`
 	Description                 types.String `tfsdk:"description"`
 	ErrorMessage                types.String `tfsdk:"error_message"`
 	ErrorTraceback              types.String `tfsdk:"error_traceback"`

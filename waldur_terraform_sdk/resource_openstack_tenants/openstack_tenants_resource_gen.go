@@ -53,6 +53,9 @@ func OpenstackTenantsResourceSchema(ctx context.Context) schema.Schema {
 			"customer_native_name": schema.StringAttribute{
 				Computed: true,
 			},
+			"customer_uuid": schema.StringAttribute{
+				Computed: true,
+			},
 			"default_volume_type_name": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
@@ -222,6 +225,7 @@ type OpenstackTenantsModel struct {
 	CustomerAbbreviation        types.String `tfsdk:"customer_abbreviation"`
 	CustomerName                types.String `tfsdk:"customer_name"`
 	CustomerNativeName          types.String `tfsdk:"customer_native_name"`
+	CustomerUuid                types.String `tfsdk:"customer_uuid"`
 	DefaultVolumeTypeName       types.String `tfsdk:"default_volume_type_name"`
 	Description                 types.String `tfsdk:"description"`
 	ErrorMessage                types.String `tfsdk:"error_message"`
