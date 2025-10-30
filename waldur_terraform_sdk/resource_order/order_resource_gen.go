@@ -266,6 +266,7 @@ func OrderResourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"start_date": schema.StringAttribute{
+				Optional:            true,
 				Computed:            true,
 				Description:         "Enables delayed processing of resource provisioning order.",
 				MarkdownDescription: "Enables delayed processing of resource provisioning order.",
