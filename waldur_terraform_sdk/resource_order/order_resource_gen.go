@@ -77,9 +77,6 @@ func OrderResourceSchema(ctx context.Context) schema.Schema {
 			"created": schema.StringAttribute{
 				Computed: true,
 			},
-			"created_by": schema.StringAttribute{
-				Computed: true,
-			},
 			"created_by_civil_number": schema.StringAttribute{
 				Computed: true,
 			},
@@ -315,7 +312,6 @@ type OrderModel struct {
 	ConsumerReviewedByUsername types.String  `tfsdk:"consumer_reviewed_by_username"`
 	Cost                       types.String  `tfsdk:"cost"`
 	Created                    types.String  `tfsdk:"created"`
-	CreatedBy                  types.String  `tfsdk:"created_by"`
 	CreatedByCivilNumber       types.String  `tfsdk:"created_by_civil_number"`
 	CreatedByFullName          types.String  `tfsdk:"created_by_full_name"`
 	CreatedByUsername          types.String  `tfsdk:"created_by_username"`
