@@ -12,6 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
+	"regexp"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -262,6 +263,14 @@ func OrderResourceSchema(ctx context.Context) schema.Schema {
 			"resource_uuid": schema.StringAttribute{
 				Computed: true,
 			},
+			"slug": schema.StringAttribute{
+				Optional: true,
+				Computed: true,
+				Validators: []validator.String{
+					stringvalidator.LengthAtMost(50),
+					stringvalidator.RegexMatches(regexp.MustCompile("^[-a-zA-Z0-9_]+$"), ""),
+				},
+			},
 			"start_date": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
@@ -363,6 +372,7 @@ type OrderModel struct {
 	ResourceName               types.String  `tfsdk:"resource_name"`
 	ResourceType               types.String  `tfsdk:"resource_type"`
 	ResourceUuid               types.String  `tfsdk:"resource_uuid"`
+	Slug                       types.String  `tfsdk:"slug"`
 	StartDate                  types.String  `tfsdk:"start_date"`
 	State                      types.String  `tfsdk:"state"`
 	TerminationComment         types.String  `tfsdk:"termination_comment"`

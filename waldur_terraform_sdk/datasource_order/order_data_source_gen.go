@@ -243,6 +243,9 @@ func OrderDataSourceSchema(ctx context.Context) schema.Schema {
 			"resource_uuid": schema.StringAttribute{
 				Computed: true,
 			},
+			"slug": schema.StringAttribute{
+				Computed: true,
+			},
 			"start_date": schema.StringAttribute{
 				Computed:            true,
 				Description:         "Enables delayed processing of resource provisioning order.",
@@ -333,6 +336,7 @@ type OrderModel struct {
 	ResourceName               types.String  `tfsdk:"resource_name"`
 	ResourceType               types.String  `tfsdk:"resource_type"`
 	ResourceUuid               types.String  `tfsdk:"resource_uuid"`
+	Slug                       types.String  `tfsdk:"slug"`
 	StartDate                  types.String  `tfsdk:"start_date"`
 	State                      types.String  `tfsdk:"state"`
 	TerminationComment         types.String  `tfsdk:"termination_comment"`
