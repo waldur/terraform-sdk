@@ -291,6 +291,7 @@ func OrderResourceSchema(ctx context.Context) schema.Schema {
 						"Create",
 						"Update",
 						"Terminate",
+						"Restore",
 					),
 				},
 			},
