@@ -246,6 +246,9 @@ func OrdersDataSourceSchema(ctx context.Context) schema.Schema {
 						"old_plan_uuid": schema.StringAttribute{
 							Computed: true,
 						},
+						"order_subtype": schema.StringAttribute{
+							Computed: true,
+						},
 						"output": schema.StringAttribute{
 							Computed: true,
 						},
@@ -1241,6 +1244,24 @@ func (t OrdersType) ValueFromObject(ctx context.Context, in basetypes.ObjectValu
 			fmt.Sprintf(`old_plan_uuid expected to be basetypes.StringValue, was: %T`, oldPlanUuidAttribute))
 	}
 
+	orderSubtypeAttribute, ok := attributes["order_subtype"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`order_subtype is missing from object`)
+
+		return nil, diags
+	}
+
+	orderSubtypeVal, ok := orderSubtypeAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`order_subtype expected to be basetypes.StringValue, was: %T`, orderSubtypeAttribute))
+	}
+
 	outputAttribute, ok := attributes["output"]
 
 	if !ok {
@@ -1793,6 +1814,7 @@ func (t OrdersType) ValueFromObject(ctx context.Context, in basetypes.ObjectValu
 		OldCostEstimate:            oldCostEstimateVal,
 		OldPlanName:                oldPlanNameVal,
 		OldPlanUuid:                oldPlanUuidVal,
+		OrderSubtype:               orderSubtypeVal,
 		Output:                     outputVal,
 		Plan:                       planVal,
 		PlanDescription:            planDescriptionVal,
@@ -2662,6 +2684,24 @@ func NewOrdersValue(attributeTypes map[string]attr.Type, attributes map[string]a
 			fmt.Sprintf(`old_plan_uuid expected to be basetypes.StringValue, was: %T`, oldPlanUuidAttribute))
 	}
 
+	orderSubtypeAttribute, ok := attributes["order_subtype"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`order_subtype is missing from object`)
+
+		return NewOrdersValueUnknown(), diags
+	}
+
+	orderSubtypeVal, ok := orderSubtypeAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`order_subtype expected to be basetypes.StringValue, was: %T`, orderSubtypeAttribute))
+	}
+
 	outputAttribute, ok := attributes["output"]
 
 	if !ok {
@@ -3214,6 +3254,7 @@ func NewOrdersValue(attributeTypes map[string]attr.Type, attributes map[string]a
 		OldCostEstimate:            oldCostEstimateVal,
 		OldPlanName:                oldPlanNameVal,
 		OldPlanUuid:                oldPlanUuidVal,
+		OrderSubtype:               orderSubtypeVal,
 		Output:                     outputVal,
 		Plan:                       planVal,
 		PlanDescription:            planDescriptionVal,
@@ -3357,6 +3398,7 @@ type OrdersValue struct {
 	OldCostEstimate            basetypes.Float64Value `tfsdk:"old_cost_estimate"`
 	OldPlanName                basetypes.StringValue  `tfsdk:"old_plan_name"`
 	OldPlanUuid                basetypes.StringValue  `tfsdk:"old_plan_uuid"`
+	OrderSubtype               basetypes.StringValue  `tfsdk:"order_subtype"`
 	Output                     basetypes.StringValue  `tfsdk:"output"`
 	Plan                       basetypes.StringValue  `tfsdk:"plan"`
 	PlanDescription            basetypes.StringValue  `tfsdk:"plan_description"`
@@ -3389,7 +3431,7 @@ type OrdersValue struct {
 }
 
 func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 71)
+	attrTypes := make(map[string]tftypes.Type, 72)
 
 	var val tftypes.Value
 	var err error
@@ -3441,6 +3483,7 @@ func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 	attrTypes["old_cost_estimate"] = basetypes.Float64Type{}.TerraformType(ctx)
 	attrTypes["old_plan_name"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["old_plan_uuid"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["order_subtype"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["output"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["plan"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["plan_description"] = basetypes.StringType{}.TerraformType(ctx)
@@ -3474,7 +3517,7 @@ func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 71)
+		vals := make(map[string]tftypes.Value, 72)
 
 		val, err = v.ActivationPrice.ToTerraformValue(ctx)
 
@@ -3820,6 +3863,14 @@ func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 
 		vals["old_plan_uuid"] = val
 
+		val, err = v.OrderSubtype.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["order_subtype"] = val
+
 		val, err = v.Output.ToTerraformValue(ctx)
 
 		if err != nil {
@@ -4155,6 +4206,7 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 			"old_cost_estimate":              basetypes.Float64Type{},
 			"old_plan_name":                  basetypes.StringType{},
 			"old_plan_uuid":                  basetypes.StringType{},
+			"order_subtype":                  basetypes.StringType{},
 			"output":                         basetypes.StringType{},
 			"plan":                           basetypes.StringType{},
 			"plan_description":               basetypes.StringType{},
@@ -4234,6 +4286,7 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 		"old_cost_estimate":              basetypes.Float64Type{},
 		"old_plan_name":                  basetypes.StringType{},
 		"old_plan_uuid":                  basetypes.StringType{},
+		"order_subtype":                  basetypes.StringType{},
 		"output":                         basetypes.StringType{},
 		"plan":                           basetypes.StringType{},
 		"plan_description":               basetypes.StringType{},
@@ -4318,6 +4371,7 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 			"old_cost_estimate":              v.OldCostEstimate,
 			"old_plan_name":                  v.OldPlanName,
 			"old_plan_uuid":                  v.OldPlanUuid,
+			"order_subtype":                  v.OrderSubtype,
 			"output":                         v.Output,
 			"plan":                           v.Plan,
 			"plan_description":               v.PlanDescription,
@@ -4538,6 +4592,10 @@ func (v OrdersValue) Equal(o attr.Value) bool {
 		return false
 	}
 
+	if !v.OrderSubtype.Equal(other.OrderSubtype) {
+		return false
+	}
+
 	if !v.Output.Equal(other.Output) {
 		return false
 	}
@@ -4710,6 +4768,7 @@ func (v OrdersValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 		"old_cost_estimate":              basetypes.Float64Type{},
 		"old_plan_name":                  basetypes.StringType{},
 		"old_plan_uuid":                  basetypes.StringType{},
+		"order_subtype":                  basetypes.StringType{},
 		"output":                         basetypes.StringType{},
 		"plan":                           basetypes.StringType{},
 		"plan_description":               basetypes.StringType{},

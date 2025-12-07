@@ -188,6 +188,9 @@ func OrderResourceSchema(ctx context.Context) schema.Schema {
 			"old_plan_uuid": schema.StringAttribute{
 				Computed: true,
 			},
+			"order_subtype": schema.StringAttribute{
+				Computed: true,
+			},
 			"output": schema.StringAttribute{
 				Computed: true,
 			},
@@ -351,6 +354,7 @@ type OrderModel struct {
 	OldCostEstimate            types.Float64 `tfsdk:"old_cost_estimate"`
 	OldPlanName                types.String  `tfsdk:"old_plan_name"`
 	OldPlanUuid                types.String  `tfsdk:"old_plan_uuid"`
+	OrderSubtype               types.String  `tfsdk:"order_subtype"`
 	Output                     types.String  `tfsdk:"output"`
 	Plan                       types.String  `tfsdk:"plan"`
 	PlanDescription            types.String  `tfsdk:"plan_description"`
