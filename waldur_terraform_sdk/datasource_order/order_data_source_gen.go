@@ -167,7 +167,7 @@ func OrderDataSourceSchema(ctx context.Context) schema.Schema {
 			"offering_uuid": schema.StringAttribute{
 				Computed: true,
 			},
-			"old_cost_estimate": schema.StringAttribute{
+			"old_cost_estimate": schema.Float64Attribute{
 				Computed: true,
 			},
 			"old_plan_name": schema.StringAttribute{
@@ -312,7 +312,7 @@ type OrderModel struct {
 	OfferingThumbnail          types.String  `tfsdk:"offering_thumbnail"`
 	OfferingType               types.String  `tfsdk:"offering_type"`
 	OfferingUuid               types.String  `tfsdk:"offering_uuid"`
-	OldCostEstimate            types.String  `tfsdk:"old_cost_estimate"`
+	OldCostEstimate            types.Float64 `tfsdk:"old_cost_estimate"`
 	OldPlanName                types.String  `tfsdk:"old_plan_name"`
 	OldPlanUuid                types.String  `tfsdk:"old_plan_uuid"`
 	Output                     types.String  `tfsdk:"output"`

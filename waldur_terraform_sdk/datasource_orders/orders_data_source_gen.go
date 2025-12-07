@@ -237,7 +237,7 @@ func OrdersDataSourceSchema(ctx context.Context) schema.Schema {
 						"offering_uuid": schema.StringAttribute{
 							Computed: true,
 						},
-						"old_cost_estimate": schema.StringAttribute{
+						"old_cost_estimate": schema.Float64Attribute{
 							Computed: true,
 						},
 						"old_plan_name": schema.StringAttribute{
@@ -1197,12 +1197,12 @@ func (t OrdersType) ValueFromObject(ctx context.Context, in basetypes.ObjectValu
 		return nil, diags
 	}
 
-	oldCostEstimateVal, ok := oldCostEstimateAttribute.(basetypes.StringValue)
+	oldCostEstimateVal, ok := oldCostEstimateAttribute.(basetypes.Float64Value)
 
 	if !ok {
 		diags.AddError(
 			"Attribute Wrong Type",
-			fmt.Sprintf(`old_cost_estimate expected to be basetypes.StringValue, was: %T`, oldCostEstimateAttribute))
+			fmt.Sprintf(`old_cost_estimate expected to be basetypes.Float64Value, was: %T`, oldCostEstimateAttribute))
 	}
 
 	oldPlanNameAttribute, ok := attributes["old_plan_name"]
@@ -2618,12 +2618,12 @@ func NewOrdersValue(attributeTypes map[string]attr.Type, attributes map[string]a
 		return NewOrdersValueUnknown(), diags
 	}
 
-	oldCostEstimateVal, ok := oldCostEstimateAttribute.(basetypes.StringValue)
+	oldCostEstimateVal, ok := oldCostEstimateAttribute.(basetypes.Float64Value)
 
 	if !ok {
 		diags.AddError(
 			"Attribute Wrong Type",
-			fmt.Sprintf(`old_cost_estimate expected to be basetypes.StringValue, was: %T`, oldCostEstimateAttribute))
+			fmt.Sprintf(`old_cost_estimate expected to be basetypes.Float64Value, was: %T`, oldCostEstimateAttribute))
 	}
 
 	oldPlanNameAttribute, ok := attributes["old_plan_name"]
@@ -3354,7 +3354,7 @@ type OrdersValue struct {
 	OfferingThumbnail          basetypes.StringValue  `tfsdk:"offering_thumbnail"`
 	OfferingType               basetypes.StringValue  `tfsdk:"offering_type"`
 	OfferingUuid               basetypes.StringValue  `tfsdk:"offering_uuid"`
-	OldCostEstimate            basetypes.StringValue  `tfsdk:"old_cost_estimate"`
+	OldCostEstimate            basetypes.Float64Value `tfsdk:"old_cost_estimate"`
 	OldPlanName                basetypes.StringValue  `tfsdk:"old_plan_name"`
 	OldPlanUuid                basetypes.StringValue  `tfsdk:"old_plan_uuid"`
 	Output                     basetypes.StringValue  `tfsdk:"output"`
@@ -3438,7 +3438,7 @@ func (v OrdersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 	attrTypes["offering_thumbnail"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["offering_type"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["offering_uuid"] = basetypes.StringType{}.TerraformType(ctx)
-	attrTypes["old_cost_estimate"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["old_cost_estimate"] = basetypes.Float64Type{}.TerraformType(ctx)
 	attrTypes["old_plan_name"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["old_plan_uuid"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["output"] = basetypes.StringType{}.TerraformType(ctx)
@@ -4152,7 +4152,7 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 			"offering_thumbnail":             basetypes.StringType{},
 			"offering_type":                  basetypes.StringType{},
 			"offering_uuid":                  basetypes.StringType{},
-			"old_cost_estimate":              basetypes.StringType{},
+			"old_cost_estimate":              basetypes.Float64Type{},
 			"old_plan_name":                  basetypes.StringType{},
 			"old_plan_uuid":                  basetypes.StringType{},
 			"output":                         basetypes.StringType{},
@@ -4231,7 +4231,7 @@ func (v OrdersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 		"offering_thumbnail":             basetypes.StringType{},
 		"offering_type":                  basetypes.StringType{},
 		"offering_uuid":                  basetypes.StringType{},
-		"old_cost_estimate":              basetypes.StringType{},
+		"old_cost_estimate":              basetypes.Float64Type{},
 		"old_plan_name":                  basetypes.StringType{},
 		"old_plan_uuid":                  basetypes.StringType{},
 		"output":                         basetypes.StringType{},
@@ -4707,7 +4707,7 @@ func (v OrdersValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 		"offering_thumbnail":             basetypes.StringType{},
 		"offering_type":                  basetypes.StringType{},
 		"offering_uuid":                  basetypes.StringType{},
-		"old_cost_estimate":              basetypes.StringType{},
+		"old_cost_estimate":              basetypes.Float64Type{},
 		"old_plan_name":                  basetypes.StringType{},
 		"old_plan_uuid":                  basetypes.StringType{},
 		"output":                         basetypes.StringType{},
